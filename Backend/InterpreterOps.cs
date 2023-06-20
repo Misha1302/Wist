@@ -11,6 +11,21 @@ public static partial class Interpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CallFunc()
+    {
+        PushVariables(_consts2[_index].GetInternalInteger());
+        PushRet(_index);
+        Jmp();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void Ret()
+    {
+        PopVariables();
+        _index = PopRet();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Add()
     {
         var b = Pop();
@@ -155,7 +170,7 @@ public static partial class Interpreter
 
         Push((WistConst)res);
     }
-    
+
 
     private static WistConst CmpInternal()
     {
@@ -171,14 +186,14 @@ public static partial class Interpreter
 
         res = a.Type switch
         {
-            WistType.Number => (WistConst)(Math.Abs(a.GetNumber() - b.GetNumber()) < 0.000_000_001m),
+            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_1),
             WistType.String => (WistConst)(a.GetString() == b.GetString()),
             _ => throw new NotImplementedException()
         };
 #else
         res = a.Type switch
         {
-            WistType.Number => (WistConst)(Math.Abs(a.GetNumber() - b.GetNumber()) < 0.000_000_001m),
+            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_1),
             _ => (WistConst)(a.GetString() == b.GetString())
         };
 #endif
@@ -211,12 +226,6 @@ public static partial class Interpreter
     private static void Jmp()
     {
         _index = _consts[_index].GetInternalInteger();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void FreeVars()
-    {
-        PopVariables(_consts[_index].GetInternalInteger());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

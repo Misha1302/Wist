@@ -1,5 +1,6 @@
 namespace Backend;
 
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -7,10 +8,12 @@ using System.Runtime.InteropServices;
 public readonly struct WistConst
 {
     [FieldOffset(0)] private readonly IntPtr _ptr; // 8 bytes
-    [FieldOffset(0)] private readonly decimal _valueR; // 16 bytes
+    [FieldOffset(0)] private readonly double _valueR; // 16 bytes
     [FieldOffset(0)] private readonly long _valueL; // 8 bytes
     [FieldOffset(0)] private readonly int _valueI; // 4 bytes
+
     [FieldOffset(0)] private readonly bool _valueB; // 1-4-8 bytes
+
     // max - 16 bytes
     [FieldOffset(16)] public readonly WistType Type; // 1-4-8 bytes
 
@@ -22,17 +25,10 @@ public readonly struct WistConst
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst(decimal v)
+    public WistConst(double v)
     {
         _valueR = v;
         Type = WistType.Number;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private WistConst(bool b)
-    {
-        _valueB = b;
-        Type = WistType.Bool;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -55,9 +51,16 @@ public readonly struct WistConst
         Type = WistType.Pointer;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistConst(bool b)
+    {
+        _valueB = b;
+        Type = WistType.Bool;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public decimal GetNumber() => _valueR;
+    public double GetNumber() => _valueR;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetInternalInteger() => _valueI;
@@ -85,7 +88,7 @@ public readonly struct WistConst
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static explicit operator WistConst(decimal d) => new(d);
+    public static explicit operator WistConst(double d) => new(d);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static explicit operator WistConst(string d) => new(d);
@@ -98,7 +101,7 @@ public readonly struct WistConst
     {
         return Type switch
         {
-            WistType.Number => $"{GetNumber()}",
+            WistType.Number => $"{GetNumber().ToString("0.##############", CultureInfo.InvariantCulture)}",
             WistType.Bool => $"{GetBool()}",
             WistType.InternalInteger => $"{GetInternalInteger()}",
             WistType.Pointer => $"{GetInternalPtr()}",

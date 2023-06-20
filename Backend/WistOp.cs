@@ -1,6 +1,6 @@
 ﻿namespace Backend;
 
-public enum WistOp
+public enum WistOp : byte
 {
     PushConst,
     Add,
@@ -10,7 +10,6 @@ public enum WistOp
     CallExternalMethod,
     JmpIfTrue,
     Jmp,
-    FreeVars,
     SetVar,
     LoadVar,
     LessThan,
@@ -21,5 +20,7 @@ public enum WistOp
     Sub,
     Rem,
     Mul,
-    Div
+    Div,
+    Ret,
+    CallFunc
 }

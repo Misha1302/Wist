@@ -15,6 +15,8 @@ public static class Program
 
         // while i < 100_000_000
         image.SetLabel("while");
+
+
         image.LoadVar("i");
         image.PushConst((WistConst)100_000_000);
         image.LessThan();
@@ -34,7 +36,6 @@ public static class Program
         var s = Stopwatch.StartNew();
         Interpreter.Run(image);
         s.Stop();
-        // only 3-4% slower than python!
         Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
     }
 

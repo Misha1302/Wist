@@ -4,11 +4,18 @@ using Backend;
 using WisT;
 using WisT.WistGrammar;
 
-// only 6.94% slower than python!
 const string code = """
-let i = 0.1
-while i < 100_000_000.1 {
-    i = i + 1.1
+loop let i = 0; i < 20_100; i = i + 1 {
+    let q = IsPrime(i) 
+}
+
+func IsPrime(n) {
+    loop let i = 2; i <= (n / 2); i = i + 1 {
+        if n % i == 0 {
+            return false
+        }
+    }
+    return true
 }
 """;
 
@@ -23,4 +30,4 @@ var image = visitor.GetImage();
 
 var s = Stopwatch.StartNew();
 Interpreter.Run(image);
-Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
+Console.WriteLine($"ms: {s.ElapsedMilliseconds / 1000.0}");

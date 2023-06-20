@@ -1,12 +1,13 @@
 grammar WistGrammar;
 
 program: line* EOF;
-line: statement | ifBlock | whileBlock;
-statement: (assigment | functionCall | gotoLabel | setLabel) ('\n' | ';');
+line: statement | ifBlock | whileBlock | loopBlock | funcDecl;
+statement: (assigment | functionCall | gotoLabel | setLabel | return) ('\n' | ';');
 
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;
+loopBlock: LOOP assigment? expression assigment? block;
 assigment: (TYPE)? (IDENTIFIER | elementOfArray) '=' expression;
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 block: '{' line* '}';
@@ -14,11 +15,13 @@ gotoLabel: 'goto' IDENTIFIER;
 setLabel: IDENTIFIER ':';
 elementOfArray: IDENTIFIER '[' expression ']'; 
 arrayInit: '[' (expression)* ']';
+funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
+return: 'return' expression;
 
 expression
     : constant                              #constantExpression
-    | IDENTIFIER                            #identifierExpression
     | functionCall                          #functionalExpression
+    | IDENTIFIER                            #identifierExpression
     | elementOfArray                        #elementOfArrayExpression
     | arrayInit                             #arrayInitExpression
     | '(' expression ')'                    #parenthesizedExpression
@@ -31,10 +34,11 @@ expression
     ;
 
 
-constant: NUMBER | STRING | NULL;
+constant: NUMBER | STRING | BOOL | NULL;
 
-NUMBER: [-]? [0-9] [0-9_]* ('.' [0-9_]*)?;
+NUMBER: [-]? [0-9] [0-9_]* ('.' [0-9_]*)? ('e' ('+' | '-')? [0-9_]*)?;
 STRING: ('"' ~'"'* '"') | ('\'' ~'\''* '\'');
+BOOL: 'true' | 'false';
 NULL: 'null' | 'none';
 BOOL_OP: 'and' | 'or' | 'xor';
 MUL_OP: '*' | '/';
@@ -42,6 +46,7 @@ ADD_OP: '+' | '-';
 REM_OP: '%';
 CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 WHILE: 'while' | 'until';
+LOOP: 'loop';
 TYPE: 'let' | 'global';
 ARRAY_IDENTIFIER: '[' ']';
 WS: [ \t\r\n]+ -> skip;

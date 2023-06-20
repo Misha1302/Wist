@@ -14,7 +14,7 @@ public readonly struct WistFunction : ICloneable
     }
 
     private WistFunction WistClone() => new(CopyList(Locals), OpStartIndex);
-    
+
     public object Clone() => WistClone();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
