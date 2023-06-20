@@ -6,7 +6,7 @@ public static class Program
 {
     public static void Main(string[] args)
     {
-        WistImage image = new();
+        WistImageBuilder image = new();
 
         // i = 0
         image.CreateVar("i");
@@ -33,8 +33,9 @@ public static class Program
         image.SetLabel("end");
 
 
+        var wistFixedImage = image.Compile();
         var s = Stopwatch.StartNew();
-        Interpreter.Run(image);
+        Interpreter.Run(wistFixedImage);
         s.Stop();
         Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
     }

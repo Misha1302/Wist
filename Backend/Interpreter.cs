@@ -31,21 +31,21 @@ public static unsafe partial class Interpreter
         &Mul,
         &Div,
         &Ret,
-        &CallFunc
+        &CallFunc,
+        &Drop
     };
 
-    private static void Init(WistImage image)
+    private static void Init(WistImageObject imageObject)
     {
-        image.Compile();
-        _ops = image.GetOps().ToArray();
-        _consts = image.GetConsts().ToArray();
-        _consts2 = image.GetConsts2().ToArray();
+        _ops = imageObject.Ops.ToArray();
+        _consts = imageObject.Consts.ToArray();
+        _consts2 = imageObject.Consts2.ToArray();
     }
 
 
-    public static void Run(WistImage image)
+    public static void Run(WistImageObject imageObject)
     {
-        Init(image);
+        Init(imageObject);
 
         var len = _ops.Length;
         var ops = _ops.AsSpan();
@@ -62,5 +62,10 @@ public static unsafe partial class Interpreter
 
             Console.WriteLine(format);
         }
+    }
+
+    public static void Exit()
+    {
+        _index = _ops.Length;
     }
 }

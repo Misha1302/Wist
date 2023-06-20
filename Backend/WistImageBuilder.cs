@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-public class WistImage
+public class WistImageBuilder
 {
     private readonly List<WistConst> _consts = new();
     private readonly List<WistConst> _consts2 = new();
@@ -18,10 +18,6 @@ public class WistImage
         SetConst(c);
     }
 
-    public List<WistOp> GetOps() => _ops;
-    public List<WistConst> GetConsts() => _consts;
-
-    public List<WistConst> GetConsts2() => _consts2;
 
     public void SetLabel(string labelName)
     {
@@ -88,12 +84,6 @@ public class WistImage
         _jumps.Add((_consts.Count - 1, labelName));
     }
 
-    public void Dup()
-    {
-        _ops.Add(WistOp.Dup);
-        SetConst(default);
-    }
-
     public void CallExternalMethod(MethodInfo methodInfo)
     {
         _ops.Add(WistOp.CallExternalMethod);
@@ -120,14 +110,6 @@ public class WistImage
         if (_curFunction.name == string.Empty) return;
 
         SetLabel($"{_curFunction.name}_end");
-    }
-
-    public void Compile()
-    {
-        EndPreviousFunc();
-
-        foreach (var (ind, labelName) in _jumps)
-            _consts[ind] = WistConst.CreateInternalConst(_labels[labelName]);
     }
 
     public void SetVar(string s)
@@ -192,5 +174,25 @@ public class WistImage
         SetConst(default);
         _consts2[^1] = WistConst.CreateInternalConst(_curFunction.varsCount);
         _jumps.Add((_consts.Count - 1, funcName));
+    }
+
+    public void Drop()
+    {
+        _ops.Add(WistOp.Drop);
+        SetConst(default);
+    }
+
+
+    public WistImageObject Compile()
+    {
+        EndPreviousFunc();
+
+        var constsCopy = _consts.ToList();
+
+        foreach (var (ind, labelName) in _jumps)
+            constsCopy[ind] = WistConst.CreateInternalConst(_labels[labelName]);
+
+
+        return new WistImageObject(constsCopy, _consts2.ToList(), _ops.ToList());
     }
 }

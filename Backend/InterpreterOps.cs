@@ -11,6 +11,12 @@ public static partial class Interpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void Drop()
+    {
+        _sp--;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void CallFunc()
     {
         PushVariables(_consts2[_index].GetInternalInteger());
@@ -186,14 +192,16 @@ public static partial class Interpreter
 
         res = a.Type switch
         {
-            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_1),
+            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
             WistType.String => (WistConst)(a.GetString() == b.GetString()),
+            WistType.Null => (WistConst)(b.Type == WistType.Null),
             _ => throw new NotImplementedException()
         };
 #else
         res = a.Type switch
         {
-            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_1),
+            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
+            WistType.Null => (WistConst)(b.Type == WistType.Null),
             _ => (WistConst)(a.GetString() == b.GetString())
         };
 #endif

@@ -7,10 +7,22 @@ using WisT.WistGrammar;
 
 public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
-    private readonly WistImage _image = new();
+    private WistImageBuilder _imageBuilder = null!;
+    private int _needResultLevel;
+
+    public WistImageObject CompileCode(WistGrammarParser.ProgramContext program)
+    {
+        _imageBuilder = new WistImageBuilder();
+        _needResultLevel = 0;
+
+        Visit(program);
+
+        return GetFixedImage();
+    }
 
     public override object? VisitAssigment(WistGrammarParser.AssigmentContext context)
     {
+        _needResultLevel++;
         var type = context.TYPE()?.GetText();
         var name = context.IDENTIFIER().GetText();
 
@@ -18,13 +30,15 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             throw new NotImplementedException();
 
         if (type == "let")
-            _image.CreateVar(name);
+            _imageBuilder.CreateVar(name);
         else if (type == "var")
             throw new NotImplementedException();
 
         var expressionContext = context.expression();
         Visit(expressionContext);
-        _image.SetVar(name);
+        _imageBuilder.SetVar(name);
+
+        _needResultLevel--;
 
         return default;
     }
@@ -37,22 +51,22 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         switch (context.CMP_OP().GetText())
         {
             case ">":
-                _image.GreaterThan();
+                _imageBuilder.GreaterThan();
                 break;
             case "<":
-                _image.LessThan();
+                _imageBuilder.LessThan();
                 break;
             case "==":
-                _image.Cmp();
+                _imageBuilder.Cmp();
                 break;
             case "!=":
-                _image.NotCmp();
+                _imageBuilder.NotCmp();
                 break;
             case "<=":
-                _image.LessOrEquals();
+                _imageBuilder.LessOrEquals();
                 break;
             case ">=":
-                _image.GreaterOrEquals();
+                _imageBuilder.GreaterOrEquals();
                 break;
             default:
                 throw new NotImplementedException();
@@ -66,14 +80,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         var startName = $"while_start_{Guid.NewGuid()}";
         var endName = $"while_end_{Guid.NewGuid()}";
 
-        _image.SetLabel(startName);
+        _imageBuilder.SetLabel(startName);
         Visit(context.expression());
-        _image.JmpIfFalse(endName);
+        _imageBuilder.JmpIfFalse(endName);
 
         Visit(context.block());
 
-        _image.Jmp(startName);
-        _image.SetLabel(endName);
+        _imageBuilder.Jmp(startName);
+        _imageBuilder.SetLabel(endName);
 
         return default;
     }
@@ -81,12 +95,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitConstant(WistGrammarParser.ConstantContext context)
     {
         if (context.NUMBER() is { } i)
-            _image.PushConst(new WistConst(double.Parse(i.GetText().Replace("_", ""), NumberStyles.Any,
+            _imageBuilder.PushConst(new WistConst(double.Parse(i.GetText().Replace("_", ""), NumberStyles.Any,
                 CultureInfo.InvariantCulture)));
         else if (context.STRING() is { } s)
-            _image.PushConst(new WistConst(s.GetText()));
+            _imageBuilder.PushConst(new WistConst(s.GetText()));
         else if (context.BOOL() is { } b)
-            _image.PushConst(new WistConst(b.GetText() == "true"));
+            _imageBuilder.PushConst(new WistConst(b.GetText() == "true"));
+        else if (context.NULL() is not null)
+            _imageBuilder.PushConst(WistConst.CreateNull());
         else throw new NotImplementedException();
 
         return default;
@@ -102,36 +118,39 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         if (lineContext != null)
             Visit(lineContext); // let i = 0
 
-        _image.SetLabel(startName);
+        _imageBuilder.SetLabel(startName);
         var lineContext2 = context.expression();
         if (lineContext2 != null)
             Visit(lineContext2); // i < 10
-        _image.JmpIfFalse(endName);
+        _imageBuilder.JmpIfFalse(endName);
 
         Visit(context.block());
         var lineContext3 = context.assigment(1);
         if (lineContext3 != null)
             Visit(lineContext3); // i = i + 1
 
-        _image.Jmp(startName);
-        _image.SetLabel(endName);
+        _imageBuilder.Jmp(startName);
+        _imageBuilder.SetLabel(endName);
 
         return default;
     }
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
-        _image.CreateFunction(context.IDENTIFIER(0).GetText());
+        _imageBuilder.CreateFunction(context.IDENTIFIER(0).GetText());
 
         // handle parameters
         for (var i = context.IDENTIFIER().Length - 1; i >= 1; i--)
         {
             var name = context.IDENTIFIER(i).GetText();
-            _image.CreateVar(name);
-            _image.SetVar(name);
+            _imageBuilder.CreateVar(name);
+            _imageBuilder.SetVar(name);
         }
 
         Visit(context.block());
+
+        _imageBuilder.PushConst(WistConst.CreateNull());
+        _imageBuilder.Ret();
 
         return default;
     }
@@ -139,7 +158,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitReturn(WistGrammarParser.ReturnContext context)
     {
         Visit(context.expression());
-        _image.Ret();
+        _imageBuilder.Ret();
 
         return default;
     }
@@ -153,19 +172,19 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         // if condition
         Visit(context.expression());
 
-        _image.JmpIfFalse(endIfName);
+        _imageBuilder.JmpIfFalse(endIfName);
         // if block
         Visit(context.block());
 
-        _image.Jmp(elseEndName);
-        _image.SetLabel(endIfName);
+        _imageBuilder.Jmp(elseEndName);
+        _imageBuilder.SetLabel(endIfName);
 
         // else block
         var elseIfBlockContext = context.elseIfBlock();
         if (elseIfBlockContext != null)
             Visit(elseIfBlockContext);
 
-        _image.SetLabel(elseEndName);
+        _imageBuilder.SetLabel(elseEndName);
 
         return default;
     }
@@ -175,23 +194,27 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
 
-        _image.Rem();
+        _imageBuilder.Rem();
         return default;
     }
 
 
     public override object? VisitFunctionCall(WistGrammarParser.FunctionCallContext context)
     {
+        _needResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
+        _needResultLevel--;
 
 
         var text = context.IDENTIFIER().GetText();
         var m = typeof(BuildInFunctions).GetMethod(text, BindingFlags.Static | BindingFlags.Public);
 
         if (m is not null)
-            _image.CallExternalMethod(m);
-        else _image.CallFunc(text);
+            _imageBuilder.CallExternalMethod(m);
+        else _imageBuilder.CallFunc(text);
+
+        if (_needResultLevel == 0) _imageBuilder.Drop();
 
         return default;
     }
@@ -199,7 +222,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitIdentifierExpression(WistGrammarParser.IdentifierExpressionContext context)
     {
-        _image.LoadVar(context.IDENTIFIER().GetText());
+        _imageBuilder.LoadVar(context.IDENTIFIER().GetText());
         return default;
     }
 
@@ -210,9 +233,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             Visit(expressionContext);
 
         if (context.ADD_OP().GetText() == "+")
-            _image.Add();
+            _imageBuilder.Add();
         else
-            _image.Sub();
+            _imageBuilder.Sub();
 
         return default;
     }
@@ -223,13 +246,13 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             Visit(expressionContext);
 
         if (context.MUL_OP().GetText() == "*")
-            _image.Mul();
+            _imageBuilder.Mul();
         else
-            _image.Div();
+            _imageBuilder.Div();
 
         return default;
     }
 
 
-    public WistImage GetImage() => _image;
+    public WistImageObject GetFixedImage() => _imageBuilder.Compile();
 }

@@ -1,6 +1,6 @@
 namespace Backend;
 
-public enum WistType
+public enum WistType : byte
 {
     // ReSharper disable once UnusedMember.Global
     // None should never be used
@@ -9,5 +9,6 @@ public enum WistType
     String,
     InternalInteger,
     Bool,
-    Pointer
+    Pointer,
+    Null
 }

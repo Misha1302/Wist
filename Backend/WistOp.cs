@@ -22,5 +22,6 @@ public enum WistOp : byte
     Mul,
     Div,
     Ret,
-    CallFunc
+    CallFunc,
+    Drop
 }

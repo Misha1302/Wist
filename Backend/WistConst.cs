@@ -8,14 +8,13 @@ using System.Runtime.InteropServices;
 public readonly struct WistConst
 {
     [FieldOffset(0)] private readonly IntPtr _ptr; // 8 bytes
-    [FieldOffset(0)] private readonly double _valueR; // 16 bytes
+    [FieldOffset(0)] private readonly double _valueR; // 8 bytes
     [FieldOffset(0)] private readonly long _valueL; // 8 bytes
     [FieldOffset(0)] private readonly int _valueI; // 4 bytes
+    [FieldOffset(0)] private readonly bool _valueB; // 1 byte
 
-    [FieldOffset(0)] private readonly bool _valueB; // 1-4-8 bytes
-
-    // max - 16 bytes
-    [FieldOffset(16)] public readonly WistType Type; // 1-4-8 bytes
+    // max - 8 bytes
+    [FieldOffset(8)] public readonly WistType Type; // 1 byte
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(string v)
@@ -56,6 +55,12 @@ public readonly struct WistConst
     {
         _valueB = b;
         Type = WistType.Bool;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private WistConst(WistType t)
+    {
+        Type = t;
     }
 
 
@@ -101,13 +106,16 @@ public readonly struct WistConst
     {
         return Type switch
         {
-            WistType.Number => $"{GetNumber().ToString("0.##############", CultureInfo.InvariantCulture)}",
+            WistType.Number => $"{GetNumber().ToString(CultureInfo.InvariantCulture)}",
             WistType.Bool => $"{GetBool()}",
             WistType.InternalInteger => $"{GetInternalInteger()}",
             WistType.Pointer => $"{GetInternalPtr()}",
             WistType.String => $"{GetString()}",
-            WistType.None => "<<None>>",
+            WistType.None => "<<Undefined>>",
+            WistType.Null => "None",
             _ => throw new NotImplementedException()
         };
     }
+
+    public static WistConst CreateNull() => new(WistType.Null);
 }
