@@ -1,7 +1,6 @@
 namespace WisT;
 
 using System.Globalization;
-using System.Reflection;
 using Backend;
 using WisT.WistGrammar;
 
@@ -9,11 +8,15 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
     private WistImageBuilder _imageBuilder = null!;
     private int _needResultLevel;
+    private WistLibsManager _wistLibsManager = null!;
 
     public WistImageObject CompileCode(WistGrammarParser.ProgramContext program)
     {
         _imageBuilder = new WistImageBuilder();
+        _wistLibsManager = new WistLibsManager();
         _needResultLevel = 0;
+
+        _wistLibsManager.AddLibByType(typeof(BuildInFunctions));
 
         Visit(program);
 
@@ -98,7 +101,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _imageBuilder.PushConst(new WistConst(double.Parse(i.GetText().Replace("_", ""), NumberStyles.Any,
                 CultureInfo.InvariantCulture)));
         else if (context.STRING() is { } s)
-            _imageBuilder.PushConst(new WistConst(s.GetText()));
+            _imageBuilder.PushConst(new WistConst(s.GetText()[1..^1]));
         else if (context.BOOL() is { } b)
             _imageBuilder.PushConst(new WistConst(b.GetText() == "true"));
         else if (context.NULL() is not null)
@@ -208,13 +211,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
 
         var text = context.IDENTIFIER().GetText();
-        var m = typeof(BuildInFunctions).GetMethod(text, BindingFlags.Static | BindingFlags.Public);
+        var m = _wistLibsManager.TryGetFunction(text);
 
         if (m is not null)
             _imageBuilder.CallExternalMethod(m);
         else _imageBuilder.CallFunc(text);
 
-        if (_needResultLevel == 0) _imageBuilder.Drop();
+        if (_needResultLevel == 0)
+            _imageBuilder.Drop();
 
         return default;
     }
@@ -253,6 +257,12 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         return default;
     }
 
+    public override object? VisitDllImport(WistGrammarParser.DllImportContext context)
+    {
+        _wistLibsManager.AddLib(context.STRING().GetText()[1..^1]);
+
+        return default;
+    }
 
     public WistImageObject GetFixedImage() => _imageBuilder.Compile();
 }

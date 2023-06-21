@@ -2,7 +2,7 @@ grammar WistGrammar;
 
 program: line* EOF;
 line: statement | ifBlock | whileBlock | loopBlock | funcDecl;
-statement: (assigment | functionCall | gotoLabel | setLabel | return) ('\n' | ';');
+statement: (assigment | functionCall | gotoLabel | setLabel | return | dllImport) ('\n' | ';');
 
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
@@ -17,6 +17,7 @@ elementOfArray: IDENTIFIER '[' expression ']';
 arrayInit: '[' (expression)* ']';
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 return: 'return' expression;
+dllImport: 'import' STRING;
 
 expression
     : constant                              #constantExpression

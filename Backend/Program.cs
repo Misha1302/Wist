@@ -39,11 +39,4 @@ public static class Program
         s.Stop();
         Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
     }
-
-
-    // ReSharper disable once UnusedMember.Local
-    private static void Print()
-    {
-        Console.WriteLine($"{Interpreter.Pop()}");
-    }
 }
