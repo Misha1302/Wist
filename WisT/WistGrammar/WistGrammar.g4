@@ -4,17 +4,20 @@ program: line* EOF;
 line: statement | ifBlock | whileBlock | loopBlock | funcDecl;
 statement: (assigment | functionCall | gotoLabel | setLabel | return | dllImport) ('\n' | ';');
 
+assigment: varAssigment | elementOfArrayAssigment;
+varAssigment: (TYPE)? IDENTIFIER '=' expression;
+elementOfArrayAssigment: IDENTIFIER '[' expression ']' '=' expression;
+
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;
 loopBlock: LOOP assigment? expression assigment? block;
-assigment: (TYPE)? (IDENTIFIER | elementOfArray) '=' expression;
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 block: '{' line* '}';
 gotoLabel: 'goto' IDENTIFIER;
 setLabel: IDENTIFIER ':';
 elementOfArray: IDENTIFIER '[' expression ']'; 
-arrayInit: '[' (expression)* ']';
+arrayInit: '[' (expression (',' expression)*)? ']';
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 return: 'return' expression;
 dllImport: 'import' STRING;
@@ -24,7 +27,6 @@ expression
     | functionCall                          #functionalExpression
     | IDENTIFIER                            #identifierExpression
     | elementOfArray                        #elementOfArrayExpression
-    | arrayInit                             #arrayInitExpression
     | '(' expression ')'                    #parenthesizedExpression
     | '!' expression                        #notExpression
     | expression REM_OP expression          #remExpression
@@ -32,6 +34,7 @@ expression
     | expression ADD_OP expression          #addExpression
     | expression CMP_OP expression          #cmpExpression
     | expression BOOL_OP expression         #boolExpression
+    | arrayInit                             #arrayInitExpression
     ;
 
 
@@ -49,6 +52,5 @@ CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 WHILE: 'while' | 'until';
 LOOP: 'loop';
 TYPE: 'let' | 'global';
-ARRAY_IDENTIFIER: '[' ']';
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

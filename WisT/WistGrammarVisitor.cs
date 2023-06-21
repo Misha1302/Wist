@@ -2,11 +2,13 @@ namespace WisT;
 
 using System.Globalization;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Backend;
 using WisT.WistGrammar;
 
 public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
+    private const string MainFuncName = "Start";
     private WistImageBuilder _imageBuilder = null!;
     private int _needResultLevel;
     private string _path = string.Empty;
@@ -31,28 +33,30 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _needResultLevel = 0;
         _wistLibsManager.AddLibByType(typeof(BuildInFunctions));
 
-        _imageBuilder.CallFunc("start");
+        _imageBuilder.CallFunc(MainFuncName);
 
         Visit(program);
 
         return GetFixedImage();
     }
 
-    public override object? VisitAssigment(WistGrammarParser.AssigmentContext context)
+    public override object? VisitAssigment(WistGrammarParser.AssigmentContext context) =>
+        Visit((IParseTree)context.varAssigment() ?? context.elementOfArrayAssigment());
+
+    public override object? VisitVarAssigment(WistGrammarParser.VarAssigmentContext context)
     {
         _needResultLevel++;
         var type = context.TYPE()?.GetText();
-        var name = context.IDENTIFIER().GetText();
 
-        if (context.elementOfArray() != null)
-            throw new NotImplementedException();
+        var expressionContext = context.expression();
+
+        var name = context.IDENTIFIER().GetText();
 
         if (type == "let")
             _imageBuilder.CreateVar(name);
         else if (type == "var")
             throw new NotImplementedException();
 
-        var expressionContext = context.expression();
         Visit(expressionContext);
         _imageBuilder.SetVar(name);
 
@@ -61,10 +65,22 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         return default;
     }
 
+    public override object? VisitElementOfArrayAssigment(WistGrammarParser.ElementOfArrayAssigmentContext context)
+    {
+        _imageBuilder.LoadVar(context.IDENTIFIER().GetText()); // list
+        Visit(context.expression(1)); // value
+        Visit(context.expression(0)); // index
+
+        _imageBuilder.SetElem();
+        return default;
+    }
+
     public override object? VisitCmpExpression(WistGrammarParser.CmpExpressionContext context)
     {
+        _needResultLevel++;
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
+        _needResultLevel--;
 
         switch (context.CMP_OP().GetText())
         {
@@ -279,6 +295,39 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _wistLibsManager.AddLib(s);
         else
             CompileOtherCode(File.ReadAllText(Path.Combine(_path, s)));
+
+        return default;
+    }
+
+    public override object? VisitArrayInit(WistGrammarParser.ArrayInitContext context)
+    {
+        _imageBuilder.PushConst(new WistConst(new List<WistConst>()));
+
+        var length = context.expression().Length;
+
+        for (var i = 0; i < length; i++)
+            _imageBuilder.Dup();
+
+        for (var i = 0; i < length; i++)
+        {
+            Visit(context.expression(i));
+            _imageBuilder.AddElem();
+        }
+
+        return default;
+    }
+
+    public override object? VisitElementOfArrayExpression(WistGrammarParser.ElementOfArrayExpressionContext context)
+    {
+        Visit(context.elementOfArray());
+        return default;
+    }
+
+    public override object? VisitElementOfArray(WistGrammarParser.ElementOfArrayContext context)
+    {
+        _imageBuilder.LoadVar(context.IDENTIFIER().GetText());
+        Visit(context.expression());
+        _imageBuilder.PushElem();
 
         return default;
     }

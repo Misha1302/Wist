@@ -5,7 +5,6 @@ using Backend;
 using WisT;
 using WisT.WistGrammar;
 
-
 const string path = @"WistGrammar\Code.wst";
 var code = File.ReadAllText(path);
 
@@ -24,4 +23,5 @@ for (var i = 0; i < 1; i++)
     Interpreter.Run(wistFixedImage);
     Console.Write($"{(s.ElapsedMilliseconds / 1000.0).ToString(CultureInfo.InvariantCulture)} + ");
 }
+
 Console.Write("\b\b \b\b");

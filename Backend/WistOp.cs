@@ -22,5 +22,9 @@ public enum WistOp : byte
     Div,
     Ret,
     CallFunc,
-    Drop
+    Drop,
+    Dup,
+    SetElem,
+    PushElem,
+    AddElem
 }

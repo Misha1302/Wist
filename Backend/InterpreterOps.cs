@@ -349,4 +349,35 @@ public static partial class Interpreter
 
         Push(res);
     }
+
+    private static void Dup()
+    {
+        _stack[_sp] = _stack[_sp - 1];
+        _sp++;
+    }
+
+    private static void SetElem()
+    {
+        var index = Pop().GetNumber();
+        var elem = Pop();
+        var list = Pop();
+
+        list.GetList()[(int)(index + 0.1) - 1] = elem;
+    }
+
+    private static void PushElem()
+    {
+        var index = Pop().GetNumber();
+        var list = Pop();
+
+        Push(list.GetList()[(int)(index + 0.1) - 1]);
+    }
+
+    private static void AddElem()
+    {
+        var elem = Pop();
+        var list = Pop();
+
+        list.GetList().Add(elem);
+    }
 }

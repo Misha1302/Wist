@@ -1,1 +1,23 @@
-﻿
+﻿import "WistRandomLib.dll"
+import "WistTypeConverter.dll"
+
+
+func Start() {
+    let arr = []
+
+    loop let i = 1; i <= 10; i = i + 1 {
+        AddElem(arr, RandomReal(-10, 10))
+    }
+    
+    loop let i = 1; i < GetLen(arr); i = i + 1 {
+        loop let j = 1; j < GetLen(arr); j = j + 1 {
+            if (arr[j]) > (arr[j + 1]) {
+                let temp = arr[j]
+                arr[j] = arr[j + 1]
+                arr[j + 1] = temp
+            }
+        }
+    }
+    
+    Print(arr)
+}

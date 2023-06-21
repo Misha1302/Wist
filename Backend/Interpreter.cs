@@ -31,7 +31,11 @@ public static unsafe partial class Interpreter
         &Div,
         &Ret,
         &CallFunc,
-        &Drop
+        &Drop,
+        &Dup,
+        &SetElem,
+        &PushElem,
+        &AddElem
     };
 
     private static void Init(WistImageObject imageObject)

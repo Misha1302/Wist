@@ -115,6 +115,9 @@ public class WistImageBuilder
     public void SetVar(string s)
     {
         var ind = _localVars.IndexOf($"var<{s}>{_curFunction.name}");
+        if (ind == -1)
+            throw new WistException($"Cannot find {s} var in {_curFunction.name} func");
+
         _ops.Add(WistOp.SetVar);
         SetConst(WistConst.CreateInternalConst(ind));
     }
@@ -122,6 +125,9 @@ public class WistImageBuilder
     public void LoadVar(string s)
     {
         var ind = _localVars.IndexOf($"var<{s}>{_curFunction.name}");
+        if (ind == -1)
+            throw new WistException($"Cannot find {s} var in {_curFunction.name} func");
+
         _ops.Add(WistOp.LoadVar);
         SetConst(WistConst.CreateInternalConst(ind));
     }
@@ -200,5 +206,29 @@ public class WistImageBuilder
             _labels.TryGetValue(labelName, out var value)
                 ? value
                 : throw new WistException($"Cannot find the label or function with name: {labelName}");
+    }
+
+    public void Dup()
+    {
+        _ops.Add(WistOp.Dup);
+        SetConst(default);
+    }
+
+    public void SetElem()
+    {
+        _ops.Add(WistOp.SetElem);
+        SetConst(default);
+    }
+
+    public void PushElem()
+    {
+        _ops.Add(WistOp.PushElem);
+        SetConst(default);
+    }
+
+    public void AddElem()
+    {
+        _ops.Add(WistOp.AddElem);
+        SetConst(default);
     }
 }

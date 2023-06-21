@@ -63,6 +63,13 @@ public readonly struct WistConst
         Type = t;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistConst(List<WistConst> wistConsts)
+    {
+        _ptr = (IntPtr)GCHandle.Alloc(wistConsts);
+        Type = WistType.List;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetNumber() => _valueR;
@@ -113,9 +120,14 @@ public readonly struct WistConst
             WistType.String => $"{GetString()}",
             WistType.None => "<<Undefined>>",
             WistType.Null => "None",
+            WistType.List => $"[{string.Join(", ", GetList())}]",
             _ => throw new NotImplementedException()
         };
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => new(WistType.Null);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_ptr).Target!;
 }

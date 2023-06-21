@@ -10,5 +10,6 @@ public enum WistType : byte
     InternalInteger,
     Bool,
     Pointer,
-    Null
+    Null,
+    List
 }
