@@ -9,10 +9,10 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
     private WistImageBuilder _imageBuilder = null!;
     private int _needResultLevel;
-    private WistLibsManager _wistLibsManager = null!;
     private string _path = string.Empty;
+    private WistLibsManager _wistLibsManager = null!;
 
-    private WistGrammarVisitor(WistImageBuilder imageBuilder, WistLibsManager wistLibsManager, string s)
+    private WistGrammarVisitor(WistImageBuilder imageBuilder, WistLibsManager wistLibsManager)
     {
         _imageBuilder = imageBuilder;
         _wistLibsManager = wistLibsManager;
@@ -30,7 +30,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _wistLibsManager = new WistLibsManager();
         _needResultLevel = 0;
         _wistLibsManager.AddLibByType(typeof(BuildInFunctions));
-        
+
         _imageBuilder.CallFunc("start");
 
         Visit(program);
@@ -285,7 +285,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     private void CompileOtherCode(string s)
     {
-        var visitor = new WistGrammarVisitor(_imageBuilder, _wistLibsManager, s);
+        var visitor = new WistGrammarVisitor(_imageBuilder, _wistLibsManager);
 
         var inputStream = new AntlrInputStream(s);
         var simpleLexer = new WistGrammarLexer(inputStream);
@@ -296,5 +296,5 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         visitor.Visit(simpleContext);
     }
 
-    public WistImageObject GetFixedImage() => _imageBuilder.Compile();
+    private WistImageObject GetFixedImage() => _imageBuilder.Compile();
 }

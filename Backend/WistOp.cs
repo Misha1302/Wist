@@ -6,7 +6,6 @@ public enum WistOp : byte
     Add,
     Cmp,
     JmpIfFalse,
-    Dup,
     CallExternalMethod,
     JmpIfTrue,
     Jmp,

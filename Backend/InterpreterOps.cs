@@ -41,14 +41,14 @@ public static partial class Interpreter
 
 #if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
 
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() + b.GetNumber()),
             WistType.String => (WistConst)(a.GetString() + b.GetString()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = a.Type switch
@@ -77,7 +77,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() - b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() - b.GetNumber());
@@ -102,7 +102,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() * b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() * b.GetNumber());
@@ -127,7 +127,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() / b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() / b.GetNumber());
@@ -152,7 +152,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() % b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() % b.GetNumber());
@@ -195,7 +195,7 @@ public static partial class Interpreter
             WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
             WistType.String => (WistConst)(a.GetString() == b.GetString()),
             WistType.Null => (WistConst)(b.Type == WistType.Null),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = a.Type switch
@@ -243,12 +243,6 @@ public static partial class Interpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Dup()
-    {
-        DupTop();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe void CallExternalMethod()
     {
         ((delegate*<void>)_consts[_index].GetInternalPtr())();
@@ -275,7 +269,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() < b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() < b.GetNumber());
@@ -299,7 +293,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() > b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() > b.GetNumber());
@@ -323,7 +317,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() >= b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() >= b.GetNumber());
@@ -347,7 +341,7 @@ public static partial class Interpreter
         res = a.Type switch
         {
             WistType.Number => (WistConst)(a.GetNumber() <= b.GetNumber()),
-            _ => throw new NotImplementedException()
+            _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
 #else
         res = (WistConst)(a.GetNumber() <= b.GetNumber());

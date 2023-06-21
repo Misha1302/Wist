@@ -24,3 +24,4 @@ for (var i = 0; i < 1; i++)
     Interpreter.Run(wistFixedImage);
     Console.Write($"{(s.ElapsedMilliseconds / 1000.0).ToString(CultureInfo.InvariantCulture)} + ");
 }
+Console.Write("\b\b \b\b");

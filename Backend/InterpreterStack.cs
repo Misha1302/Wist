@@ -16,17 +16,10 @@ public static partial class Interpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst Pop() => _stack[--_sp];
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void DupTop()
-    {
-        _stack[_sp] = _stack[_sp - 1];
-        _sp++;
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void PushRet(int c) => _returnStack[_rsp++] = c;
+    private static void PushRet(int c) => _returnStack[_rsp++] = c;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int PopRet() => _returnStack[--_rsp];
+    private static int PopRet() => _returnStack[--_rsp];
 }

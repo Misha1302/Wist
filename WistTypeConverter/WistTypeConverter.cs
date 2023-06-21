@@ -20,7 +20,7 @@ public static class WistTypeConverter
             WistType.Bool => wistConst.GetBool(),
             WistType.String => string.Equals(wistConst.GetString(), "true", StringComparison.OrdinalIgnoreCase),
             WistType.Number => Math.Abs(wistConst.GetNumber() - 1) < 0.000_01,
-            _ => throw new Exception($"Cannot convert {wistConst.Type} to bool")
+            _ => throw new WistException($"Cannot convert {wistConst.Type} to bool")
         };
 
         Interpreter.Push((WistConst)result);
@@ -35,7 +35,7 @@ public static class WistTypeConverter
             WistType.Bool => wistConst.GetBool() ? 1 : 0,
             WistType.String => double.Parse(wistConst.GetString()),
             WistType.Number => wistConst.GetNumber(),
-            _ => throw new Exception($"Cannot convert {wistConst.Type} to number")
+            _ => throw new WistException($"Cannot convert {wistConst.Type} to number")
         };
 
         Interpreter.Push((WistConst)result);

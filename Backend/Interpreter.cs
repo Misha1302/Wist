@@ -15,7 +15,6 @@ public static unsafe partial class Interpreter
         &Add,
         &Cmp,
         &JmpIfFalse,
-        &Dup,
         &CallExternalMethod,
         &JmpIfTrue,
         &Jmp,

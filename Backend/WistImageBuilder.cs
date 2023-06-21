@@ -190,9 +190,15 @@ public class WistImageBuilder
         var constsCopy = _consts.ToList();
 
         foreach (var (ind, labelName) in _jumps)
-            constsCopy[ind] = WistConst.CreateInternalConst(_labels[labelName]);
+            constsCopy[ind] = WistConst.CreateInternalConst(GetLabelOrFuncPtr(labelName));
 
 
         return new WistImageObject(constsCopy, _consts2.ToList(), _ops.ToList());
+
+
+        int GetLabelOrFuncPtr(string labelName) =>
+            _labels.TryGetValue(labelName, out var value)
+                ? value
+                : throw new WistException($"Cannot find the label or function with name: {labelName}");
     }
 }
