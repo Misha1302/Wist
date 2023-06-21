@@ -1,6 +1,7 @@
 namespace WisT;
 
 using System.Globalization;
+using Antlr4.Runtime;
 using Backend;
 using WisT.WistGrammar;
 
@@ -9,14 +10,28 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     private WistImageBuilder _imageBuilder = null!;
     private int _needResultLevel;
     private WistLibsManager _wistLibsManager = null!;
+    private string _path = string.Empty;
 
-    public WistImageObject CompileCode(WistGrammarParser.ProgramContext program)
+    private WistGrammarVisitor(WistImageBuilder imageBuilder, WistLibsManager wistLibsManager, string s)
     {
+        _imageBuilder = imageBuilder;
+        _wistLibsManager = wistLibsManager;
+        _needResultLevel = 0;
+    }
+
+    public WistGrammarVisitor()
+    {
+    }
+
+    public WistImageObject CompileCode(WistGrammarParser.ProgramContext program, string path)
+    {
+        _path = path;
         _imageBuilder = new WistImageBuilder();
         _wistLibsManager = new WistLibsManager();
         _needResultLevel = 0;
-
         _wistLibsManager.AddLibByType(typeof(BuildInFunctions));
+        
+        _imageBuilder.CallFunc("start");
 
         Visit(program);
 
@@ -259,9 +274,26 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitDllImport(WistGrammarParser.DllImportContext context)
     {
-        _wistLibsManager.AddLib(context.STRING().GetText()[1..^1]);
+        var s = context.STRING().GetText()[1..^1];
+        if (s.EndsWith("dll"))
+            _wistLibsManager.AddLib(s);
+        else
+            CompileOtherCode(File.ReadAllText(Path.Combine(_path, s)));
 
         return default;
+    }
+
+    private void CompileOtherCode(string s)
+    {
+        var visitor = new WistGrammarVisitor(_imageBuilder, _wistLibsManager, s);
+
+        var inputStream = new AntlrInputStream(s);
+        var simpleLexer = new WistGrammarLexer(inputStream);
+        var commonTokenStream = new CommonTokenStream(simpleLexer);
+        var simpleParser = new WistGrammarParser(commonTokenStream);
+        var simpleContext = simpleParser.program();
+
+        visitor.Visit(simpleContext);
     }
 
     public WistImageObject GetFixedImage() => _imageBuilder.Compile();

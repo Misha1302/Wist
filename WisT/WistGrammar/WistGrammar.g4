@@ -51,5 +51,4 @@ LOOP: 'loop';
 TYPE: 'let' | 'global';
 ARRAY_IDENTIFIER: '[' ']';
 WS: [ \t\r\n]+ -> skip;
-SINGLE_COMMENT: ('#' [.]* '\n') -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

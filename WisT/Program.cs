@@ -5,17 +5,9 @@ using Backend;
 using WisT;
 using WisT.WistGrammar;
 
-// only 13.5% slower than python
-const string code = """
-import "WistRandomLib.dll"
-import "WistTypeConverter.dll"
 
-loop let i = 0; i < 10; i = i + 1 {
-    Print('random int: ' + ToStr(RandomInteger(-10, 10)))
-    Print('random real: '  + ToStr(RandomReal(-10, 10)))
-    Print('')
-}
-""";
+const string path = @"WistGrammar\Code.wst";
+var code = File.ReadAllText(path);
 
 var inputStream = new AntlrInputStream(code);
 var simpleLexer = new WistGrammarLexer(inputStream);
@@ -23,7 +15,7 @@ var commonTokenStream = new CommonTokenStream(simpleLexer);
 var simpleParser = new WistGrammarParser(commonTokenStream);
 var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
-var wistFixedImage = visitor.CompileCode(simpleContext);
+var wistFixedImage = visitor.CompileCode(simpleContext, "WistGrammar");
 
 
 for (var i = 0; i < 1; i++)

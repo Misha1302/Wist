@@ -21,15 +21,23 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Antlr4.Runtime" Version="4.6.6"/>
+        <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="WistGrammar\WistGrammar.g4"/>
+        <Content Include="WistGrammar\WistGrammar.g4">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="WistGrammar\Code.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="WistGrammar\OtherCode.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Backend\Backend.csproj"/>
+        <ProjectReference Include="..\Backend\Backend.csproj" />
     </ItemGroup>
 
 </Project>
