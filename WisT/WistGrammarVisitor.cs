@@ -191,7 +191,10 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitReturn(WistGrammarParser.ReturnContext context)
     {
+        _needResultLevel++;
         Visit(context.expression());
+        _needResultLevel--;
+        
         _imageBuilder.Ret();
 
         return default;
