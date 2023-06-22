@@ -14,13 +14,15 @@ var commonTokenStream = new CommonTokenStream(simpleLexer);
 var simpleParser = new WistGrammarParser(commonTokenStream);
 var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
-var wistFixedImage = visitor.CompileCode(simpleContext, "WistGrammar");
+visitor.CompileCode(simpleContext, "WistGrammar", false);
 
 
 for (var i = 0; i < 1; i++)
 {
+    WistImageObject wistImageObject = visitor.GetFixedImage();
+    
     var s = Stopwatch.StartNew();
-    Interpreter.Run(wistFixedImage);
+    Interpreter.Run(wistImageObject);
     Console.Write($"{(s.ElapsedMilliseconds / 1000.0).ToString(CultureInfo.InvariantCulture)} + ");
 }
 

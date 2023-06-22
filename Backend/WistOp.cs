@@ -9,8 +9,8 @@ public enum WistOp : byte
     CallExternalMethod,
     JmpIfTrue,
     Jmp,
-    SetVar,
-    LoadVar,
+    SetLocal,
+    LoadLocal,
     LessThan,
     GreaterThan,
     NotCmp,
@@ -26,5 +26,7 @@ public enum WistOp : byte
     Dup,
     SetElem,
     PushElem,
-    AddElem
+    AddElem,
+    SetGlobal,
+    LoadGlobal
 }

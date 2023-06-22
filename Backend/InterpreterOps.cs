@@ -237,7 +237,7 @@ public static partial class Interpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetVar()
+    private static void SetLocal()
     {
         SetCurVar(_consts[_index].GetInternalInteger(), Pop());
     }
@@ -249,9 +249,21 @@ public static partial class Interpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LoadVar()
+    private static void LoadLocal()
     {
         Push(GetCurVar(_consts[_index].GetInternalInteger()));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void LoadGlobal()
+    {
+        Push(GetGlobalVar(_consts[_index].GetInternalInteger()));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void SetGlobal()
+    {
+        SetGlobalVar(_consts[_index].GetInternalInteger(), Pop());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -9,24 +9,24 @@ public static class Program
         WistImageBuilder image = new();
 
         // i = 0
-        image.CreateVar("i");
+        image.CreateLocal("i");
         image.PushConst((WistConst)0);
-        image.SetVar("i");
+        image.SetLocal("i");
 
         // while i < 100_000_000
         image.SetLabel("while");
 
 
-        image.LoadVar("i");
+        image.LoadLocal("i");
         image.PushConst((WistConst)100_000_000);
         image.LessThan();
         image.JmpIfFalse("end");
 
         // i = i + 1
-        image.LoadVar("i");
+        image.LoadLocal("i");
         image.PushConst((WistConst)1);
         image.Add();
-        image.SetVar("i");
+        image.SetLocal("i");
         image.Jmp("while");
 
         // end

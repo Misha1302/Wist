@@ -6,11 +6,12 @@ public class WistImageBuilder
 {
     private readonly List<WistConst> _consts = new();
     private readonly List<WistConst> _consts2 = new();
+    private readonly List<string> _globals = new();
     private readonly List<(int jmpInd, string labelName)> _jumps = new();
     private readonly Dictionary<string, int> _labels = new();
-    private readonly List<string> _localVars = new();
+    private readonly List<string> _locals = new();
     private readonly List<WistOp> _ops = new();
-    private (string name, int varsCount) _curFunction = (string.Empty, 0);
+    private (string name, int localsCount) _curFunction = (string.Empty, 0);
 
     public void PushConst(WistConst c)
     {
@@ -90,10 +91,15 @@ public class WistImageBuilder
         SetConst(WistConst.CreateInternalConst(methodInfo.MethodHandle.GetFunctionPointer()));
     }
 
-    public void CreateVar(string name)
+    public void CreateLocal(string name)
     {
-        _curFunction.varsCount++;
-        _localVars.Add($"var<{name}>{_curFunction.name}");
+        _curFunction.localsCount++;
+        _locals.Add($"local<{name}>{_curFunction.name}");
+    }
+
+    public void CreateGlobal(string name)
+    {
+        _globals.Add(name);
     }
 
     public void CreateFunction(string name)
@@ -110,25 +116,22 @@ public class WistImageBuilder
         if (_curFunction.name == string.Empty) return;
 
         SetLabel($"{_curFunction.name}_end");
+        _curFunction = (string.Empty, 0);
     }
 
-    public void SetVar(string s)
+    public void SetLocal(string s)
     {
-        var ind = _localVars.IndexOf($"var<{s}>{_curFunction.name}");
-        if (ind == -1)
-            throw new WistException($"Cannot find {s} var in {_curFunction.name} func");
+        var ind = FindLocal(s);
 
-        _ops.Add(WistOp.SetVar);
+        _ops.Add(WistOp.SetLocal);
         SetConst(WistConst.CreateInternalConst(ind));
     }
 
-    public void LoadVar(string s)
+    public void LoadLocal(string s)
     {
-        var ind = _localVars.IndexOf($"var<{s}>{_curFunction.name}");
-        if (ind == -1)
-            throw new WistException($"Cannot find {s} var in {_curFunction.name} func");
+        var ind = FindLocal(s);
 
-        _ops.Add(WistOp.LoadVar);
+        _ops.Add(WistOp.LoadLocal);
         SetConst(WistConst.CreateInternalConst(ind));
     }
 
@@ -178,7 +181,7 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.CallFunc);
         SetConst(default);
-        _consts2[^1] = WistConst.CreateInternalConst(_curFunction.varsCount);
+        _consts2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
         _jumps.Add((_consts.Count - 1, funcName));
     }
 
@@ -193,19 +196,38 @@ public class WistImageBuilder
     {
         EndPreviousFunc();
 
-        var constsCopy = _consts.ToList();
+        var constsCopy = CopyListConsts(_consts);
 
         foreach (var (ind, labelName) in _jumps)
             constsCopy[ind] = WistConst.CreateInternalConst(GetLabelOrFuncPtr(labelName));
 
 
-        return new WistImageObject(constsCopy, _consts2.ToList(), _ops.ToList());
+        return new WistImageObject(constsCopy, CopyListConsts(_consts2), _ops.ToList());
 
 
         int GetLabelOrFuncPtr(string labelName) =>
             _labels.TryGetValue(labelName, out var value)
                 ? value
                 : throw new WistException($"Cannot find the label or function with name: {labelName}");
+
+        List<WistConst> CopyListConsts(List<WistConst> consts)
+        {
+            var lst = new List<WistConst>();
+
+            foreach (var c in consts)
+                if (c.Type != WistType.List)
+                {
+                    lst.Add(c);
+                }
+                else
+                {
+                    var wistConsts = c.GetList();
+                    var list = wistConsts.ToList();
+                    lst.Add(new WistConst(list));
+                }
+
+            return lst;
+        }
     }
 
     public void Dup()
@@ -230,5 +252,47 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.AddElem);
         SetConst(default);
+    }
+
+    public void SetGlobal(string name)
+    {
+        var ind = FindGlobal(name);
+
+        _ops.Add(WistOp.SetGlobal);
+        SetConst(WistConst.CreateInternalConst(ind));
+    }
+
+    public void LoadGlobal(string name)
+    {
+        var ind = FindGlobal(name);
+
+        _ops.Add(WistOp.LoadGlobal);
+        SetConst(WistConst.CreateInternalConst(ind));
+    }
+
+    private int FindGlobal(string name)
+    {
+        var ind = _globals.IndexOf(name);
+        return ind == -1 ? throw new WistException($"Cannot find {name} global") : ind;
+    }
+
+    private int FindLocal(string name)
+    {
+        var ind = _locals.IndexOf($"local<{name}>{_curFunction.name}");
+        return ind == -1 ? throw new WistException($"Cannot find {name} local in {_curFunction.name} func") : ind;
+    }
+
+    public bool IsLocal(string name) => _locals.Contains($"local<{name}>{_curFunction.name}");
+
+    public void LoadGlobalOrLocal(string name)
+    {
+        if (IsLocal(name)) LoadLocal(name);
+        else LoadGlobal(name);
+    }
+
+    public void SetGlobalOrLocal(string name)
+    {
+        if (IsLocal(name)) SetLocal(name);
+        else SetGlobal(name);
     }
 }

@@ -25,7 +25,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     {
     }
 
-    public WistImageObject CompileCode(WistGrammarParser.ProgramContext program, string path)
+    public WistImageObject CompileCode(WistGrammarParser.ProgramContext program, string path, bool retImage = true)
     {
         _path = path;
         _imageBuilder = new WistImageBuilder();
@@ -37,7 +37,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
         Visit(program);
 
-        return GetFixedImage();
+        return retImage ? GetFixedImage() : default!;
     }
 
     public override object? VisitAssigment(WistGrammarParser.AssigmentContext context) =>
@@ -52,13 +52,15 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
         var name = context.IDENTIFIER().GetText();
 
-        if (type == "let")
-            _imageBuilder.CreateVar(name);
-        else if (type == "var")
-            throw new NotImplementedException();
-
         Visit(expressionContext);
-        _imageBuilder.SetVar(name);
+
+        if (type == "let")
+            _imageBuilder.CreateLocal(name);
+        else if (type == "var")
+            _imageBuilder.CreateGlobal(name);
+
+        _imageBuilder.SetGlobalOrLocal(name);
+
 
         _needResultLevel--;
 
@@ -67,7 +69,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitElementOfArrayAssigment(WistGrammarParser.ElementOfArrayAssigmentContext context)
     {
-        _imageBuilder.LoadVar(context.IDENTIFIER().GetText()); // list
+        _imageBuilder.LoadGlobalOrLocal(context.IDENTIFIER().GetText()); // list
         Visit(context.expression(1)); // value
         Visit(context.expression(0)); // index
 
@@ -177,8 +179,8 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         for (var i = context.IDENTIFIER().Length - 1; i >= 1; i--)
         {
             var name = context.IDENTIFIER(i).GetText();
-            _imageBuilder.CreateVar(name);
-            _imageBuilder.SetVar(name);
+            _imageBuilder.CreateLocal(name);
+            _imageBuilder.SetLocal(name);
         }
 
         Visit(context.block());
@@ -194,7 +196,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _needResultLevel++;
         Visit(context.expression());
         _needResultLevel--;
-        
+
         _imageBuilder.Ret();
 
         return default;
@@ -260,7 +262,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitIdentifierExpression(WistGrammarParser.IdentifierExpressionContext context)
     {
-        _imageBuilder.LoadVar(context.IDENTIFIER().GetText());
+        _imageBuilder.LoadGlobalOrLocal(context.IDENTIFIER().GetText());
         return default;
     }
 
@@ -328,7 +330,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitElementOfArray(WistGrammarParser.ElementOfArrayContext context)
     {
-        _imageBuilder.LoadVar(context.IDENTIFIER().GetText());
+        _imageBuilder.LoadGlobalOrLocal(context.IDENTIFIER().GetText());
         Visit(context.expression());
         _imageBuilder.PushElem();
 
@@ -348,5 +350,5 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         visitor.Visit(simpleContext);
     }
 
-    private WistImageObject GetFixedImage() => _imageBuilder.Compile();
+    public WistImageObject GetFixedImage() => _imageBuilder.Compile();
 }

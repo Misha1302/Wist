@@ -24,9 +24,9 @@ dllImport: 'import' STRING;
 
 expression
     : constant                              #constantExpression
+    | elementOfArray                        #elementOfArrayExpression
     | functionCall                          #functionalExpression
     | IDENTIFIER                            #identifierExpression
-    | elementOfArray                        #elementOfArrayExpression
     | '(' expression ')'                    #parenthesizedExpression
     | '!' expression                        #notExpression
     | expression REM_OP expression          #remExpression
@@ -51,6 +51,6 @@ REM_OP: '%';
 CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 WHILE: 'while' | 'until';
 LOOP: 'loop';
-TYPE: 'let' | 'global';
+TYPE: 'let' | 'var';
 WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

@@ -4,10 +4,10 @@ using System.Runtime.CompilerServices;
 
 public static partial class Interpreter
 {
-    private static readonly WistConst[] _stack = new WistConst[512 * 2 * 2];
+    private static readonly WistConst[] _stack = new WistConst[32768];
     private static int _sp;
 
-    private static readonly int[] _returnStack = new int[512];
+    private static readonly int[] _returnStack = new int[32768];
     private static int _rsp;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
