@@ -2,27 +2,14 @@
 import "WistTypeConverter.dll"
 
 func Start() {
-    var myGlobalArray = []
-
-    CreateMyGlobalArray()
-    SortMyGlobalArray()
-    Print(myGlobalArray)
+    let user = new MySuperClass();
+    Print(user);
+    user.name = "Hi!";
+    Print(user);
+    user.age = 12;
+    Print(user);
+    Print(user.name);
+    Print(user.age);
 }
 
-func SortMyGlobalArray() {
-    loop let i = 1; i < GetLen(myGlobalArray); i = i + 1 {
-        loop let j = 1; j < GetLen(myGlobalArray); j = j + 1 {
-            if (myGlobalArray[j]) > (myGlobalArray[j + 1]) {
-                let temp = myGlobalArray[j]
-                myGlobalArray[j] = myGlobalArray[j + 1]
-                myGlobalArray[j + 1] = temp
-            }
-        }
-    }
-}
-
-func CreateMyGlobalArray() {
-    loop let i = 1; i <= 10; i = i + 1 {
-        AddElem(myGlobalArray, RandomReal(-10, 10))
-    }
-}
+class MySuperClass(name, age) { }

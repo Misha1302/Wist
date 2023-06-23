@@ -37,7 +37,10 @@ public static unsafe partial class Interpreter
         &PushElem,
         &AddElem,
         &SetGlobal,
-        &LoadGlobal
+        &LoadGlobal,
+        &CopyClass,
+        &SetField,
+        &LoadField
     };
 
     private static void Init(WistImageObject imageObject)
@@ -55,14 +58,12 @@ public static unsafe partial class Interpreter
         var len = _ops.Length;
         var ops = _ops.AsSpan();
 
-        var q = 0;
         for (_index = 0; _index < len; _index++)
         {
             var wistOp = ops[_index];
             _functions[(int)wistOp]();
 
 
-            //if(q++ > 100) break;
             continue;
             var format = $"{wistOp} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";

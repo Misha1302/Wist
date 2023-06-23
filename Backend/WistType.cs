@@ -11,5 +11,6 @@ public enum WistType : byte
     Bool,
     Pointer,
     Null,
-    List
+    List,
+    Class
 }

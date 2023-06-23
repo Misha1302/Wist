@@ -4,8 +4,10 @@ using System.Reflection;
 
 public class WistImageBuilder
 {
-    private readonly List<WistConst> _consts = new();
-    private readonly List<WistConst> _consts2 = new();
+    private readonly List<WistBuilderClass> _classes = new();
+    private readonly List<(int ind, string c)> _classInserts = new();
+    private readonly List<WistConst> _constants = new();
+    private readonly List<WistConst> _constants2 = new();
     private readonly List<string> _globals = new();
     private readonly List<(int jmpInd, string labelName)> _jumps = new();
     private readonly Dictionary<string, int> _labels = new();
@@ -28,8 +30,8 @@ public class WistImageBuilder
 
     private void SetConst(WistConst c)
     {
-        _consts.Add(c);
-        _consts2.Add(default);
+        _constants.Add(c);
+        _constants2.Add(default);
     }
 
     public void Add()
@@ -66,7 +68,7 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.JmpIfFalse);
         SetConst(default);
-        _jumps.Add((_consts.Count - 1, labelName));
+        _jumps.Add((_constants.Count - 1, labelName));
     }
 
 
@@ -74,7 +76,7 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.JmpIfTrue);
         SetConst(default);
-        _jumps.Add((_consts.Count - 1, labelName));
+        _jumps.Add((_constants.Count - 1, labelName));
     }
 
 
@@ -82,7 +84,7 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.Jmp);
         SetConst(default);
-        _jumps.Add((_consts.Count - 1, labelName));
+        _jumps.Add((_constants.Count - 1, labelName));
     }
 
     public void CallExternalMethod(MethodInfo methodInfo)
@@ -181,8 +183,8 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.CallFunc);
         SetConst(default);
-        _consts2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
-        _jumps.Add((_consts.Count - 1, funcName));
+        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+        _jumps.Add((_constants.Count - 1, funcName));
     }
 
     public void Drop()
@@ -196,13 +198,21 @@ public class WistImageBuilder
     {
         EndPreviousFunc();
 
-        var constsCopy = CopyListConsts(_consts);
+        var constantsCopy = CopyListConstants(_constants);
 
         foreach (var (ind, labelName) in _jumps)
-            constsCopy[ind] = WistConst.CreateInternalConst(GetLabelOrFuncPtr(labelName));
+            constantsCopy[ind] = WistConst.CreateInternalConst(GetLabelOrFuncPtr(labelName));
+
+        foreach (var (ind, className) in _classInserts)
+            constantsCopy[ind] = new WistConst(GetClass(className));
 
 
-        return new WistImageObject(constsCopy, CopyListConsts(_consts2), _ops.ToList());
+        return new WistImageObject(constantsCopy, CopyListConstants(_constants2), _ops.ToList());
+
+
+        WistClass GetClass(string name) =>
+            CreateWistClass(_classes.Find(x => x.Name == name)
+                            ?? throw new WistException($"Cannot find the label or function with name: {name}"));
 
 
         int GetLabelOrFuncPtr(string labelName) =>
@@ -210,23 +220,16 @@ public class WistImageBuilder
                 ? value
                 : throw new WistException($"Cannot find the label or function with name: {labelName}");
 
-        List<WistConst> CopyListConsts(List<WistConst> consts)
+        
+        WistClass CreateWistClass(WistBuilderClass c) =>
+            new(c.Fields.Select(x => (x.GetHashCode(), WistConst.CreateNull())).ToArray());
+
+        
+        List<WistConst> CopyListConstants(IEnumerable<WistConst> constants)
         {
-            var lst = new List<WistConst>();
-
-            foreach (var c in consts)
-                if (c.Type != WistType.List)
-                {
-                    lst.Add(c);
-                }
-                else
-                {
-                    var wistConsts = c.GetList();
-                    var list = wistConsts.ToList();
-                    lst.Add(new WistConst(list));
-                }
-
-            return lst;
+            return constants.Select(c => c.Type != WistType.List
+                ? c
+                : new WistConst(c.GetList().ToList())).ToList();
         }
     }
 
@@ -294,5 +297,31 @@ public class WistImageBuilder
     {
         if (IsLocal(name)) SetLocal(name);
         else SetGlobal(name);
+    }
+
+    public void CreateClass(string name, List<string> fields)
+    {
+        _classes.Add(new WistBuilderClass(name, fields));
+    }
+
+    public void InstantiateClass(string name)
+    {
+        _ops.Add(WistOp.CopyClass);
+        SetConst(default);
+        _classInserts.Add((_constants.Count - 1, name));
+    }
+
+    private record WistBuilderClass(string Name, List<string> Fields);
+
+    public void SetField(string name)
+    {
+        _ops.Add(WistOp.SetField);
+        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
+    }
+
+    public void LoadField(string name)
+    {
+        _ops.Add(WistOp.LoadField);
+        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
     }
 }

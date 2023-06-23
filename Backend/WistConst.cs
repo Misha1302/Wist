@@ -24,6 +24,13 @@ public readonly struct WistConst
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistConst(WistClass c)
+    {
+        _ptr = (nint)GCHandle.Alloc(c);
+        Type = WistType.Class;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(double v)
     {
         _valueR = v;
@@ -82,6 +89,13 @@ public readonly struct WistConst
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool GetBool() => _valueB;
+    
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_ptr).Target!;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistClass GetClass() => (WistClass)(((GCHandle)_ptr).Target ?? throw new InvalidOperationException());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetString() => Marshal.PtrToStringUni(_ptr)!;
@@ -121,13 +135,11 @@ public readonly struct WistConst
             WistType.None => "<<Undefined>>",
             WistType.Null => "None",
             WistType.List => $"[{string.Join(", ", GetList())}]",
-            _ => throw new NotImplementedException()
+            WistType.Class => $"{{{GetClass()}}}",
+            _ => throw new WistException($"Unknown type - {Type}")
         };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => new(WistType.Null);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_ptr).Target!;
 }

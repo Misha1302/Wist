@@ -28,5 +28,8 @@ public enum WistOp : byte
     PushElem,
     AddElem,
     SetGlobal,
-    LoadGlobal
+    LoadGlobal,
+    CopyClass,
+    SetField,
+    LoadField
 }

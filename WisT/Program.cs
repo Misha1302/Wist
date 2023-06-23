@@ -20,6 +20,7 @@ visitor.CompileCode(simpleContext, "WistGrammar", false);
 for (var i = 0; i < 1; i++)
 {
     var wistImageObject = visitor.GetFixedImage();
+    Console.WriteLine(wistImageObject);
 
     var s = Stopwatch.StartNew();
     Interpreter.Run(wistImageObject);

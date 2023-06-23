@@ -1,10 +1,11 @@
 grammar WistGrammar;
 
 program: line* EOF;
-line: statement | ifBlock | whileBlock | loopBlock | funcDecl;
-statement: (assigment | functionCall | gotoLabel | setLabel | return | dllImport) ('\n' | ';');
+line: statement | ifBlock | whileBlock | loopBlock | funcDecl | classDecl;
+statement: (functionCall | gotoLabel | setLabel | return | dllImport | assigment) ('\n' | ';');
 
-assigment: varAssigment | elementOfArrayAssigment;
+assigment: varAssigment | elementOfArrayAssigment | fieldAssigment;
+fieldAssigment: expression '.' IDENTIFIER '=' expression;
 varAssigment: (TYPE)? IDENTIFIER '=' expression;
 elementOfArrayAssigment: IDENTIFIER '[' expression ']' '=' expression;
 
@@ -21,6 +22,8 @@ arrayInit: '[' (expression (',' expression)*)? ']';
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 return: 'return' expression;
 dllImport: 'import' STRING;
+classDecl: 'class' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
+classInit: 'new' IDENTIFIER '(' ')';
 
 expression
     : constant                              #constantExpression
@@ -35,6 +38,8 @@ expression
     | expression CMP_OP expression          #cmpExpression
     | expression BOOL_OP expression         #boolExpression
     | arrayInit                             #arrayInitExpression
+    | classInit                             #classInitExpression
+    | expression '.' IDENTIFIER             #fieldExpression
     ;
 
 

@@ -261,6 +261,26 @@ public static partial class Interpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CopyClass()
+    {
+        Push(new WistConst(_consts[_index].GetClass().Copy()));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void SetField()
+    {
+        var value = Pop();
+        var c = Pop().GetClass();
+        c.SetField(_consts[_index].GetInternalInteger(), value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void LoadField()
+    {
+        Push(Pop().GetClass().GetField(_consts[_index].GetInternalInteger()));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void SetGlobal()
     {
         SetGlobalVar(_consts[_index].GetInternalInteger(), Pop());

@@ -25,6 +25,28 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     {
     }
 
+    public override object? VisitClassDecl(WistGrammarParser.ClassDeclContext context)
+    {
+        _imageBuilder.CreateClass(
+            context.IDENTIFIER(0).GetText(),
+            context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToList()
+        );
+
+        return default;
+    }
+
+    public override object? VisitClassInitExpression(WistGrammarParser.ClassInitExpressionContext context)
+    {
+        Visit(context.classInit());
+        return default;
+    }
+
+    public override object? VisitClassInit(WistGrammarParser.ClassInitContext context)
+    {
+        _imageBuilder.InstantiateClass(context.IDENTIFIER().GetText());
+        return default;
+    }
+
     public WistImageObject CompileCode(WistGrammarParser.ProgramContext program, string path, bool retImage = true)
     {
         _path = path;
@@ -41,7 +63,22 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     }
 
     public override object? VisitAssigment(WistGrammarParser.AssigmentContext context) =>
-        Visit((IParseTree)context.varAssigment() ?? context.elementOfArrayAssigment());
+        Visit((IParseTree)context.varAssigment() ?? (IParseTree)context.elementOfArrayAssigment() ?? context.fieldAssigment());
+
+    public override object? VisitFieldAssigment(WistGrammarParser.FieldAssigmentContext context)
+    {
+        Visit(context.expression(0)); // class
+        Visit(context.expression(1)); // value
+        _imageBuilder.SetField(context.IDENTIFIER().GetText());
+        return default;
+    }
+
+    public override object? VisitFieldExpression(WistGrammarParser.FieldExpressionContext context)
+    {
+        Visit(context.expression()); // class
+        _imageBuilder.LoadField(context.IDENTIFIER().GetText());
+        return default;
+    }
 
     public override object? VisitVarAssigment(WistGrammarParser.VarAssigmentContext context)
     {
