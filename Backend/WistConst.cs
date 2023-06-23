@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct WistConst
 {
-    [FieldOffset(0)] private readonly IntPtr _ptr; // 8 bytes
+    [FieldOffset(0)] private readonly nint _ptr; // 8 bytes
     [FieldOffset(0)] private readonly double _valueR; // 8 bytes
     [FieldOffset(0)] private readonly long _valueL; // 8 bytes
     [FieldOffset(0)] private readonly int _valueI; // 4 bytes
@@ -34,7 +34,7 @@ public readonly struct WistConst
     public static WistConst CreateInternalConst(int i) => new(i);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst CreateInternalConst(IntPtr i) => new(i);
+    public static WistConst CreateInternalConst(nint i) => new(i);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private WistConst(int i)
@@ -44,7 +44,7 @@ public readonly struct WistConst
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private WistConst(IntPtr i)
+    private WistConst(nint i)
     {
         _ptr = i;
         Type = WistType.Pointer;
@@ -66,7 +66,7 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(List<WistConst> wistConsts)
     {
-        _ptr = (IntPtr)GCHandle.Alloc(wistConsts);
+        _ptr = (nint)GCHandle.Alloc(wistConsts);
         Type = WistType.List;
     }
 
@@ -78,7 +78,7 @@ public readonly struct WistConst
     public int GetInternalInteger() => _valueI;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IntPtr GetInternalPtr() => _ptr;
+    public nint GetInternalPtr() => _ptr;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool GetBool() => _valueB;

@@ -10,8 +10,7 @@ public class WistLibsManager
     public void AddLib(string s)
     {
         foreach (var t in Assembly.LoadFrom(s).GetTypes().Where(t1 => t1.IsDefined(typeof(WistLibAttribute))))
-            foreach (var m in t.GetMethods().Where(x => x.IsDefined(typeof(WistLibFunctionAttribute))))
-                _functions.TryAdd(m.Name, m);
+            AddLibByType(t);
     }
 
     public void AddLibByType(Type t)

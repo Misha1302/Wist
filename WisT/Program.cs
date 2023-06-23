@@ -19,8 +19,8 @@ visitor.CompileCode(simpleContext, "WistGrammar", false);
 
 for (var i = 0; i < 1; i++)
 {
-    WistImageObject wistImageObject = visitor.GetFixedImage();
-    
+    var wistImageObject = visitor.GetFixedImage();
+
     var s = Stopwatch.StartNew();
     Interpreter.Run(wistImageObject);
     Console.Write($"{(s.ElapsedMilliseconds / 1000.0).ToString(CultureInfo.InvariantCulture)} + ");

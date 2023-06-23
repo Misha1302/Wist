@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 
-public static class Program
+public static class WistProgram
 {
     public static void Main(string[] args)
     {
