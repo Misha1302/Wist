@@ -1,15 +1,16 @@
-﻿import "WistRandomLib.dll"
-import "WistTypeConverter.dll"
+﻿import "WistRandomLib.dll";
+import "WistTypeConverter.dll";
 
 func Start() {
-    let user = new MySuperClass()
-    Print(user)
-    user.name = "Hi!"
-    Print(user)
-    user.age = 12
-    Print(user)
-    Print(user.name)
-    Print(user.age)
+    let user = new MySuperClass();
+    user.age = 10;
+    loop let i = 0; i < 0; i = i + 1 {
+        
+    }
+    Print(1);
+    Print(user.age);
+    Print(1);
 }
+
 
 class MySuperClass(name, age) { }

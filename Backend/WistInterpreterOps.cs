@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-public static partial class Interpreter
+public static partial class WistInterpreter
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void PushConst()

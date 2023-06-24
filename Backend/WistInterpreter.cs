@@ -1,6 +1,6 @@
 ﻿namespace Backend;
 
-public static unsafe partial class Interpreter
+public static unsafe partial class WistInterpreter
 {
     private static WistConst[] _consts = null!;
     private static WistConst[] _consts2 = null!;
@@ -60,15 +60,14 @@ public static unsafe partial class Interpreter
 
         for (_index = 0; _index < len; _index++)
         {
+            
             var wistOp = ops[_index];
-            _functions[(int)wistOp]();
-
-
-            continue;
+            
             var format = $"{wistOp} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
-
-            Console.WriteLine(format);
+            //Console.WriteLine(format);
+            
+            _functions[(int)wistOp]();
         }
     }
 

@@ -5,24 +5,20 @@ using System.Text;
 
 public class WistClass
 {
-    private readonly SortedDictionary<int, WistConst> _fields;
+    private readonly WistGlossary<WistConst> _fields = new(3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistClass(IEnumerable<(int id, WistConst value)> fields)
     {
-        _fields = new SortedDictionary<int, WistConst>();
-
         foreach (var (id, value) in fields)
             _fields.Add(id, value);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private WistClass(SortedDictionary<int, WistConst> fields)
+    private WistClass(WistGlossary<WistConst> fields)
     {
-        _fields = new SortedDictionary<int, WistConst>();
-
-        foreach (var (id, value) in fields)
-            _fields.Add(id, value);
+        foreach (var entry in fields)
+            _fields.Add(entry.Key, entry.Value);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,8 +37,8 @@ public class WistClass
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetField(int id, WistConst value) => _fields[id] = value;
+    public void SetField(int id, WistConst value) => _fields.GetValue(id) = value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst GetField(int id) => _fields[id];
+    public WistConst GetField(int id) => _fields.GetValue(id);
 }

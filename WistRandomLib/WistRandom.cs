@@ -10,22 +10,22 @@ public static class WistRandom
     [WistLibFunction]
     public static void SetSeed()
     {
-        _random = new Random((int)Interpreter.Pop().GetNumber());
+        _random = new Random((int)WistInterpreter.Pop().GetNumber());
     }
 
     [WistLibFunction]
     public static void RandomInteger()
     {
-        var max = Interpreter.Pop().GetNumber();
-        var min = Interpreter.Pop().GetNumber();
-        Interpreter.Push((WistConst)Random.Shared.Next((int)min, (int)max + 1));
+        var max = WistInterpreter.Pop().GetNumber();
+        var min = WistInterpreter.Pop().GetNumber();
+        WistInterpreter.Push((WistConst)Random.Shared.Next((int)min, (int)max + 1));
     }
 
     [WistLibFunction]
     public static void RandomReal()
     {
-        var max = Interpreter.Pop().GetNumber();
-        var min = Interpreter.Pop().GetNumber();
-        Interpreter.Push((WistConst)(_random.NextDouble() * (max - min) + min));
+        var max = WistInterpreter.Pop().GetNumber();
+        var min = WistInterpreter.Pop().GetNumber();
+        WistInterpreter.Push((WistConst)(_random.NextDouble() * (max - min) + min));
     }
 }

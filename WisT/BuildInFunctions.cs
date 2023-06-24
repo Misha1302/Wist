@@ -8,46 +8,46 @@ public static class BuildInFunctions
     [WistLibFunction]
     public static void Print()
     {
-        Console.WriteLine(Interpreter.Pop());
-        Interpreter.Push(WistConst.CreateNull());
+        Console.WriteLine(WistInterpreter.Pop());
+        WistInterpreter.Push(WistConst.CreateNull());
     }
 
     [WistLibFunction]
     public static void Input()
     {
-        Interpreter.Push((WistConst)(Console.ReadLine() ?? string.Empty));
+        WistInterpreter.Push((WistConst)(Console.ReadLine() ?? string.Empty));
     }
 
     [WistLibFunction]
     public static void Exit()
     {
-        Interpreter.Exit();
+        WistInterpreter.Exit();
         // there is no need for Interpreter.Push(WistConst.CreateNull()) because the program will already exit
     }
 
     [WistLibFunction]
     public static void GetLen()
     {
-        var value = Interpreter.Pop();
+        var value = WistInterpreter.Pop();
         var res = value.Type switch
         {
             WistType.List => (WistConst)value.GetList().Count,
             WistType.String => (WistConst)value.GetString().Length,
             _ => throw new WistException($"Cannot get len for this type {value.Type}")
         };
-        Interpreter.Push(res);
+        WistInterpreter.Push(res);
     }
 
     [WistLibFunction]
     public static void AddElem()
     {
-        var value = Interpreter.Pop();
-        var list = Interpreter.Pop();
+        var value = WistInterpreter.Pop();
+        var list = WistInterpreter.Pop();
 
         if (list.Type == WistType.List)
             list.GetList().Add(value);
         else throw new WistException($"Cannot add element for this type {value.Type}");
 
-        Interpreter.Push(value);
+        WistInterpreter.Push(value);
     }
 }

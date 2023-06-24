@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-public readonly struct WistFunction : ICloneable
+public readonly struct WistFunction
 {
     public readonly List<WistConst> Locals = new();
     public readonly int OpStartIndex;
@@ -13,9 +13,7 @@ public readonly struct WistFunction : ICloneable
         OpStartIndex = opStartIndex;
     }
 
-    private WistFunction WistClone() => new(CopyList(Locals), OpStartIndex);
-
-    public object Clone() => WistClone();
+    private WistFunction Copy() => new(CopyList(Locals), OpStartIndex);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private List<T> CopyList<T>(IReadOnlyList<T> list)

@@ -35,7 +35,7 @@ public static class WistProgram
 
         var wistFixedImage = image.Compile();
         var s = Stopwatch.StartNew();
-        Interpreter.Run(wistFixedImage);
+        WistInterpreter.Run(wistFixedImage);
         s.Stop();
         Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
     }

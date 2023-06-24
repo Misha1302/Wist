@@ -2,7 +2,7 @@ grammar WistGrammar;
 
 program: line* EOF;
 line: statement | ifBlock | whileBlock | loopBlock | funcDecl | classDecl;
-statement: (functionCall | gotoLabel | setLabel | return | dllImport | assigment) ('\n' | ';');
+statement: (functionCall | gotoLabel | setLabel | return | dllImport | assigment) EOL;
 
 assigment: varAssigment | elementOfArrayAssigment | fieldAssigment;
 fieldAssigment: expression '.' IDENTIFIER '=' expression;
@@ -12,7 +12,7 @@ elementOfArrayAssigment: IDENTIFIER '[' expression ']' '=' expression;
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;
-loopBlock: LOOP assigment? expression assigment? block;
+loopBlock: LOOP assigment? EOL expression EOL assigment? block;
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 block: '{' line* '}';
 gotoLabel: 'goto' IDENTIFIER;
@@ -57,5 +57,6 @@ CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 WHILE: 'while' | 'until';
 LOOP: 'loop';
 TYPE: 'let' | 'var';
-WS: [ \t]+ -> skip;
+EOL: ';';
+WS: [ \t\r\n]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

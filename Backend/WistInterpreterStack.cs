@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-public static partial class Interpreter
+public static partial class WistInterpreter
 {
     private static readonly WistConst[] _stack = new WistConst[32768];
     private static int _sp;
