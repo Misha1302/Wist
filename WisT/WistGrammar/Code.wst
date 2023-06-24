@@ -1,30 +1,27 @@
 ﻿import "WistRandomLib.dll"
 import "WistTypeConverter.dll"
+import "WistTime.dll"
 
 func Start() {
-    loop let i = 0; i < 10; i = i + 1 {
-        let user = new MySuperClass("Nick" + ToStr(i), i)   
-        
-        loop let j = 0; j < 10; j = j + 1 {
-            user.GrowOld(j)
-        } 
-        
-        Print(user.ToString())
-    }
-}
-
-
-class MySuperClass(name, age) {
-    method Constructor(name, age) {
-        this.name = name
-        this.age = age
-    }
+    let arr = []
     
-    method ToString() {
-        return this.name + '::' + ToStr(this.age)
-    }
+    loop let j = 0; j < 10; j = j + 1 {
+        let t = GetTime()
     
-    method GrowOld(value) {
-        this.age = this.age + value
+        let s = 0
+        loop let i = 1; i < 2_000_000; i = i + 1 {
+            s = s + i * i - i / i
+        }
+    
+        let t2 = GetTime() - t
+        Write(ToStr(t2) + ' + ')
+        AddElem(arr, t2)
     }
+    Print('')
+    
+    let sum = 0
+    loop let i = 1; i <= 10; i = i + 1 {
+        sum = sum + arr[i]
+    }
+    Print(sum / 10)
 }

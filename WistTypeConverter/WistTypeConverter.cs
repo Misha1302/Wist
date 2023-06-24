@@ -8,7 +8,7 @@ public static class WistTypeConverter
     [WistLibFunction]
     public static void ToStr()
     {
-        WistInterpreter.Push((WistConst)WistInterpreter.Pop().ToString());
+        WistInterpreter.Push(new WistConst(WistInterpreter.Pop().ToString()));
     }
 
     [WistLibFunction]
@@ -23,7 +23,7 @@ public static class WistTypeConverter
             _ => throw new WistException($"Cannot convert {wistConst.Type} to bool")
         };
 
-        WistInterpreter.Push((WistConst)result);
+        WistInterpreter.Push(new WistConst(result));
     }
 
     [WistLibFunction]
@@ -38,6 +38,6 @@ public static class WistTypeConverter
             _ => throw new WistException($"Cannot convert {wistConst.Type} to number")
         };
 
-        WistInterpreter.Push((WistConst)result);
+        WistInterpreter.Push(new WistConst(result));
     }
 }

@@ -44,27 +44,16 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
             WistException.ThrowTypesMustBeTheSame();
 
-
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() + b.GetNumber()),
-            WistType.String => (WistConst)(a.GetString() + b.GetString()),
+            WistType.Number => new WistConst(a.GetNumber() + b.GetNumber()),
+            WistType.String => new WistConst(a.GetString() + b.GetString()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = a.Type switch
-        {
-            WistType.Number => (WistConst)(a.GetNumber() + b.GetNumber()),
-            _ => (WistConst)(a.GetString() + b.GetString())
-        };
-#endif
 
         Push(res);
     }
@@ -74,22 +63,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() - b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() - b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() - b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -99,22 +81,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() * b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() * b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() * b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -124,22 +99,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() / b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() / b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() / b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -149,22 +117,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() % b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() % b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() % b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -182,7 +143,7 @@ public static partial class WistInterpreter
     {
         var res = !CmpInternal().GetBool();
 
-        Push((WistConst)res);
+        Push(new WistConst(res));
     }
 
 
@@ -190,39 +151,26 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
-            WistType.String => (WistConst)(a.GetString() == b.GetString()),
-            WistType.Null => (WistConst)(b.Type == WistType.Null),
+            WistType.Number => new WistConst(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
+            WistType.String => new WistConst(a.GetString() == b.GetString()),
+            WistType.Null => new WistConst(b.Type == WistType.Null),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = a.Type switch
-        {
-            WistType.Number => (WistConst)(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
-            WistType.Null => (WistConst)(b.Type == WistType.Null),
-            _ => (WistConst)(a.GetString() == b.GetString())
-        };
-#endif
+
         return res;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void JmpIfFalse()
     {
-#if DEBUG
         if (_stack[_sp - 1].Type != WistType.Bool)
-            throw new InvalidOperationException();
-#endif
+            WistException.ThrowTypeMustBe(WistType.Bool);
 
         if (!Pop().GetBool()) Jmp();
     }
@@ -230,10 +178,8 @@ public static partial class WistInterpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void JmpIfTrue()
     {
-#if DEBUG
         if (_stack[_sp - 1].Type != WistType.Bool)
-            throw new InvalidOperationException();
-#endif
+            WistException.ThrowTypeMustBe(WistType.Bool);
 
         if (Pop().GetBool()) Jmp();
     }
@@ -299,21 +245,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() < b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() < b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() < b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -323,21 +263,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() > b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() > b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() > b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -347,21 +281,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() >= b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() >= b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() >= b.GetNumber());
-#endif
 
         Push(res);
     }
@@ -371,21 +299,15 @@ public static partial class WistInterpreter
     {
         var b = Pop();
         var a = Pop();
-        // ReSharper disable once JoinDeclarationAndInitializer
-        WistConst res;
 
-#if DEBUG
         if (a.Type != b.Type)
-            throw new InvalidOperationException();
+            WistException.ThrowTypesMustBeTheSame();
 
-        res = a.Type switch
+        var res = a.Type switch
         {
-            WistType.Number => (WistConst)(a.GetNumber() <= b.GetNumber()),
+            WistType.Number => new WistConst(a.GetNumber() <= b.GetNumber()),
             _ => WistException.ThrowInvalidOperationForThisType(a.Type, b.Type)
         };
-#else
-        res = (WistConst)(a.GetNumber() <= b.GetNumber());
-#endif
 
         Push(res);
     }

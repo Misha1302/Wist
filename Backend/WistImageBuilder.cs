@@ -224,7 +224,7 @@ public class WistImageBuilder
 
         WistClass CreateWistClass(WistBuilderClass c) =>
             new(
-                c.Fields.Select(x => (x.GetHashCode(), WistConst.CreateNull())).ToArray(),
+                c.Fields.Select(x => (x.GetHashCode(), WistConst.CreateNull())),
                 c.Methods.Select(x => (x.GetHashCode(), GetLabelOrFuncPtr(x)))
             );
 
@@ -259,7 +259,7 @@ public class WistImageBuilder
         SetConst(default);
     }
 
-    public void SetGlobal(string name)
+    private void SetGlobal(string name)
     {
         var ind = FindGlobal(name);
 
@@ -267,7 +267,7 @@ public class WistImageBuilder
         SetConst(WistConst.CreateInternalConst(ind));
     }
 
-    public void LoadGlobal(string name)
+    private void LoadGlobal(string name)
     {
         var ind = FindGlobal(name);
 

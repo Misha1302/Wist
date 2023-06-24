@@ -112,16 +112,6 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(WistConst left, WistConst right) => !(left == right);
 
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static explicit operator WistConst(double d) => new(d);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static explicit operator WistConst(string d) => new(d);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static explicit operator WistConst(bool d) => new(d);
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override string ToString()
     {

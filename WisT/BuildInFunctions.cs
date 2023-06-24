@@ -3,7 +3,7 @@
 using Backend;
 
 [WistLib]
-public static class BuildInFunctions
+public static class WistBuildInFunctions
 {
     [WistLibFunction]
     public static void Print()
@@ -13,9 +13,16 @@ public static class BuildInFunctions
     }
 
     [WistLibFunction]
+    public static void Write()
+    {
+        Console.Write(WistInterpreter.Pop());
+        WistInterpreter.Push(WistConst.CreateNull());
+    }
+
+    [WistLibFunction]
     public static void Input()
     {
-        WistInterpreter.Push((WistConst)(Console.ReadLine() ?? string.Empty));
+        WistInterpreter.Push(new WistConst(Console.ReadLine() ?? string.Empty));
     }
 
     [WistLibFunction]
@@ -31,8 +38,8 @@ public static class BuildInFunctions
         var value = WistInterpreter.Pop();
         var res = value.Type switch
         {
-            WistType.List => (WistConst)value.GetList().Count,
-            WistType.String => (WistConst)value.GetString().Length,
+            WistType.List => new WistConst(value.GetList().Count),
+            WistType.String => new WistConst(value.GetString().Length),
             _ => throw new WistException($"Cannot get len for this type {value.Type}")
         };
         WistInterpreter.Push(res);

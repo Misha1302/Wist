@@ -18,7 +18,7 @@ public static class WistRandom
     {
         var max = WistInterpreter.Pop().GetNumber();
         var min = WistInterpreter.Pop().GetNumber();
-        WistInterpreter.Push((WistConst)Random.Shared.Next((int)min, (int)max + 1));
+        WistInterpreter.Push(new WistConst(Random.Shared.Next((int)min, (int)max + 1)));
     }
 
     [WistLibFunction]
@@ -26,6 +26,6 @@ public static class WistRandom
     {
         var max = WistInterpreter.Pop().GetNumber();
         var min = WistInterpreter.Pop().GetNumber();
-        WistInterpreter.Push((WistConst)(_random.NextDouble() * (max - min) + min));
+        WistInterpreter.Push(new WistConst(_random.NextDouble() * (max - min) + min));
     }
 }

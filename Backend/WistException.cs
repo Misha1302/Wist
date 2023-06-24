@@ -15,4 +15,8 @@ public class WistException : Exception
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static WistConst ThrowInvalidOperationForThisType(WistType aType, WistType bType) =>
         throw new WistException($"Invalid operation for types: {aType}, {bType}");
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ThrowTypeMustBe(WistType t) =>
+        throw new WistException($"Type must be {t}");
 }

@@ -1,6 +1,7 @@
 ﻿namespace Backend;
 
 using System.Diagnostics;
+using System.Reflection;
 
 public static class WistProgram
 {
@@ -10,7 +11,7 @@ public static class WistProgram
 
         // i = 0
         image.CreateLocal("i");
-        image.PushConst((WistConst)0);
+        image.PushConst(new WistConst(0));
         image.SetLocal("i");
 
         // while i < 100_000_000
@@ -18,13 +19,17 @@ public static class WistProgram
 
 
         image.LoadLocal("i");
-        image.PushConst((WistConst)100_000_000);
+        image.PushConst(new WistConst(5));
         image.LessThan();
         image.JmpIfFalse("end");
 
+        image.CallExternalMethod(
+            typeof(WistProgram).GetMethod("PrintHelloWorld", BindingFlags.Static | BindingFlags.Public)!
+        );
+
         // i = i + 1
         image.LoadLocal("i");
-        image.PushConst((WistConst)1);
+        image.PushConst(new WistConst(1));
         image.Add();
         image.SetLocal("i");
         image.Jmp("while");
@@ -38,5 +43,10 @@ public static class WistProgram
         WistInterpreter.Run(wistFixedImage);
         s.Stop();
         Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
+    }
+
+    public static void PrintHelloWorld()
+    {
+        Console.WriteLine("Hello, World!");
     }
 }

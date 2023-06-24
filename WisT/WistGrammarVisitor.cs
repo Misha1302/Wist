@@ -68,7 +68,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _imageBuilder = new WistImageBuilder();
         _wistLibsManager = new WistLibsManager();
         _needResultLevel = 0;
-        _wistLibsManager.AddLibByType(typeof(BuildInFunctions));
+        _wistLibsManager.AddLibByType(typeof(WistBuildInFunctions));
 
         _imageBuilder.CallFunc(MainFuncName);
 
@@ -78,8 +78,11 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     }
 
     public override object? VisitAssigment(WistGrammarParser.AssigmentContext context) =>
-        Visit((IParseTree)context.varAssigment() ??
-              (IParseTree)context.elementOfArrayAssigment() ?? context.fieldAssigment());
+        Visit(
+            (IParseTree)context.varAssigment() ??
+            (IParseTree)context.elementOfArrayAssigment() ??
+            (IParseTree)context.fieldAssigment()
+        );
 
     public override object? VisitFieldAssigment(WistGrammarParser.FieldAssigmentContext context)
     {
@@ -335,7 +338,6 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     {
         _methodCall = context.expression();
         Visit(context.call());
-
         return default;
     }
 
