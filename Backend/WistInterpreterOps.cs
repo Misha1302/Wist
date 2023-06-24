@@ -25,6 +25,14 @@ public static partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CallMethod()
+    {
+        PushVariables(_consts2[_index].GetInternalInteger());
+        PushRet(_index);
+        _index = Pop().GetClass().GetMethodPtr(_consts[_index].GetInternalInteger());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Ret()
     {
         PopVariables();

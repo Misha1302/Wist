@@ -14,12 +14,11 @@ var commonTokenStream = new CommonTokenStream(simpleLexer);
 var simpleParser = new WistGrammarParser(commonTokenStream);
 var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
-var wistImageObject = visitor.CompileCode(simpleContext, "WistGrammar");
-Console.WriteLine(wistImageObject);
+visitor.CompileCode(simpleContext, "WistGrammar", false);
 
 for (var i = 0; i < 1; i++)
 {
-    wistImageObject = visitor.GetFixedImage();
+    var wistImageObject = visitor.GetFixedImage();
 
     var s = Stopwatch.StartNew();
     WistInterpreter.Run(wistImageObject);

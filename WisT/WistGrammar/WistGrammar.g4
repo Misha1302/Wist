@@ -1,9 +1,9 @@
 grammar WistGrammar;
 
 program: line* EOF;
-line: statement | ifBlock | whileBlock | loopBlock | funcDecl | classDecl;
+line: statement | ifBlock | whileBlock | loopBlock | funcDecl | methodDecl | classDecl;
 statement: simpleStatement (SEMICOLON simpleStatement)* (SEMICOLON)? NEWLINE;
-simpleStatement: functionCall | gotoLabel | setLabel | return | dllImport | assigment;
+simpleStatement: methodCall | call | gotoLabel | setLabel | return | dllImport | assigment;
 
 assigment: varAssigment | elementOfArrayAssigment | fieldAssigment;
 fieldAssigment: expression '.' IDENTIFIER '=' expression;
@@ -14,22 +14,25 @@ ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;
 loopBlock: LOOP assigment? SEMICOLON expression SEMICOLON assigment? block;
-functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
+call: IDENTIFIER '(' (expression (',' expression)*)? ')';
 block: '{' line* '}';
 gotoLabel: 'goto' IDENTIFIER;
 setLabel: IDENTIFIER ':';
 elementOfArray: IDENTIFIER '[' expression ']'; 
 arrayInit: '[' (expression (',' expression)*)? ']';
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
+methodDecl: 'method' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 return: 'return' expression;
 dllImport: 'import' STRING;
 classDecl: 'class' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
-classInit: 'new' IDENTIFIER '(' ')';
+classInit: 'new' IDENTIFIER '(' (expression (',' expression)*)? ')';
+methodCall: expression '.' call;
 
 expression
     : constant                              #constantExpression
     | elementOfArray                        #elementOfArrayExpression
-    | functionCall                          #functionalExpression
+    | expression '.' call                   #methodExpression
+    | call                                  #functionExpression
     | IDENTIFIER                            #identifierExpression
     | '(' expression ')'                    #parenthesizedExpression
     | '!' expression                        #notExpression

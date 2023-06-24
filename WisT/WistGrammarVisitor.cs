@@ -8,8 +8,12 @@ using WisT.WistGrammar;
 
 public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
+    private const string This = "this";
+    private const string Constructor = "Constructor";
     private const string MainFuncName = "Start";
+
     private WistImageBuilder _imageBuilder = null!;
+    private IParseTree? _methodCall;
     private int _needResultLevel;
     private string _path = string.Empty;
     private WistLibsManager _wistLibsManager = null!;
@@ -19,6 +23,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _imageBuilder = imageBuilder;
         _wistLibsManager = wistLibsManager;
         _needResultLevel = 0;
+        _methodCall = null!;
     }
 
     public WistGrammarVisitor()
@@ -29,8 +34,11 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     {
         _imageBuilder.CreateClass(
             context.IDENTIFIER(0).GetText(),
-            context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToList()
+            context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToList(),
+            new List<string>()
         );
+
+        Visit(context.block());
 
         return default;
     }
@@ -43,7 +51,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitClassInit(WistGrammarParser.ClassInitContext context)
     {
+        // handle params
+        foreach (var expressionContext in context.expression())
+            Visit(expressionContext);
+
         _imageBuilder.InstantiateClass(context.IDENTIFIER().GetText());
+        _imageBuilder.Dup();
+        _imageBuilder.CallMethod(Constructor);
+
         return default;
     }
 
@@ -63,13 +78,21 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     }
 
     public override object? VisitAssigment(WistGrammarParser.AssigmentContext context) =>
-        Visit((IParseTree)context.varAssigment() ?? (IParseTree)context.elementOfArrayAssigment() ?? context.fieldAssigment());
+        Visit((IParseTree)context.varAssigment() ??
+              (IParseTree)context.elementOfArrayAssigment() ?? context.fieldAssigment());
 
     public override object? VisitFieldAssigment(WistGrammarParser.FieldAssigmentContext context)
     {
         Visit(context.expression(0)); // class
         Visit(context.expression(1)); // value
         _imageBuilder.SetField(context.IDENTIFIER().GetText());
+        return default;
+    }
+
+    public override object? VisitMethodCall(WistGrammarParser.MethodCallContext context)
+    {
+        _methodCall = context.expression();
+        Visit(context.call());
         return default;
     }
 
@@ -142,7 +165,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
                 _imageBuilder.GreaterOrEquals();
                 break;
             default:
-                throw new NotImplementedException();
+                throw new WistException("Unknown op");
         }
 
         return default;
@@ -176,7 +199,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _imageBuilder.PushConst(new WistConst(b.GetText() == "true"));
         else if (context.NULL() is not null)
             _imageBuilder.PushConst(WistConst.CreateNull());
-        else throw new NotImplementedException();
+        else throw new WistException("Unknown const");
 
         return default;
     }
@@ -204,6 +227,33 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
         _imageBuilder.Jmp(startName);
         _imageBuilder.SetLabel(endName);
+
+        return default;
+    }
+
+    public override object? VisitMethodDecl(WistGrammarParser.MethodDeclContext context)
+    {
+        var methodName = context.IDENTIFIER(0).GetText();
+        _imageBuilder.CreateMethod(methodName);
+
+
+        _imageBuilder.CreateLocal(This);
+        _imageBuilder.SetLocal(This);
+        for (var i = context.IDENTIFIER().Length - 1; i >= 1; i--)
+        {
+            var name = context.IDENTIFIER(i).GetText();
+            _imageBuilder.CreateLocal(name);
+            _imageBuilder.SetLocal(name);
+        }
+
+        Visit(context.block());
+
+        if (methodName == Constructor)
+            _imageBuilder.LoadLocal(This);
+        else
+            _imageBuilder.PushConst(WistConst.CreateNull());
+
+        _imageBuilder.Ret();
 
         return default;
     }
@@ -275,7 +325,21 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     }
 
 
-    public override object? VisitFunctionCall(WistGrammarParser.FunctionCallContext context)
+    public override object? VisitFunctionExpression(WistGrammarParser.FunctionExpressionContext context)
+    {
+        Visit(context.call());
+        return default;
+    }
+
+    public override object? VisitMethodExpression(WistGrammarParser.MethodExpressionContext context)
+    {
+        _methodCall = context.expression();
+        Visit(context.call());
+
+        return default;
+    }
+
+    public override object? VisitCall(WistGrammarParser.CallContext context)
     {
         _needResultLevel++;
         foreach (var expressionContext in context.expression())
@@ -283,12 +347,23 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _needResultLevel--;
 
 
-        var text = context.IDENTIFIER().GetText();
-        var m = _wistLibsManager.TryGetFunction(text);
+        var name = context.IDENTIFIER().GetText();
 
-        if (m is not null)
-            _imageBuilder.CallExternalMethod(m);
-        else _imageBuilder.CallFunc(text);
+        if (_methodCall is null)
+        {
+            var m = _wistLibsManager.TryGetFunction(name);
+
+            if (m is not null)
+                _imageBuilder.CallExternalMethod(m);
+            else _imageBuilder.CallFunc(name);
+        }
+        else
+        {
+            Visit(_methodCall);
+            _imageBuilder.Dup();
+            _methodCall = null;
+            _imageBuilder.CallMethod(name);
+        }
 
         if (_needResultLevel == 0)
             _imageBuilder.Drop();

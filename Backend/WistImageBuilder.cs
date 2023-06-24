@@ -96,7 +96,7 @@ public class WistImageBuilder
     public void CreateLocal(string name)
     {
         _curFunction.localsCount++;
-        _locals.Add($"local<{name}>{_curFunction.name}");
+        _locals.Add(GenerateLocalName(name));
     }
 
     public void CreateGlobal(string name)
@@ -108,9 +108,10 @@ public class WistImageBuilder
     {
         EndPreviousFunc();
 
-        Jmp($"{name}_end");
-        SetLabel(name);
-        _curFunction = (name, 0);
+        var generated = GenerateFuncName(name);
+        Jmp(generated + "_end");
+        SetLabel(generated);
+        _curFunction = (generated, 0);
     }
 
     private void EndPreviousFunc()
@@ -184,7 +185,7 @@ public class WistImageBuilder
         _ops.Add(WistOp.CallFunc);
         SetConst(default);
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
-        _jumps.Add((_constants.Count - 1, funcName));
+        _jumps.Add((_constants.Count - 1, GenerateFuncName(funcName)));
     }
 
     public void Drop()
@@ -220,17 +221,18 @@ public class WistImageBuilder
                 ? value
                 : throw new WistException($"Cannot find the label or function with name: {labelName}");
 
-        
-        WistClass CreateWistClass(WistBuilderClass c) =>
-            new(c.Fields.Select(x => (x.GetHashCode(), WistConst.CreateNull())).ToArray());
 
-        
-        List<WistConst> CopyListConstants(IEnumerable<WistConst> constants)
-        {
-            return constants.Select(c => c.Type != WistType.List
+        WistClass CreateWistClass(WistBuilderClass c) =>
+            new(
+                c.Fields.Select(x => (x.GetHashCode(), WistConst.CreateNull())).ToArray(),
+                c.Methods.Select(x => (x.GetHashCode(), GetLabelOrFuncPtr(x)))
+            );
+
+
+        List<WistConst> CopyListConstants(IEnumerable<WistConst> constants) =>
+            constants.Select(c => c.Type != WistType.List
                 ? c
                 : new WistConst(c.GetList().ToList())).ToList();
-        }
     }
 
     public void Dup()
@@ -281,11 +283,14 @@ public class WistImageBuilder
 
     private int FindLocal(string name)
     {
-        var ind = _locals.IndexOf($"local<{name}>{_curFunction.name}");
+        var ind = _locals.IndexOf(GenerateLocalName(name));
         return ind == -1 ? throw new WistException($"Cannot find {name} local in {_curFunction.name} func") : ind;
     }
 
-    public bool IsLocal(string name) => _locals.Contains($"local<{name}>{_curFunction.name}");
+    public bool IsLocal(string name) => _locals.Contains(GenerateLocalName(name));
+
+
+    private string GenerateLocalName(string name) => $"local<{name}>{_curFunction.name}";
 
     public void LoadGlobalOrLocal(string name)
     {
@@ -299,9 +304,9 @@ public class WistImageBuilder
         else SetGlobal(name);
     }
 
-    public void CreateClass(string name, List<string> fields)
+    public void CreateClass(string name, List<string> fields, List<string> methods)
     {
-        _classes.Add(new WistBuilderClass(name, fields));
+        _classes.Add(new WistBuilderClass(name, fields, methods));
     }
 
     public void InstantiateClass(string name)
@@ -310,8 +315,6 @@ public class WistImageBuilder
         SetConst(default);
         _classInserts.Add((_constants.Count - 1, name));
     }
-
-    private record WistBuilderClass(string Name, List<string> Fields);
 
     public void SetField(string name)
     {
@@ -324,4 +327,28 @@ public class WistImageBuilder
         _ops.Add(WistOp.LoadField);
         SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
     }
+
+    public void CreateMethod(string name)
+    {
+        EndPreviousFunc();
+
+        var generated = GenerateMethodName(name);
+        Jmp(generated + "_end");
+        SetLabel(generated);
+        _curFunction = (generated, 0);
+
+        _classes[^1].Methods.Add(generated);
+    }
+
+    private static string GenerateMethodName(string name) => $"<method>_{name}";
+    private static string GenerateFuncName(string name) => $"<func>_{name}";
+
+    public void CallMethod(string methName)
+    {
+        _ops.Add(WistOp.CallMethod);
+        SetConst(WistConst.CreateInternalConst(GenerateMethodName(methName).GetHashCode()));
+        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+    }
+
+    private record WistBuilderClass(string Name, List<string> Fields, List<string> Methods);
 }

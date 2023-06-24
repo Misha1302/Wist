@@ -1,16 +1,30 @@
-﻿import "WistRandomLib.dll";
-import "WistTypeConverter.dll";
+﻿import "WistRandomLib.dll"
+import "WistTypeConverter.dll"
 
 func Start() {
-    let user = new MySuperClass();
-    user.age = 10;
     loop let i = 0; i < 10; i = i + 1 {
-        user.age = user.age + 4
+        let user = new MySuperClass("Nick" + ToStr(i), i)   
+        
+        loop let j = 0; j < 10; j = j + 1 {
+            user.GrowOld(j)
+        } 
+        
+        Print(user.ToString())
     }
-    Print(1);
-    Print(user.age);
-    Print(1);
 }
 
 
-class MySuperClass(name, age) { }
+class MySuperClass(name, age) {
+    method Constructor(name, age) {
+        this.name = name
+        this.age = age
+    }
+    
+    method ToString() {
+        return this.name + '::' + ToStr(this.age)
+    }
+    
+    method GrowOld(value) {
+        this.age = this.age + value
+    }
+}

@@ -89,7 +89,7 @@ public readonly struct WistConst
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool GetBool() => _valueB;
-    
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_ptr).Target!;

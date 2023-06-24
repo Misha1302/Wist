@@ -31,5 +31,6 @@ public enum WistOp : byte
     LoadGlobal,
     CopyClass,
     SetField,
-    LoadField
+    LoadField,
+    CallMethod
 }
