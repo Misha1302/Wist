@@ -33,6 +33,7 @@ public class WistClass
     {
         var sb = new StringBuilder();
 
+        // possible rearrangement of fields due to SortedList
         foreach (var field in _fields)
             sb.Append($"{field.Value}, ");
 

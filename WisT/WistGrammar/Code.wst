@@ -2,14 +2,14 @@
 import "WistTypeConverter.dll"
 
 func Start() {
-    let user = new MySuperClass();
-    Print(user);
-    user.name = "Hi!";
-    Print(user);
-    user.age = 12;
-    Print(user);
-    Print(user.name);
-    Print(user.age);
+    let user = new MySuperClass()
+    Print(user)
+    user.name = "Hi!"
+    Print(user)
+    user.age = 12
+    Print(user)
+    Print(user.name)
+    Print(user.age)
 }
 
 class MySuperClass(name, age) { }

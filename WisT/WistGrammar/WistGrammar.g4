@@ -57,5 +57,5 @@ CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 WHILE: 'while' | 'until';
 LOOP: 'loop';
 TYPE: 'let' | 'var';
-WS: [ \t\r\n]+ -> skip;
+WS: [ \t]+ -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
