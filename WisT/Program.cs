@@ -6,7 +6,7 @@ using WisT;
 using WisT.WistGrammar;
 
 const string path = @"WistGrammar\Code.wst";
-var code = File.ReadAllText(path);
+var code = string.Join("\n", File.ReadAllText(path).Split('\n', '\r').Where(x => !string.IsNullOrWhiteSpace(x)));
 
 var inputStream = new AntlrInputStream(code);
 var simpleLexer = new WistGrammarLexer(inputStream);

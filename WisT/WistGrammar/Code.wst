@@ -4,8 +4,8 @@ import "WistTypeConverter.dll";
 func Start() {
     let user = new MySuperClass();
     user.age = 10;
-    loop let i = 0; i < 0; i = i + 1 {
-        
+    loop let i = 0; i < 10; i = i + 1 {
+        user.age = user.age + 4
     }
     Print(1);
     Print(user.age);

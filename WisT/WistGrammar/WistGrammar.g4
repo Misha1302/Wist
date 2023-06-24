@@ -2,7 +2,8 @@ grammar WistGrammar;
 
 program: line* EOF;
 line: statement | ifBlock | whileBlock | loopBlock | funcDecl | classDecl;
-statement: (functionCall | gotoLabel | setLabel | return | dllImport | assigment) EOL;
+statement: simpleStatement (SEMICOLON simpleStatement)* (SEMICOLON)? NEWLINE;
+simpleStatement: functionCall | gotoLabel | setLabel | return | dllImport | assigment;
 
 assigment: varAssigment | elementOfArrayAssigment | fieldAssigment;
 fieldAssigment: expression '.' IDENTIFIER '=' expression;
@@ -12,7 +13,7 @@ elementOfArrayAssigment: IDENTIFIER '[' expression ']' '=' expression;
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;
-loopBlock: LOOP assigment? EOL expression EOL assigment? block;
+loopBlock: LOOP assigment? SEMICOLON expression SEMICOLON assigment? block;
 functionCall: IDENTIFIER '(' (expression (',' expression)*)? ')';
 block: '{' line* '}';
 gotoLabel: 'goto' IDENTIFIER;
@@ -45,6 +46,8 @@ expression
 
 constant: NUMBER | STRING | BOOL | NULL;
 
+NEWLINE: ( '\r'? '\n' | '\r' | '\f' );
+SEMICOLON: ';';
 NUMBER: [-]? [0-9] [0-9_]* ('.' [0-9_]*)? ('e' ('+' | '-')? [0-9_]*)?;
 STRING: ('"' ~'"'* '"') | ('\'' ~'\''* '\'');
 BOOL: 'true' | 'false';
@@ -57,6 +60,5 @@ CMP_OP: '==' | '!=' | '>' | '<' | '<=' | '>=';
 WHILE: 'while' | 'until';
 LOOP: 'loop';
 TYPE: 'let' | 'var';
-EOL: ';';
-WS: [ \t\r\n]+ -> skip;
+WS: ('\t' | ' ' | NEWLINE) -> skip;
 IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
