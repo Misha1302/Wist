@@ -1,7 +1,7 @@
 ﻿namespace Backend;
 
 using System.Runtime.CompilerServices;
-using System.Text;
+using Backend.Glossary;
 
 public class WistClass
 {
@@ -32,15 +32,7 @@ public class WistClass
     public WistClass Copy() => new(_fields, _methods);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-    {
-        var sb = new StringBuilder();
-
-        foreach (var field in _fields)
-            sb.Append($"{field.Value}, ");
-
-        return sb.ToString(0, sb.Length - 2);
-    }
+    public override string ToString() => WistToStringManager.ToStr(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetField(int id, WistConst value) => _fields.GetValue(id) = value;
@@ -50,4 +42,13 @@ public class WistClass
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetMethodPtr(int id) => _methods.GetValue(id);
+
+    public IEnumerable<(int, WistConst)> GetAllFields()
+    {
+        var list = new List<(int, WistConst)>();
+        var e = _fields.GetEnumerator();
+        while (e.MoveNext())
+            list.Add((e.Current.Key, e.Current.Value));
+        return list;
+    }
 }

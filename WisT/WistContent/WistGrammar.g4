@@ -8,7 +8,7 @@ simpleStatement: methodCall | call | gotoLabel | setLabel | return | dllImport |
 assigment: varAssigment | elementOfArrayAssigment | fieldAssigment;
 fieldAssigment: expression '.' IDENTIFIER '=' expression;
 varAssigment: (TYPE)? IDENTIFIER '=' expression;
-elementOfArrayAssigment: IDENTIFIER '[' expression ']' '=' expression;
+elementOfArrayAssigment: expression '[' expression ']' '=' expression;
 
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
@@ -18,7 +18,6 @@ call: IDENTIFIER '(' (expression (',' expression)*)? ')';
 block: '{' line* '}';
 gotoLabel: 'goto' IDENTIFIER;
 setLabel: IDENTIFIER ':';
-elementOfArray: IDENTIFIER '[' expression ']'; 
 arrayInit: '[' (expression (',' expression)*)? ']';
 funcDecl: 'func' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
 methodDecl: 'method' IDENTIFIER '(' (IDENTIFIER (',' IDENTIFIER)*)? ')' block;
@@ -30,7 +29,7 @@ methodCall: expression '.' call;
 
 expression
     : constant                              #constantExpression
-    | elementOfArray                        #elementOfArrayExpression
+    | expression '[' expression ']'         #elementOfArrayExpression
     | expression '.' call                   #methodExpression
     | call                                  #functionExpression
     | IDENTIFIER                            #identifierExpression

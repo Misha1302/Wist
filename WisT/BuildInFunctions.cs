@@ -1,6 +1,8 @@
 ﻿namespace WisT;
 
 using Backend;
+using Backend.Attributes;
+using Backend.Interpreter;
 
 [WistLib]
 public static class WistBuildInFunctions

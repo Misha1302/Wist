@@ -2,10 +2,12 @@
 using System.Globalization;
 using Antlr4.Runtime;
 using Backend;
+using Backend.Interpreter;
 using WisT;
-using WisT.WistGrammar;
+using WisT.WistContent;
 
-const string path = @"WistGrammar\Code.wst";
+const string dir = "WistContent";
+const string path = @$"{dir}\Code.wst";
 var code = string.Join("\n", File.ReadAllText(path).Split('\n', '\r').Where(x => !string.IsNullOrWhiteSpace(x)));
 
 var inputStream = new AntlrInputStream(code);
@@ -14,7 +16,7 @@ var commonTokenStream = new CommonTokenStream(simpleLexer);
 var simpleParser = new WistGrammarParser(commonTokenStream);
 var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
-visitor.CompileCode(simpleContext, "WistGrammar", false);
+visitor.CompileCode(simpleContext, dir, false);
 
 for (var i = 0; i < 1; i++)
 {

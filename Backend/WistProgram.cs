@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
+using Backend.Interpreter;
 
 public static class WistProgram
 {

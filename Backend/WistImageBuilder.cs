@@ -340,7 +340,7 @@ public class WistImageBuilder
         _classes[^1].Methods.Add(generated);
     }
 
-    private static string GenerateMethodName(string name) => $"<method>_{name}";
+    private string GenerateMethodName(string name) => $"{_classes[^1].Name}_<method>_{name}";
     private static string GenerateFuncName(string name) => $"<func>_{name}";
 
     public void CallMethod(string methName)
@@ -348,6 +348,18 @@ public class WistImageBuilder
         _ops.Add(WistOp.CallMethod);
         SetConst(WistConst.CreateInternalConst(GenerateMethodName(methName).GetHashCode()));
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+    }
+
+    public void SetFirstRegister()
+    {
+        _ops.Add(WistOp.SetFirstRegister);
+        SetConst(default);
+    }
+
+    public void LoadFirstRegister()
+    {
+        _ops.Add(WistOp.LoadFirstRegister);
+        SetConst(default);
     }
 
     private record WistBuilderClass(string Name, List<string> Fields, List<string> Methods);

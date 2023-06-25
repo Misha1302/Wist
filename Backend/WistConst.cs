@@ -1,6 +1,5 @@
 namespace Backend;
 
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -113,22 +112,7 @@ public readonly struct WistConst
     public static bool operator !=(WistConst left, WistConst right) => !(left == right);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override string ToString()
-    {
-        return Type switch
-        {
-            WistType.Number => $"{GetNumber().ToString(CultureInfo.InvariantCulture)}",
-            WistType.Bool => $"{GetBool()}",
-            WistType.InternalInteger => $"{GetInternalInteger()}",
-            WistType.Pointer => $"{GetInternalPtr()}",
-            WistType.String => $"{GetString()}",
-            WistType.None => "<<Undefined>>",
-            WistType.Null => "None",
-            WistType.List => $"[{string.Join(", ", GetList())}]",
-            WistType.Class => $"{{{GetClass()}}}",
-            _ => throw new WistException($"Unknown type - {Type}")
-        };
-    }
+    public override string ToString() => WistToStringManager.ToStr(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst CreateNull() => new(WistType.Null);

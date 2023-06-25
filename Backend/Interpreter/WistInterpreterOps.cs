@@ -1,9 +1,11 @@
-﻿namespace Backend;
+﻿namespace Backend.Interpreter;
 
 using System.Runtime.CompilerServices;
 
 public static partial class WistInterpreter
 {
+    private static WistConst _firstRegister;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void PushConst()
     {
@@ -30,6 +32,18 @@ public static partial class WistInterpreter
         PushVariables(_consts2[_index].GetInternalInteger());
         PushRet(_index);
         _index = Pop().GetClass().GetMethodPtr(_consts[_index].GetInternalInteger());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void SetFirstRegister()
+    {
+        _firstRegister = Pop();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void LoadFirstRegister()
+    {
+        Push(_firstRegister);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

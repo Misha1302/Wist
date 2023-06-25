@@ -4,7 +4,7 @@ using System.Globalization;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Backend;
-using WisT.WistGrammar;
+using WisT.WistContent;
 
 public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
@@ -13,17 +13,20 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     private const string MainFuncName = "Start";
 
     private WistImageBuilder _imageBuilder = null!;
+    private List<string> _importedCodes = null!;
     private IParseTree? _methodCall;
     private int _needResultLevel;
     private string _path = string.Empty;
     private WistLibsManager _wistLibsManager = null!;
 
-    private WistGrammarVisitor(WistImageBuilder imageBuilder, WistLibsManager wistLibsManager)
+    private WistGrammarVisitor(WistImageBuilder imageBuilder, WistLibsManager wistLibsManager,
+        List<string> importedCodes)
     {
         _imageBuilder = imageBuilder;
         _wistLibsManager = wistLibsManager;
         _needResultLevel = 0;
         _methodCall = null!;
+        _importedCodes = importedCodes;
     }
 
     public WistGrammarVisitor()
@@ -67,6 +70,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _path = path;
         _imageBuilder = new WistImageBuilder();
         _wistLibsManager = new WistLibsManager();
+        _importedCodes = new List<string>();
         _needResultLevel = 0;
         _wistLibsManager.AddLibByType(typeof(WistBuildInFunctions));
 
@@ -132,9 +136,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitElementOfArrayAssigment(WistGrammarParser.ElementOfArrayAssigmentContext context)
     {
-        _imageBuilder.LoadGlobalOrLocal(context.IDENTIFIER().GetText()); // list
-        Visit(context.expression(1)); // value
-        Visit(context.expression(0)); // index
+        Visit(context.expression(0)); // array
+        Visit(context.expression(2)); // value
+        Visit(context.expression(1)); // index
 
         _imageBuilder.SetElem();
         return default;
@@ -409,43 +413,51 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitDllImport(WistGrammarParser.DllImportContext context)
     {
-        var s = context.STRING().GetText()[1..^1];
-        if (s.EndsWith("dll"))
-            _wistLibsManager.AddLib(s);
-        else
-            CompileOtherCode(File.ReadAllText(Path.Combine(_path, s)));
+        var path = context.STRING().GetText()[1..^1];
 
+        if (path.EndsWith("dll"))
+        {
+            if (_importedCodes.Contains(path)) goto end;
+
+            _wistLibsManager.AddLib(path);
+            _importedCodes.Add(path);
+        }
+        else
+        {
+            var fullPath = Path.GetFullPath(Path.Combine(_path, path));
+            if (_importedCodes.Contains(fullPath)) goto end;
+
+            CompileOtherCode(File.ReadAllText(fullPath));
+            _importedCodes.Add(fullPath);
+        }
+
+        end:
         return default;
     }
 
     public override object? VisitArrayInit(WistGrammarParser.ArrayInitContext context)
     {
         _imageBuilder.PushConst(new WistConst(new List<WistConst>()));
+        _imageBuilder.SetFirstRegister();
 
         var length = context.expression().Length;
 
         for (var i = 0; i < length; i++)
-            _imageBuilder.Dup();
-
-        for (var i = 0; i < length; i++)
         {
+            _imageBuilder.LoadFirstRegister();
             Visit(context.expression(i));
             _imageBuilder.AddElem();
         }
+
+        _imageBuilder.LoadFirstRegister();
 
         return default;
     }
 
     public override object? VisitElementOfArrayExpression(WistGrammarParser.ElementOfArrayExpressionContext context)
     {
-        Visit(context.elementOfArray());
-        return default;
-    }
-
-    public override object? VisitElementOfArray(WistGrammarParser.ElementOfArrayContext context)
-    {
-        _imageBuilder.LoadGlobalOrLocal(context.IDENTIFIER().GetText());
-        Visit(context.expression());
+        Visit(context.expression(0)); // array
+        Visit(context.expression(1)); // index
         _imageBuilder.PushElem();
 
         return default;
@@ -453,7 +465,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     private void CompileOtherCode(string s)
     {
-        var visitor = new WistGrammarVisitor(_imageBuilder, _wistLibsManager);
+        var visitor = new WistGrammarVisitor(_imageBuilder, _wistLibsManager, _importedCodes);
 
         var inputStream = new AntlrInputStream(s);
         var simpleLexer = new WistGrammarLexer(inputStream);

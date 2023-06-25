@@ -1,4 +1,4 @@
-﻿namespace Backend;
+﻿namespace Backend.Interpreter;
 
 using System.Runtime.CompilerServices;
 

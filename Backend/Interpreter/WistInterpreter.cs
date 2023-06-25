@@ -1,4 +1,4 @@
-﻿namespace Backend;
+﻿namespace Backend.Interpreter;
 
 public static unsafe partial class WistInterpreter
 {
@@ -14,7 +14,7 @@ public static unsafe partial class WistInterpreter
         &PushConst, &Add, &Cmp, &JmpIfFalse, &CallExternalMethod, &JmpIfTrue, &Jmp, &SetLocal, &LoadLocal,
         &LessThan, &GreaterThan, &NotCmp, &LessOrEquals, &GreaterOrEquals, &Sub, &Rem, &Mul, &Div, &Ret, &CallFunc,
         &Drop, &Dup, &SetElem, &PushElem, &AddElem, &SetGlobal, &LoadGlobal, &CopyClass, &SetField, &LoadField,
-        &CallMethod
+        &CallMethod, &SetFirstRegister, &LoadFirstRegister
     };
 
     private static void Init(WistImageObject imageObject)

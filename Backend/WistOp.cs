@@ -32,5 +32,7 @@ public enum WistOp : byte
     CopyClass,
     SetField,
     LoadField,
-    CallMethod
+    CallMethod,
+    SetFirstRegister,
+    LoadFirstRegister
 }

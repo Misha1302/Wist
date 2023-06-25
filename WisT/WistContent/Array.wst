@@ -1,0 +1,32 @@
+﻿import "WistTypeConverter.dll"
+
+class Array(_array) {
+    method Constructor(arr) {
+        this._array = arr
+    }
+    
+    method Add(el) {
+        AddElem(this._array, el)
+    }
+    
+    method SetElem(ind, value) {
+       this._array[ind] = value
+    }
+    
+    method ToString() {
+        return ToStr(this._array);
+    }
+    
+    method Average() {
+        let sum = 0
+        let len = GetLen(this._array)
+        loop let i = 1; i <= len; i = i + 1 {
+            sum = sum + (this._array[i])
+        }
+        return sum / len
+    }
+    
+    method GetLen() {
+        return GetLen(this._array)
+    }
+}

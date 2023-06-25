@@ -1,6 +1,8 @@
 ﻿namespace WistTypeConverter;
 
 using Backend;
+using Backend.Attributes;
+using Backend.Interpreter;
 
 [WistLib]
 public static class WistTypeConverter

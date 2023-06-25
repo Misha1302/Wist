@@ -1,4 +1,4 @@
-﻿namespace Backend;
+﻿namespace Backend.Glossary;
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

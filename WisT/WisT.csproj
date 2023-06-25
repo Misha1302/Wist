@@ -25,19 +25,31 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="WistGrammar\WistGrammar.g4">
+        <Content Include="WistContent\WistGrammar.g4">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <Content Include="WistGrammar\Code.wst">
+        <Content Include="WistContent\Code.wst">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <Content Include="WistGrammar\OtherCode.wst">
+        <Content Update="WistGrammar\Array.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Update="WistGrammar">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Backend\Backend.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="WistGrammar\Array.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="WistContent\Array.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>
