@@ -156,6 +156,8 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitElementOfArrayAssigment(WistGrammarParser.ElementOfArrayAssigmentContext context)
     {
+        Visit(context.expression(0)); // array
+        
         var assigmentSign = context.ASSIGMENT_SIGN().GetText();
         if (assigmentSign != "=")
         {
@@ -167,8 +169,6 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             HandleMulOrAddOp(assigmentSign[..^1]);
         }
         
-        Visit(context.expression(0)); // array
-        Visit(context.expression(2)); // value
         Visit(context.expression(1)); // index
 
         _imageBuilder.SetElem();
