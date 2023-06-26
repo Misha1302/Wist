@@ -6,9 +6,9 @@ statement: simpleStatement (SEMICOLON simpleStatement)* (SEMICOLON)? NEWLINE;
 simpleStatement: methodCall | call | gotoLabel | setLabel | return | dllImport | assigment;
 
 assigment: varAssigment | elementOfArrayAssigment | fieldAssigment;
-fieldAssigment: expression '.' IDENTIFIER '=' expression;
-varAssigment: (TYPE)? IDENTIFIER '=' expression;
-elementOfArrayAssigment: expression '[' expression ']' '=' expression;
+fieldAssigment: expression '.' IDENTIFIER ASSIGMENT_SIGN expression;
+varAssigment: (TYPE)? IDENTIFIER ASSIGMENT_SIGN expression;
+elementOfArrayAssigment: expression '[' expression ']' ASSIGMENT_SIGN expression;
 
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
@@ -48,6 +48,7 @@ expression
 
 constant: NUMBER | STRING | BOOL | NULL;
 
+ASSIGMENT_SIGN: '=' | '+=' | '-=' | '*=' | '/=';
 NEWLINE: ( '\r'? '\n' | '\r' | '\f' );
 SEMICOLON: ';';
 NUMBER: [-]? [0-9] [0-9_]* ('.' [0-9_]*)? ('e' ('+' | '-')? [0-9_]*)?;

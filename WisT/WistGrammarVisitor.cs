@@ -91,7 +91,20 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitFieldAssigment(WistGrammarParser.FieldAssigmentContext context)
     {
         Visit(context.expression(0)); // class
-        Visit(context.expression(1)); // value
+
+        var assigmentSign = context.ASSIGMENT_SIGN().GetText();
+        if (assigmentSign != "=")
+        {
+            Visit(context.expression(0)); // class
+            _imageBuilder.LoadField(context.IDENTIFIER().GetText()); // field
+            Visit(context.expression(1));
+            HandleMulOrAddOp(assigmentSign[..^1]);
+        }
+        else
+        {
+            Visit(context.expression(1)); // value
+        }
+
         _imageBuilder.SetField(context.IDENTIFIER().GetText());
         return default;
     }
@@ -114,20 +127,27 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     {
         _needResultLevel++;
         var type = context.TYPE()?.GetText();
-
-        var expressionContext = context.expression();
-
         var name = context.IDENTIFIER().GetText();
-
-        Visit(expressionContext);
 
         if (type == "let")
             _imageBuilder.CreateLocal(name);
         else if (type == "var")
             _imageBuilder.CreateGlobal(name);
-
+        
+        
+        var assigmentSign = context.ASSIGMENT_SIGN().GetText();
+        if (assigmentSign != "=")
+        {
+            _imageBuilder.LoadGlobalOrLocal(name);
+            Visit(context.expression());
+            HandleMulOrAddOp(assigmentSign[..^1]);
+        }
+        else
+        {
+            Visit(context.expression()); // value
+        }
+        
         _imageBuilder.SetGlobalOrLocal(name);
-
 
         _needResultLevel--;
 
@@ -136,6 +156,17 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitElementOfArrayAssigment(WistGrammarParser.ElementOfArrayAssigmentContext context)
     {
+        var assigmentSign = context.ASSIGMENT_SIGN().GetText();
+        if (assigmentSign != "=")
+        {
+            Visit(context.expression(0)); // array
+            Visit(context.expression(1)); // index
+            _imageBuilder.PushElem(); // push elem
+            
+            Visit(context.expression(2)); // value
+            HandleMulOrAddOp(assigmentSign[..^1]);
+        }
+        
         Visit(context.expression(0)); // array
         Visit(context.expression(2)); // value
         Visit(context.expression(1)); // index
@@ -390,12 +421,18 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
 
-        if (context.ADD_OP().GetText() == "+")
+        var text = context.ADD_OP().GetText();
+        HandleAddOp(text);
+
+        return default;
+    }
+
+    private void HandleAddOp(string text)
+    {
+        if (text == "+")
             _imageBuilder.Add();
         else
             _imageBuilder.Sub();
-
-        return default;
     }
 
     public override object? VisitMulExpression(WistGrammarParser.MulExpressionContext context)
@@ -403,12 +440,39 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         foreach (var expressionContext in context.expression())
             Visit(expressionContext);
 
-        if (context.MUL_OP().GetText() == "*")
+        var text = context.MUL_OP().GetText();
+        HandleMulOp(text);
+
+        return default;
+    }
+
+    private void HandleMulOp(string text)
+    {
+        if (text == "*")
             _imageBuilder.Mul();
         else
             _imageBuilder.Div();
+    }
 
-        return default;
+    private void HandleMulOrAddOp(string text)
+    {
+        switch (text)
+        {
+            case "*":
+                _imageBuilder.Mul();
+                break;
+            case "/":
+                _imageBuilder.Div();
+                break;
+            case "+":
+                _imageBuilder.Add();
+                break;
+            case "-":
+                _imageBuilder.Sub();
+                break;
+            default:
+                throw new WistException($"Unknown operation {text}");
+        }
     }
 
     public override object? VisitDllImport(WistGrammarParser.DllImportContext context)
