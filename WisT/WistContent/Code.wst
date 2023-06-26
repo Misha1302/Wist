@@ -4,8 +4,8 @@ import "Array.wst"
 
 func Start() {
     let deltas = new Array([]) 
-
-    loop let c = 0; c < 100_000; c = c + 1 {
+    
+    loop let c = 0; c < 100; c = c + 1 {
         let t = GetTime()
     
         let arr = new Array([1,2,3,4])

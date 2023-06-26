@@ -363,4 +363,10 @@ public class WistImageBuilder
     }
 
     private record WistBuilderClass(string Name, List<string> Fields, List<string> Methods);
+
+    public void PushList()
+    {
+        _ops.Add(WistOp.PushNewList);
+        SetConst(default);
+    }
 }

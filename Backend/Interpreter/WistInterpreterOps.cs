@@ -47,6 +47,12 @@ public static partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void PushNewList()
+    {
+        Push(new WistConst(new List<WistConst>()));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Ret()
     {
         PopVariables();

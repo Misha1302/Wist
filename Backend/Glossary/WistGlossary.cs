@@ -22,6 +22,7 @@ internal struct WistGlossary<TValue>
     private int _freeCount;
     private int _freeList;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistGlossary(int capacity)
     {
         capacity = WistGlossaryHelper.GetPrime(capacity);
@@ -33,6 +34,7 @@ internal struct WistGlossary<TValue>
         _length = 0;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistGlossary() : this(7)
     {
     }
@@ -85,6 +87,7 @@ internal struct WistGlossary<TValue>
         return ref entry.Value;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Add(int key, in TValue value)
     {
         ref var entryValue = ref Add(key);
@@ -134,6 +137,7 @@ internal struct WistGlossary<TValue>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly WistEnumerator GetEnumerator() => new(_entries, _length);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly ref TValue GetValue(int key)
     {
         if (_length > 0)

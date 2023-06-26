@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 
 public static partial class WistInterpreter
 {
-    private static readonly WistConst[] _vars = new WistConst[32768];
+    private static readonly WistConst[] _vars = new WistConst[16384];
     private static readonly WistConst[] _globals = new WistConst[512];
-    private static readonly int[] _pushed = new int[32768];
+    private static readonly int[] _pushed = new int[16384];
     private static int _pvp;
     private static int _vp;
 

@@ -34,5 +34,6 @@ public enum WistOp : byte
     LoadField,
     CallMethod,
     SetFirstRegister,
-    LoadFirstRegister
+    LoadFirstRegister,
+    PushNewList
 }

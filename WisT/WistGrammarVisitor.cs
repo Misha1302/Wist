@@ -437,7 +437,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitArrayInit(WistGrammarParser.ArrayInitContext context)
     {
-        _imageBuilder.PushConst(new WistConst(new List<WistConst>()));
+        _imageBuilder.PushList();
         _imageBuilder.SetFirstRegister();
 
         var length = context.expression().Length;

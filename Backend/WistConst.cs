@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct WistConst
 {
-    [FieldOffset(0)] private readonly nint _ptr; // 8 bytes
+    [FieldOffset(0)] private readonly nint _ptr; // 4 or 8 bytes
     [FieldOffset(0)] private readonly double _valueR; // 8 bytes
     [FieldOffset(0)] private readonly long _valueL; // 8 bytes
     [FieldOffset(0)] private readonly int _valueI; // 4 bytes
@@ -14,18 +14,20 @@ public readonly struct WistConst
 
     // max - 8 bytes
     [FieldOffset(8)] public readonly WistType Type; // 1 byte
+    
+    [FieldOffset(16)] private readonly WistGcHandleProvider? _handle; // 8 bytes
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(string v)
     {
-        _ptr = Marshal.StringToHGlobalUni(v);
+        _handle = new WistGcHandleProvider(v);
         Type = WistType.String;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(WistClass c)
     {
-        _ptr = (nint)GCHandle.Alloc(c);
+        _handle = new WistGcHandleProvider(c);
         Type = WistType.Class;
     }
 
@@ -72,7 +74,7 @@ public readonly struct WistConst
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public WistConst(List<WistConst> wistConsts)
     {
-        _ptr = (nint)GCHandle.Alloc(wistConsts);
+        _handle = new WistGcHandleProvider(wistConsts);
         Type = WistType.List;
     }
 
@@ -91,13 +93,13 @@ public readonly struct WistConst
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_ptr).Target!;
+    public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistClass GetClass() => (WistClass)(((GCHandle)_ptr).Target ?? throw new InvalidOperationException());
+    public WistClass GetClass() => (WistClass)(((GCHandle)_handle!.Pointer).Target ?? throw new InvalidOperationException());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public string GetString() => Marshal.PtrToStringUni(_ptr)!;
+    public string GetString() => (string)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Equals(object? obj) => obj is WistConst c && c.GetHashCode() == GetHashCode();
