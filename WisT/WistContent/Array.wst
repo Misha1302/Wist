@@ -1,6 +1,10 @@
 ﻿import "WistTypeConverter.dll"
 
 class Array(_array) {
+    method Constructor() {
+        this._array = []
+    }
+    
     method Constructor(arr) {
         this._array = arr
     }

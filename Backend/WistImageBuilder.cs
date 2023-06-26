@@ -104,11 +104,11 @@ public class WistImageBuilder
         _globals.Add(name);
     }
 
-    public void CreateFunction(string name)
+    public void CreateFunction(string name, int paramsCount)
     {
         EndPreviousFunc();
 
-        var generated = GenerateFuncName(name);
+        var generated = GenerateFuncName(name + paramsCount);
         Jmp(generated + "_end");
         SetLabel(generated);
         _curFunction = (generated, 0);
@@ -180,12 +180,12 @@ public class WistImageBuilder
         SetConst(default);
     }
 
-    public void CallFunc(string funcName)
+    public void CallFunc(string funcName, int paramsCount)
     {
         _ops.Add(WistOp.CallFunc);
         SetConst(default);
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
-        _jumps.Add((_constants.Count - 1, GenerateFuncName(funcName)));
+        _jumps.Add((_constants.Count - 1, GenerateFuncName(funcName + paramsCount)));
     }
 
     public void Drop()
@@ -328,11 +328,11 @@ public class WistImageBuilder
         SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
     }
 
-    public void CreateMethod(string name)
+    public void CreateMethod(string name, int paramsCount)
     {
         EndPreviousFunc();
 
-        var generated = GenerateMethodName(name);
+        var generated = GenerateMethodName(name + paramsCount);
         Jmp(generated + "_end");
         SetLabel(generated);
         _curFunction = (generated, 0);
@@ -343,10 +343,10 @@ public class WistImageBuilder
     private string GenerateMethodName(string name) => $"{_classes[^1].Name}_<method>_{name}";
     private static string GenerateFuncName(string name) => $"<func>_{name}";
 
-    public void CallMethod(string methName)
+    public void CallMethod(string methName, int paramsCount)
     {
         _ops.Add(WistOp.CallMethod);
-        SetConst(WistConst.CreateInternalConst(GenerateMethodName(methName).GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(GenerateMethodName(methName + paramsCount).GetHashCode()));
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
     }
 

@@ -60,7 +60,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
         _imageBuilder.InstantiateClass(context.IDENTIFIER().GetText());
         _imageBuilder.Dup();
-        _imageBuilder.CallMethod(Constructor);
+        _imageBuilder.CallMethod(Constructor, context.expression().Length);
 
         return default;
     }
@@ -74,7 +74,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _needResultLevel = 0;
         _wistLibsManager.AddLibByType(typeof(WistBuildInFunctions));
 
-        _imageBuilder.CallFunc(MainFuncName);
+        _imageBuilder.CallFunc(MainFuncName, 0);
 
         Visit(program);
 
@@ -272,7 +272,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitMethodDecl(WistGrammarParser.MethodDeclContext context)
     {
         var methodName = context.IDENTIFIER(0).GetText();
-        _imageBuilder.CreateMethod(methodName);
+        _imageBuilder.CreateMethod(methodName, context.IDENTIFIER().Length - 1);
 
 
         _imageBuilder.CreateLocal(This);
@@ -298,7 +298,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
-        _imageBuilder.CreateFunction(context.IDENTIFIER(0).GetText());
+        _imageBuilder.CreateFunction(context.IDENTIFIER(0).GetText(), context.IDENTIFIER().Length - 1);
 
         // handle parameters
         for (var i = context.IDENTIFIER().Length - 1; i >= 1; i--)
@@ -392,14 +392,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
             if (m is not null)
                 _imageBuilder.CallExternalMethod(m);
-            else _imageBuilder.CallFunc(name);
+            else _imageBuilder.CallFunc(name, context.expression().Length);
         }
         else
         {
             Visit(_methodCall);
             _imageBuilder.Dup();
             _methodCall = null;
-            _imageBuilder.CallMethod(name);
+            _imageBuilder.CallMethod(name, context.expression().Length);
         }
 
         if (_needResultLevel == 0)

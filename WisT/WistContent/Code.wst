@@ -3,15 +3,25 @@ import "WistTime.dll"
 import "Array.wst"
 
 func Start() {
-    let input = "Hello"
-    let arr = [1,2,3]
+    MyPrint(1)
+    MyPrint(1, 2)
+    MyPrint(1, 2, 3)
+    
+    let arr = new Array()
     let arr2 = new Array([1,2,3])
     
-    input += "!!!"
-    arr[2] += 10
-    arr2._array[2] *= 20
-    
-    Print(input)
     Print(arr)
     Print(arr2)
+}
+
+func MyPrint(a) {
+    Print(a)
+}
+
+func MyPrint(a, b) {
+    Print(ToStr(a) + ToStr(b))
+}
+
+func MyPrint(a, b, c) {
+    Print(ToStr(a) + ToStr(b) + ToStr(c))
 }
