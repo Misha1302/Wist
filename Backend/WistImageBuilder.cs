@@ -362,11 +362,35 @@ public class WistImageBuilder
         SetConst(default);
     }
 
-    private record WistBuilderClass(string Name, List<string> Fields, List<string> Methods);
-
     public void PushList()
     {
         _ops.Add(WistOp.PushNewList);
         SetConst(default);
     }
+
+    public void And()
+    {
+        _ops.Add(WistOp.And);
+        SetConst(default);
+    }
+
+    public void Or()
+    {
+        _ops.Add(WistOp.Or);
+        SetConst(default);
+    }
+
+    public void Xor()
+    {
+        _ops.Add(WistOp.Xor);
+        SetConst(default);
+    }
+
+    public void Not()
+    {
+        _ops.Add(WistOp.Not);
+        SetConst(default);
+    }
+
+    private record WistBuilderClass(string Name, List<string> Fields, List<string> Methods);
 }

@@ -13,8 +13,12 @@ public class WistException : Exception
         throw new WistException("Types must be the same");
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static WistConst ThrowInvalidOperationForThisType(WistType aType, WistType bType) =>
+    public static WistConst ThrowInvalidOperationForThisTypes(WistType aType, WistType bType) =>
         throw new WistException($"Invalid operation for types: {aType}, {bType}");
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static WistConst ThrowInvalidOperationForThisType(WistType aType) =>
+        throw new WistException($"Invalid operation for type {aType}");
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void ThrowTypeMustBe(WistType t) =>

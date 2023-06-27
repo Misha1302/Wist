@@ -17,6 +17,10 @@ class Array(_array) {
        this._array[ind] = value
     }
     
+    method GetElem(ind) {
+       return this._array[ind]
+    }
+    
     method ToString() {
         return ToStr(this._array);
     }

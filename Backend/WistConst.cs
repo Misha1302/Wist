@@ -14,7 +14,7 @@ public readonly struct WistConst
 
     // max - 8 bytes
     [FieldOffset(8)] public readonly WistType Type; // 1 byte
-    
+
     [FieldOffset(16)] private readonly WistGcHandleProvider? _handle; // 8 bytes
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,7 +96,8 @@ public readonly struct WistConst
     public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistClass GetClass() => (WistClass)(((GCHandle)_handle!.Pointer).Target ?? throw new InvalidOperationException());
+    public WistClass GetClass() =>
+        (WistClass)(((GCHandle)_handle!.Pointer).Target ?? throw new InvalidOperationException());
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetString() => (string)((GCHandle)_handle!.Pointer).Target!;

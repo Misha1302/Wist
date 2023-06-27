@@ -14,7 +14,7 @@ public static unsafe partial class WistInterpreter
         &PushConst, &Add, &Cmp, &JmpIfFalse, &CallExternalMethod, &JmpIfTrue, &Jmp, &SetLocal, &LoadLocal,
         &LessThan, &GreaterThan, &NotCmp, &LessOrEquals, &GreaterOrEquals, &Sub, &Rem, &Mul, &Div, &Ret, &CallFunc,
         &Drop, &Dup, &SetElem, &PushElem, &AddElem, &SetGlobal, &LoadGlobal, &CopyClass, &SetField, &LoadField,
-        &CallMethod, &SetFirstRegister, &LoadFirstRegister, &PushNewList
+        &CallMethod, &SetFirstRegister, &LoadFirstRegister, &PushNewList, &And, &Or, &Xor, &Not
     };
 
     private static void Init(WistImageObject imageObject)
@@ -25,7 +25,7 @@ public static unsafe partial class WistInterpreter
     }
 
 
-    public static void Run(WistImageObject imageObject)
+    public static WistConst Run(WistImageObject imageObject)
     {
         Init(imageObject);
 
@@ -42,6 +42,8 @@ public static unsafe partial class WistInterpreter
 
             _functions[(int)wistOp]();
         }
+
+        return Pop();
     }
 
     public static void Exit()

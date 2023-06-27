@@ -47,10 +47,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     }
 
     public override object? VisitClassInitExpression(WistGrammarParser.ClassInitExpressionContext context)
-    {
-        Visit(context.classInit());
-        return default;
-    }
+        => Visit(context.classInit());
 
     public override object? VisitClassInit(WistGrammarParser.ClassInitContext context)
     {
@@ -133,8 +130,8 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _imageBuilder.CreateLocal(name);
         else if (type == "var")
             _imageBuilder.CreateGlobal(name);
-        
-        
+
+
         var assigmentSign = context.ASSIGMENT_SIGN().GetText();
         if (assigmentSign != "=")
         {
@@ -146,7 +143,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         {
             Visit(context.expression()); // value
         }
-        
+
         _imageBuilder.SetGlobalOrLocal(name);
 
         _needResultLevel--;
@@ -157,18 +154,18 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitElementOfArrayAssigment(WistGrammarParser.ElementOfArrayAssigmentContext context)
     {
         Visit(context.expression(0)); // array
-        
+
         var assigmentSign = context.ASSIGMENT_SIGN().GetText();
         if (assigmentSign != "=")
         {
             Visit(context.expression(0)); // array
             Visit(context.expression(1)); // index
             _imageBuilder.PushElem(); // push elem
-            
+
             Visit(context.expression(2)); // value
             HandleMulOrAddOp(assigmentSign[..^1]);
         }
-        
+
         Visit(context.expression(1)); // index
 
         _imageBuilder.SetElem();
@@ -241,6 +238,41 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
         return default;
     }
+
+    public override object? VisitBoolExpression(WistGrammarParser.BoolExpressionContext context)
+    {
+        Visit(context.expression(0));
+        Visit(context.expression(1));
+        switch (context.BOOL_OP().GetText())
+        {
+            case "and":
+                _imageBuilder.And();
+                break;
+            case "or":
+                _imageBuilder.Or();
+                break;
+            case "xor":
+                _imageBuilder.Xor();
+                break;
+            default:
+                throw new WistException("Unknown operator");
+        }
+
+        return default;
+    }
+
+    public override object? VisitNotExpression(WistGrammarParser.NotExpressionContext context)
+    {
+        Visit(context.expression());
+        _imageBuilder.Not();
+        return default;
+    }
+
+    public override object? VisitElseIfBlock(WistGrammarParser.ElseIfBlockContext context) =>
+        Visit((IParseTree)context.block() ?? context.ifBlock());
+
+    public override object? VisitParenthesizedExpression(WistGrammarParser.ParenthesizedExpressionContext context) =>
+        Visit(context.expression());
 
     public override object? VisitLoopBlock(WistGrammarParser.LoopBlockContext context)
     {
@@ -364,10 +396,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
 
     public override object? VisitFunctionExpression(WistGrammarParser.FunctionExpressionContext context)
-    {
-        Visit(context.call());
-        return default;
-    }
+        => Visit(context.call());
 
     public override object? VisitMethodExpression(WistGrammarParser.MethodExpressionContext context)
     {
@@ -496,6 +525,18 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         }
 
         end:
+        return default;
+    }
+
+    public override object? VisitGotoLabel(WistGrammarParser.GotoLabelContext context)
+    {
+        _imageBuilder.Jmp(context.IDENTIFIER().GetText());
+        return default;
+    }
+
+    public override object? VisitSetLabel(WistGrammarParser.SetLabelContext context)
+    {
+        _imageBuilder.SetLabel(context.IDENTIFIER().GetText());
         return default;
     }
 

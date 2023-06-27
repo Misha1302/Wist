@@ -1,27 +1,47 @@
 ﻿import "WistRandomLib.dll"
-import "WistTime.dll"
 import "Array.wst"
 
 func Start() {
-    MyPrint(1)
-    MyPrint(1, 2)
-    MyPrint(1, 2, 3)
+    if (InputNumber("Введите 1, если хотите сыграть, иначе - 0") == 1) {
+        Play()
+    }
+    else {
+        BoolOps()
+    }
+}
+
+func BoolOps() {
+    let b1 = true
+    let b2 = true
     
-    let arr = new Array()
-    let arr2 = new Array([1,2,3])
+    Print(b1 and b2)
+    Print(b1 or b2)
+    Print(b1 xor b2)
+    Print(!(b1 and b2))
+}
+
+func Play() {
+    let objects = new Array(["камень", "ножницы", "бумага"])
+    let opposites = new Array(["бумага", "камень", "ножницы"])
     
-    Print(arr)
-    Print(arr2)
+    let i = InputNumber("1 - камень. 2 - ножницы. 3 - бумага")
+    let rndInd = RandomInteger(1, 3)
+    
+    if objects.GetElem(i) == opposites.GetElem(rndInd) {
+        Print("Ничья!")
+        goto end
+    }
+    if i == rndInd {
+        Print("Вы проиграли!")
+        goto end
+    }
+    
+    Print("Вы выиграли!")
+    
+    end:
 }
 
-func MyPrint(a) {
-    Print(a)
-}
-
-func MyPrint(a, b) {
-    Print(ToStr(a) + ToStr(b))
-}
-
-func MyPrint(a, b, c) {
-    Print(ToStr(a) + ToStr(b) + ToStr(c))
+func InputNumber(output) {
+    Print(output)
+    return ToNumber(Input())
 }

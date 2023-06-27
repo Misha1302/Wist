@@ -27,8 +27,9 @@ public static class WistToStringManager
         StringBuilder sb = new();
         for (var i = 0; i < wistImageObject.Ops.Count; i++)
             if (wistImageObject.Consts2[i].Type != WistType.None)
-                sb.AppendLine($"{wistImageObject.Ops[i]} : {wistImageObject.Consts[i]} : {wistImageObject.Consts2[i]}");
-            else sb.AppendLine($"{wistImageObject.Ops[i]} : {wistImageObject.Consts[i]}");
+                sb.AppendLine(
+                    $"{i}. {wistImageObject.Ops[i]} : {wistImageObject.Consts[i]} : {wistImageObject.Consts2[i]}");
+            else sb.AppendLine($"{i}. {wistImageObject.Ops[i]} : {wistImageObject.Consts[i]}");
 
         return sb.ToString();
     }

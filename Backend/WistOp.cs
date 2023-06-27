@@ -35,5 +35,9 @@ public enum WistOp : byte
     CallMethod,
     SetFirstRegister,
     LoadFirstRegister,
-    PushNewList
+    PushNewList,
+    And,
+    Or,
+    Xor,
+    Not
 }
