@@ -4,6 +4,12 @@ using System.Runtime.CompilerServices;
 
 public static partial class WistInterpreter
 {
+    // ReSharper disable 4 InconsistentNaming
+    private static readonly int __add__ = "__add__2".GetHashCode();
+    private static readonly int __sub__ = "__sub__2".GetHashCode();
+    private static readonly int __mul__ = "__mul__2".GetHashCode();
+    private static readonly int __div__ = "__div__2".GetHashCode();
+
     private static WistConst _firstRegister;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,9 +35,16 @@ public static partial class WistInterpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void CallMethod()
     {
-        PushVariables(_consts2[_index].GetInternalInteger());
+        CallMethodInternal(_consts2[_index].GetInternalInteger(), _consts[_index].GetInternalInteger(),
+            Pop().GetClass());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CallMethodInternal(int varsCountToPush, int methodId, WistClass @class)
+    {
+        PushVariables(varsCountToPush);
         PushRet(_index);
-        _index = Pop().GetClass().GetMethodPtr(_consts[_index].GetInternalInteger());
+        _index = @class.GetMethodPtr(methodId);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -65,17 +78,32 @@ public static partial class WistInterpreter
         var b = Pop();
         var a = Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
-
-        var res = a.Type switch
+        switch (a.Type)
         {
-            WistType.Number => new WistConst(a.GetNumber() + b.GetNumber()),
-            WistType.String => new WistConst(a.GetString() + b.GetString()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
-        };
-
-        Push(res);
+            case WistType.Number:
+                if (a.Type != b.Type)
+                    WistException.ThrowTypesMustBeTheSame();
+                
+                var res = new WistConst(a.GetNumber() + b.GetNumber());
+                Push(res);
+                break;
+            case WistType.String:
+                if (a.Type != b.Type)
+                    WistException.ThrowTypesMustBeTheSame();
+                
+                res = new WistConst(a.GetString() + b.GetString());
+                Push(res);
+                break;
+            case WistType.Class:
+                var @class = a.GetClass();
+                _sp += 2;
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __add__, @class);
+                break;
+            default:
+                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                break;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -87,13 +115,25 @@ public static partial class WistInterpreter
         if (a.Type != b.Type)
             WistException.ThrowTypesMustBeTheSame();
 
-        var res = a.Type switch
+        switch (a.Type)
         {
-            WistType.Number => new WistConst(a.GetNumber() - b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
-        };
-
-        Push(res);
+            case WistType.Number:
+                if (a.Type != b.Type)
+                    WistException.ThrowTypesMustBeTheSame();
+                
+                var res = new WistConst(a.GetNumber() - b.GetNumber());
+                Push(res);
+                break;
+            case WistType.Class:
+                var @class = a.GetClass();
+                _sp += 2;
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __sub__, @class);
+                break;
+            default:
+                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                break;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -105,13 +145,25 @@ public static partial class WistInterpreter
         if (a.Type != b.Type)
             WistException.ThrowTypesMustBeTheSame();
 
-        var res = a.Type switch
+        switch (a.Type)
         {
-            WistType.Number => new WistConst(a.GetNumber() * b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
-        };
-
-        Push(res);
+            case WistType.Number:
+                if (a.Type != b.Type)
+                    WistException.ThrowTypesMustBeTheSame();
+                
+                var res = new WistConst(a.GetNumber() * b.GetNumber());
+                Push(res);
+                break;
+            case WistType.Class:
+                var @class = a.GetClass();
+                _sp += 2;
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __mul__, @class);
+                break;
+            default:
+                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                break;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -123,13 +175,25 @@ public static partial class WistInterpreter
         if (a.Type != b.Type)
             WistException.ThrowTypesMustBeTheSame();
 
-        var res = a.Type switch
+        switch (a.Type)
         {
-            WistType.Number => new WistConst(a.GetNumber() / b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
-        };
-
-        Push(res);
+            case WistType.Number:
+                if (a.Type != b.Type)
+                    WistException.ThrowTypesMustBeTheSame();
+                
+                var res = new WistConst(a.GetNumber() / b.GetNumber());
+                Push(res);
+                break;
+            case WistType.Class:
+                var @class = a.GetClass();
+                _sp += 2;
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __div__, @class);
+                break;
+            default:
+                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                break;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

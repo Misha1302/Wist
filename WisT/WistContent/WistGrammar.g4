@@ -31,6 +31,7 @@ expression
     : constant                              #constantExpression
     | expression '[' expression ']'         #elementOfArrayExpression
     | expression '.' call                   #methodExpression
+    | expression '.' IDENTIFIER             #fieldExpression
     | call                                  #functionExpression
     | IDENTIFIER                            #identifierExpression
     | '(' expression ')'                    #parenthesizedExpression
@@ -42,7 +43,6 @@ expression
     | expression BOOL_OP expression         #boolExpression
     | arrayInit                             #arrayInitExpression
     | classInit                             #classInitExpression
-    | expression '.' IDENTIFIER             #fieldExpression
     ;
 
 

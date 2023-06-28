@@ -59,4 +59,20 @@ public static class WistBuildInFunctions
 
         WistInterpreter.Push(value);
     }
+
+    [WistLibFunction]
+    public static void UniteLists()
+    {
+        var list1 = WistInterpreter.Pop();
+        var list2 = WistInterpreter.Pop();
+        var result = new WistConst(new List<WistConst>());
+
+        if (list1.Type != WistType.List || list1.Type != list2.Type)
+            throw new WistException($"Cannot unite lists, 'cause types: {list1.Type} {list2.Type}");
+
+        result.GetList().AddRange(list1.GetList());
+        result.GetList().AddRange(list2.GetList());
+
+        WistInterpreter.Push(result);
+    }
 }

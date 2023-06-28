@@ -1,11 +1,11 @@
 ﻿import "WistTypeConverter.dll"
 
 class Array(_array) {
-    method Constructor() {
+    method Ctor() {
         this._array = []
     }
     
-    method Constructor(arr) {
+    method Ctor(arr) {
         this._array = arr
     }
     
@@ -36,5 +36,10 @@ class Array(_array) {
     
     method GetLen() {
         return GetLen(this._array)
+    }
+    
+    method __add__(left, right) 
+    {
+        return new Array(UniteLists(left._array, right._array))
     }
 }

@@ -6,7 +6,7 @@ using WisT.WistContent;
 const string dir = "WistContent";
 const string path = @$"{dir}\Code.wst";
 
-var code = WistPreprocessor.Preprocess(File.ReadAllText(path), path);
+var code = WistPreprocessor.Preprocess(File.ReadAllText(path));
 
 var inputStream = new AntlrInputStream(code);
 var simpleLexer = new WistGrammarLexer(inputStream);

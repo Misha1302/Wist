@@ -9,7 +9,7 @@ using WisT.WistContent;
 public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
     private const string This = "this";
-    private const string Constructor = "Constructor";
+    private const string Constructor = "Ctor";
     private const string MainFuncName = "Start";
 
     private WistImageBuilder _imageBuilder = null!;
@@ -520,7 +520,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             var fullPath = Path.GetFullPath(Path.Combine(_path, path));
             if (_importedCodes.Contains(fullPath)) goto end;
 
-            CompileOtherCode(File.ReadAllText(fullPath));
+            CompileOtherCode(WistPreprocessor.Preprocess(File.ReadAllText(fullPath)));
             _importedCodes.Add(fullPath);
         }
 
