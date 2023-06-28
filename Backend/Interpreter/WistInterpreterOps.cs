@@ -83,14 +83,14 @@ public static partial class WistInterpreter
             case WistType.Number:
                 if (a.Type != b.Type)
                     WistException.ThrowTypesMustBeTheSame();
-                
+
                 var res = new WistConst(a.GetNumber() + b.GetNumber());
                 Push(res);
                 break;
             case WistType.String:
                 if (a.Type != b.Type)
                     WistException.ThrowTypesMustBeTheSame();
-                
+
                 res = new WistConst(a.GetString() + b.GetString());
                 Push(res);
                 break;
@@ -120,7 +120,7 @@ public static partial class WistInterpreter
             case WistType.Number:
                 if (a.Type != b.Type)
                     WistException.ThrowTypesMustBeTheSame();
-                
+
                 var res = new WistConst(a.GetNumber() - b.GetNumber());
                 Push(res);
                 break;
@@ -150,7 +150,7 @@ public static partial class WistInterpreter
             case WistType.Number:
                 if (a.Type != b.Type)
                     WistException.ThrowTypesMustBeTheSame();
-                
+
                 var res = new WistConst(a.GetNumber() * b.GetNumber());
                 Push(res);
                 break;
@@ -180,7 +180,7 @@ public static partial class WistInterpreter
             case WistType.Number:
                 if (a.Type != b.Type)
                     WistException.ThrowTypesMustBeTheSame();
-                
+
                 var res = new WistConst(a.GetNumber() / b.GetNumber());
                 Push(res);
                 break;

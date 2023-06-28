@@ -2,35 +2,26 @@
 import "Array.wst"
 
 func Start() {
-    Print(new Array([1,5,1]) + new Array([1,5,1]))
-    Print(new SmClass(2) + new SmClass(5))
-    Print(new SmClass(2) - new SmClass(5))
-    Print(new SmClass(2) * new SmClass(5))
-    Print(new SmClass(2) / new SmClass(5))
+    Print(new Dog().Eat())
 }
 
-class SmClass(a) {
+class AnimalBase(_eat) {
     method Ctor() {
-        Print("Ctor in sm class")
+        this._eat = 0
+    }
+
+    method Eat() {
+        this._eat += 10
+    }
+}
+
+class Dog(parents) {
+    method Ctor() {
+        this.parents = new Array([new AnimalBase()])
     }
     
-    method Ctor(a) {
-        this.a = a
-    }
-    
-    method __add__(left, right) {
-        return new SmClass(left.a + right.a)
-    }
-    
-    method __sub__(left, right) {
-        return new SmClass(left.a - right.a)
-    }
-    
-    method __mul__(left, right) {
-        return new SmClass(left.a * right.a)
-    }
-    
-    method __div__(left, right) {
-        return new SmClass(left.a / right.a)
+    method Eat() {
+        this.parents.GetElem(1).Eat()
+        return this.parents.GetElem(1)._eat
     }
 }

@@ -6,7 +6,7 @@ public static partial class WistPreprocessor
 {
     [GeneratedRegex("\\s*\\n*\\s*\\}.*\\n*\\s*")]
     private static partial Regex FigureBlockEndRegex();
-    
+
     [GeneratedRegex("\\s*\\n*\\s*\\{[^\\}\\n\\r]*\\n*\\s*")]
     private static partial Regex FigureBlockStartRegex();
 

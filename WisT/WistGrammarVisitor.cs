@@ -109,7 +109,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitMethodCall(WistGrammarParser.MethodCallContext context)
     {
         _methodCall = context.expression();
+
         Visit(context.call());
+
         return default;
     }
 
@@ -425,7 +427,10 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         }
         else
         {
+            _needResultLevel++;
             Visit(_methodCall);
+            _needResultLevel--;
+
             _imageBuilder.Dup();
             _methodCall = null;
             _imageBuilder.CallMethod(name, context.expression().Length);
