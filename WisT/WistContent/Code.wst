@@ -1,11 +1,12 @@
-﻿init "Start"
-
-import "WistRandomLib.dll"
-import "Array.wst"
+﻿import "Array.wst"
 import "Types.wst"
 
 func Start() {
     Print(new Type(new Dog()) == new Type(new AnimalBase())) 
+    Print(new Type(1) == new Type(2))
+    Print(new Type(Number) == new Type(Number))
+    
+     
     Print(new Type(new AnimalBase()).IsSubclass(new Type(new Dog())))
     Print(new Type(new Dog()).IsSubclass(new Type(new AnimalBase())))
     

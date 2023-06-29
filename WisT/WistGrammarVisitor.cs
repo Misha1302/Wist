@@ -10,6 +10,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
     private const string This = "this";
     private const string Constructor = "Ctor";
+    private const string StartFuncName = "Start";
 
     private WistImageBuilder _imageBuilder = null!;
     private List<string> _importedCodes = null!;
@@ -329,6 +330,12 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
     {
+        if (context.IDENTIFIER(0).GetText() == StartFuncName)
+        {
+            _imageBuilder.EndFunc();
+            _imageBuilder.CallFunc(StartFuncName, 0);
+        }
+
         _imageBuilder.CreateFunction(context.IDENTIFIER(0).GetText(), context.IDENTIFIER().Length - 1);
 
         // handle parameters

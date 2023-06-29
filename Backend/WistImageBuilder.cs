@@ -292,7 +292,7 @@ public class WistImageBuilder
     }
 
     public bool IsLocal(string name) => _locals.Contains(GenerateLocalName(name));
-    public bool IsGlobal(string name) => _globals.Contains(GenerateLocalName(name));
+    public bool IsGlobal(string name) => _globals.Contains(name);
 
 
     private string GenerateLocalName(string name) => $"local<{name}>{_curFunction.name}";
@@ -400,6 +400,11 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.Not);
         SetConst(default);
+    }
+
+    public void EndFunc()
+    {
+        EndPreviousFunc();
     }
 
     private record WistBuilderClass(string? Name, List<string> Fields, List<string> Methods);
