@@ -8,15 +8,15 @@ using Backend.Interpreter;
 public static class WistTypeConverter
 {
     [WistLibFunction]
-    public static void ToStr()
+    public static void ToStr(WistInterpreter i)
     {
-        WistInterpreter.Push(new WistConst(WistInterpreter.Pop().ToString()));
+        i.Push(new WistConst(i.Pop().ToString()));
     }
 
     [WistLibFunction]
-    public static void ToBool()
+    public static void ToBool(WistInterpreter i)
     {
-        var wistConst = WistInterpreter.Pop();
+        var wistConst = i.Pop();
         var result = wistConst.Type switch
         {
             WistType.Bool => wistConst.GetBool(),
@@ -25,13 +25,13 @@ public static class WistTypeConverter
             _ => throw new WistException($"Cannot convert {wistConst.Type} to bool")
         };
 
-        WistInterpreter.Push(new WistConst(result));
+        i.Push(new WistConst(result));
     }
 
     [WistLibFunction]
-    public static void ToNumber()
+    public static void ToNumber(WistInterpreter i)
     {
-        var wistConst = WistInterpreter.Pop();
+        var wistConst = i.Pop();
         var result = wistConst.Type switch
         {
             WistType.Bool => wistConst.GetBool() ? 1 : 0,
@@ -40,6 +40,6 @@ public static class WistTypeConverter
             _ => throw new WistException($"Cannot convert {wistConst.Type} to number")
         };
 
-        WistInterpreter.Push(new WistConst(result));
+        i.Push(new WistConst(result));
     }
 }

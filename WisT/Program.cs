@@ -1,5 +1,5 @@
 ﻿using Antlr4.Runtime;
-using Backend.Interpreter;
+using Backend;
 using WisT;
 using WisT.WistContent;
 
@@ -16,5 +16,5 @@ var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
 
 var image = visitor.CompileCode(simpleContext, dir);
-var resultValue = WistInterpreter.Run(image);
-Console.WriteLine($"main func returned: {resultValue}");
+var resultValue = WistEngine.CreateEngine(image);
+Console.WriteLine($"main func returned: {resultValue.Run()}");

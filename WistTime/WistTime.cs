@@ -8,8 +8,8 @@ using Backend.Interpreter;
 public static class WistTime
 {
     [WistLibFunction]
-    public static void GetTime()
+    public static void GetTime(WistInterpreter i)
     {
-        WistInterpreter.Push(new WistConst(DateTimeOffset.Now.ToUnixTimeMilliseconds()));
+        i.Push(new WistConst(DateTimeOffset.Now.ToUnixTimeMilliseconds()));
     }
 }

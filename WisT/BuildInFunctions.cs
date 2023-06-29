@@ -8,63 +8,63 @@ using Backend.Interpreter;
 public static class WistBuildInFunctions
 {
     [WistLibFunction]
-    public static void Print()
+    public static void Print(WistInterpreter i)
     {
-        Console.WriteLine(WistInterpreter.Pop());
-        WistInterpreter.Push(WistConst.CreateNull());
+        Console.WriteLine(i.Pop());
+        i.Push(WistConst.CreateNull());
     }
 
     [WistLibFunction]
-    public static void Write()
+    public static void Write(WistInterpreter i)
     {
-        Console.Write(WistInterpreter.Pop());
-        WistInterpreter.Push(WistConst.CreateNull());
+        Console.Write(i.Pop());
+        i.Push(WistConst.CreateNull());
     }
 
     [WistLibFunction]
-    public static void Input()
+    public static void Input(WistInterpreter i)
     {
-        WistInterpreter.Push(new WistConst(Console.ReadLine() ?? string.Empty));
+        i.Push(new WistConst(Console.ReadLine() ?? string.Empty));
     }
 
     [WistLibFunction]
-    public static void Exit()
+    public static void Exit(WistInterpreter i)
     {
-        WistInterpreter.Exit();
+        i.ExitInterpreter();
         // there is no need for Interpreter.Push(WistConst.CreateNull()) because the program will already exit
     }
 
     [WistLibFunction]
-    public static void GetLen()
+    public static void GetLen(WistInterpreter i)
     {
-        var value = WistInterpreter.Pop();
+        var value = i.Pop();
         var res = value.Type switch
         {
             WistType.List => new WistConst(value.GetList().Count),
             WistType.String => new WistConst(value.GetString().Length),
             _ => throw new WistException($"Cannot get len for this type {value.Type}")
         };
-        WistInterpreter.Push(res);
+        i.Push(res);
     }
 
     [WistLibFunction]
-    public static void AddElem()
+    public static void AddElem(WistInterpreter i)
     {
-        var value = WistInterpreter.Pop();
-        var list = WistInterpreter.Pop();
+        var value = i.Pop();
+        var list = i.Pop();
 
         if (list.Type == WistType.List)
             list.GetList().Add(value);
         else throw new WistException($"Cannot add element for this type {value.Type}");
 
-        WistInterpreter.Push(value);
+        i.Push(value);
     }
 
     [WistLibFunction]
-    public static void UniteLists()
+    public static void UniteLists(WistInterpreter i)
     {
-        var list1 = WistInterpreter.Pop();
-        var list2 = WistInterpreter.Pop();
+        var list1 = i.Pop();
+        var list2 = i.Pop();
         var result = new WistConst(new List<WistConst>());
 
         if (list1.Type != WistType.List || list1.Type != list2.Type)
@@ -73,24 +73,24 @@ public static class WistBuildInFunctions
         result.GetList().AddRange(list1.GetList());
         result.GetList().AddRange(list2.GetList());
 
-        WistInterpreter.Push(result);
+        i.Push(result);
     }
 
     [WistLibFunction]
-    public static void GetTypeAsNumber()
+    public static void GetTypeAsNumber(WistInterpreter i)
     {
-        WistInterpreter.Push(new WistConst((int)WistInterpreter.Pop().Type));
+        i.Push(new WistConst((int)i.Pop().Type));
     }
 
     [WistLibFunction]
-    public static void IsSubclass()
+    public static void IsSubclass(WistInterpreter i)
     {
-        var b = WistInterpreter.Pop();
-        var a = WistInterpreter.Pop();
+        var b = i.Pop();
+        var a = i.Pop();
 
         if (a.Type != WistType.Class || b.Type != WistType.Class)
             throw new WistException("first and second param must be classes");
 
-        WistInterpreter.Push(new WistConst(a.GetClass().IsSubclass(b.GetClass())));
+        i.Push(new WistConst(a.GetClass().IsSubclass(b.GetClass())));
     }
 }

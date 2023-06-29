@@ -1,49 +1,9 @@
 ﻿import "Array.wst"
 import "Types.wst"
+import "WistTypeConverter.dll"
 
 func Start() {
-    Print(new Type(new Dog()) == new Type(new AnimalBase())) 
-    Print(new Type(1) == new Type(2))
-    Print(new Type(Number) == new Type(Number))
-    
-     
-    Print(new Type(new AnimalBase()).IsSubclass(new Type(new Dog())))
-    Print(new Type(new Dog()).IsSubclass(new Type(new AnimalBase())))
-    
-    new Dog().Bark()
-    new Dog().Bark1()
-    new Dog().Bark2()
-}
-
-class AnimalBase(_eat) {
-    method Ctor() {
-        this._eat = 0
-    }
-
-    method Eat() {
-        this._eat += 10
-    }
-}
-
-class Dog(_eat) {
-    method Ctor() {
-        this.parents = new Array([new AnimalBase()])
-    }
-    
-    method Eat() {
-        this.parents.GetElem(1).Eat()
-        this._eat = this.parents.GetElem(1)._eat
-    }
-    
-    method Bark() {
-        Print("Woof-woof")
-    }
-    
-    method Bark1() {
-        Print("Woof-woof")
-    }
-    
-    method Bark2() {
-        Print("Woof-woof")
+    loop let i = 0; i < 100; i += 1 {
+        Print("This is " + ToStr(i) + " print")
     }
 }
