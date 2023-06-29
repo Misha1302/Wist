@@ -1,15 +1,10 @@
 ﻿namespace Backend.Interpreter;
 
 using System.Runtime.CompilerServices;
+using static WistMagicMethodsNames;
 
 public static partial class WistInterpreter
 {
-    // ReSharper disable 4 InconsistentNaming
-    private static readonly int __add__ = "__add__2".GetHashCode();
-    private static readonly int __sub__ = "__sub__2".GetHashCode();
-    private static readonly int __mul__ = "__mul__2".GetHashCode();
-    private static readonly int __div__ = "__div__2".GetHashCode();
-
     private static WistConst _firstRegister;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -307,15 +302,27 @@ public static partial class WistInterpreter
         if (a.Type != b.Type)
             WistException.ThrowTypesMustBeTheSame();
 
-        var res = a.Type switch
+        switch (a.Type)
         {
-            WistType.Number => new WistConst(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01),
-            WistType.String => new WistConst(a.GetString() == b.GetString()),
-            WistType.Null => new WistConst(b.Type == WistType.Null),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
-        };
+            case WistType.Number:
+                if (a.Type != b.Type)
+                    WistException.ThrowTypesMustBeTheSame();
 
-        return res;
+                var res = new WistConst(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01);
+                Push(res);
+                break;
+            case WistType.Class:
+                var @class = a.GetClass();
+                _sp += 2;
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __cmp__, @class);
+                break;
+            default:
+                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                break;
+        }
+
+        return Pop();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

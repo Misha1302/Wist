@@ -112,7 +112,7 @@ public class WistImageBuilder
     {
         EndPreviousFunc();
 
-        var generated = GenerateFuncName(name + paramsCount);
+        var generated = GenerateFuncName(name, paramsCount);
         Jmp(generated + "_end");
         SetLabel(generated);
         _curFunction = (generated, 0);
@@ -189,7 +189,7 @@ public class WistImageBuilder
         _ops.Add(WistOp.CallFunc);
         SetConst(default);
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
-        _jumps.Add((_constants.Count - 1, GenerateFuncName(funcName + paramsCount)));
+        _jumps.Add((_constants.Count - 1, GenerateFuncName(funcName, paramsCount)));
     }
 
     public void Drop()
@@ -350,7 +350,7 @@ public class WistImageBuilder
         $"{className ?? _classes[^1].Name}_<method>_{name}";
 
     private static string GenerateMethodNameToCall(string name) => $"{name}";
-    private static string GenerateFuncName(string name) => $"<func>_{name}";
+    private static string GenerateFuncName(string name, int paramsCount) => $"<func>_{name}_<{paramsCount}>";
 
     public void CallMethod(string methName, int paramsCount)
     {

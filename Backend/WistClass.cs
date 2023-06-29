@@ -43,10 +43,33 @@ public class WistClass
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetMethodPtr(int id) => _methods.GetValue(id);
 
-    public IEnumerable<(int, WistConst)> GetAllFields()
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsSubclass(WistClass other)
+    {
+        foreach (var entry in other._fields)
+            if (!_fields.ContainsKey(entry.Key))
+                return false;
+
+        foreach (var entry in other._methods)
+            if (!_methods.ContainsKey(entry.Key))
+                return false;
+
+        return true;
+    }
+
+    public List<(int, WistConst)> GetAllFields()
     {
         var list = new List<(int, WistConst)>();
         var e = _fields.GetEnumerator();
+        while (e.MoveNext())
+            list.Add((e.Current.Key, e.Current.Value));
+        return list;
+    }
+
+    public List<(int Key, int Value)> GetAllMethods()
+    {
+        var list = new List<(int Key, int Value)>();
+        var e = _methods.GetEnumerator();
         while (e.MoveNext())
             list.Add((e.Current.Key, e.Current.Value));
         return list;

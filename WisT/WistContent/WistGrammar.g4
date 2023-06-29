@@ -1,6 +1,6 @@
 grammar WistGrammar;
 
-program: line* EOF;
+program: initFunc? line* EOF;
 line: statement | ifBlock | whileBlock | loopBlock | funcDecl | methodDecl | classDecl;
 statement: simpleStatement (SEMICOLON simpleStatement)* (SEMICOLON)? NEWLINE;
 simpleStatement: methodCall | call | gotoLabel | setLabel | return | dllImport | assigment;
@@ -10,6 +10,7 @@ fieldAssigment: expression '.' IDENTIFIER ASSIGMENT_SIGN expression;
 varAssigment: (TYPE)? IDENTIFIER ASSIGMENT_SIGN expression;
 elementOfArrayAssigment: expression '[' expression ']' ASSIGMENT_SIGN expression;
 
+initFunc: 'init' STRING;
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;

@@ -75,4 +75,22 @@ public static class WistBuildInFunctions
 
         WistInterpreter.Push(result);
     }
+
+    [WistLibFunction]
+    public static void GetTypeAsNumber()
+    {
+        WistInterpreter.Push(new WistConst((int)WistInterpreter.Pop().Type));
+    }
+
+    [WistLibFunction]
+    public static void IsSubclass()
+    {
+        var b = WistInterpreter.Pop();
+        var a = WistInterpreter.Pop();
+
+        if (a.Type != WistType.Class || b.Type != WistType.Class)
+            throw new WistException("first and second param must be classes");
+
+        WistInterpreter.Push(new WistConst(a.GetClass().IsSubclass(b.GetClass())));
+    }
 }

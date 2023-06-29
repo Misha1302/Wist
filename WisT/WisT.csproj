@@ -50,6 +50,9 @@
         <None Update="WistContent\Array.wst">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="WistContent\Types.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

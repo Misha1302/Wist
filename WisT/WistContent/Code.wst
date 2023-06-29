@@ -1,8 +1,17 @@
-﻿import "WistRandomLib.dll"
+﻿init "Start"
+
+import "WistRandomLib.dll"
 import "Array.wst"
+import "Types.wst"
 
 func Start() {
-    Print(new Dog().Eat())
+    Print(new Type(new Dog()) == new Type(new AnimalBase())) 
+    Print(new Type(new AnimalBase()).IsSubclass(new Type(new Dog())))
+    Print(new Type(new Dog()).IsSubclass(new Type(new AnimalBase())))
+    
+    new Dog().Bark()
+    new Dog().Bark1()
+    new Dog().Bark2()
 }
 
 class AnimalBase(_eat) {
@@ -15,13 +24,25 @@ class AnimalBase(_eat) {
     }
 }
 
-class Dog(parents) {
+class Dog(_eat) {
     method Ctor() {
         this.parents = new Array([new AnimalBase()])
     }
     
     method Eat() {
         this.parents.GetElem(1).Eat()
-        return this.parents.GetElem(1)._eat
+        this._eat = this.parents.GetElem(1)._eat
+    }
+    
+    method Bark() {
+        Print("Woof-woof")
+    }
+    
+    method Bark1() {
+        Print("Woof-woof")
+    }
+    
+    method Bark2() {
+        Print("Woof-woof")
     }
 }

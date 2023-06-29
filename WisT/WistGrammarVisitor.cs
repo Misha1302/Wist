@@ -10,7 +10,6 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 {
     private const string This = "this";
     private const string Constructor = "Ctor";
-    private const string MainFuncName = "Start";
 
     private WistImageBuilder _imageBuilder = null!;
     private List<string> _importedCodes = null!;
@@ -37,7 +36,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     {
         _imageBuilder.CreateClass(
             context.IDENTIFIER(0).GetText(),
-            context.IDENTIFIER().Skip(1).Select(x => x.GetText()).ToList(),
+            context.IDENTIFIER().Skip(1).Select(x => x.GetText()).Append("parents").ToList(),
             new List<string>()
         );
 
@@ -70,8 +69,6 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _importedCodes = new List<string>();
         _needResultLevel = 0;
         _wistLibsManager.AddLibByType(typeof(WistBuildInFunctions));
-
-        _imageBuilder.CallFunc(MainFuncName, 0);
 
         Visit(program);
 
@@ -584,6 +581,12 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         var simpleContext = simpleParser.program();
 
         visitor.Visit(simpleContext);
+    }
+
+    public override object? VisitInitFunc(WistGrammarParser.InitFuncContext context)
+    {
+        _imageBuilder.CallFunc(context.STRING().GetText()[1..^1], 0);
+        return default;
     }
 
     public WistImageObject GetFixedImage() => _imageBuilder.Compile();

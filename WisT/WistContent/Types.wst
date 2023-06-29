@@ -1,0 +1,27 @@
+﻿init "TypesStart"
+
+func TypesStart() {
+    var None = 0
+    var Number = 1
+    var String = 2
+    var InternalInteger = 3
+    var Bool = 4
+    var Pointer = 5
+    var Null = 6
+    var List = 7
+    var Class = 8
+}
+
+class Type(t) {
+    method Ctor(t) {
+        this.t = t
+    }
+    
+    method __cmp__(v1, v2) {
+        return GetTypeAsNumber(v1.t) == GetTypeAsNumber(v2.t)
+    }
+    
+    method IsSubclass(v2) {
+        return IsSubclass(this.t, v2.t)
+    }
+}
