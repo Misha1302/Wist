@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 /// <typeparam name="TValue"></typeparam>
 [DebuggerDisplay("Length = {Length}")]
 [SuppressMessage("ReSharper", "InvertIf")]
-internal struct WistGlossary<TValue>
+public struct WistGlossary<TValue>
     where TValue : struct
 {
     private static TValue _defaultValue;

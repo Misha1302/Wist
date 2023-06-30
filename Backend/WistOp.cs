@@ -39,5 +39,6 @@ public enum WistOp : byte
     And,
     Or,
     Xor,
-    Not
+    Not,
+    CreateGlobal
 }

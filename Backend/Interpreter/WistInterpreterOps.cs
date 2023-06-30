@@ -403,6 +403,12 @@ public partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CreateGlobal(WistInterpreter i)
+    {
+        i.CreateGlobalVar(i._consts[i._index].GetInternalInteger());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void LessThan(WistInterpreter i)
     {
         var b = i.Pop();

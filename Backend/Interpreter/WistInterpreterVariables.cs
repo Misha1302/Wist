@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 
 public partial class WistInterpreter
 {
-    private readonly WistConst[] _globals = new WistConst[512];
     private readonly int[] _pushed = new int[16384];
     private readonly WistConst[] _vars = new WistConst[16384];
     private int _pvp;
@@ -17,10 +16,18 @@ public partial class WistInterpreter
     public void SetCurVar(int offset, WistConst value) => _vars[_vp + offset] = value;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistConst GetGlobalVar(int offset) => _globals[offset];
+    public WistConst GetGlobalVar(int hash) => _engine.Globals.GetValue(hash);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetGlobalVar(int offset, WistConst value) => _globals[offset] = value;
+    public void SetGlobalVar(int hash, WistConst value) => _engine.Globals.GetValue(hash) = value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CreateGlobalVar(int hash)
+    {
+        var q = _engine.Globals;
+        q.Add(hash);
+        _engine.Globals = q;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void PushVariables(int count)

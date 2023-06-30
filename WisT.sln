@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistTypeConverter", "WistTy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistTime", "WistTime\WistTime.csproj", "{9DFEA7CD-C38E-4B1F-B302-D210E2B8AAE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistFiles", "WistFiles\WistFiles.csproj", "{47D40EFC-1BD9-44A6-89A9-D330C934C465}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{9DFEA7CD-C38E-4B1F-B302-D210E2B8AAE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DFEA7CD-C38E-4B1F-B302-D210E2B8AAE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DFEA7CD-C38E-4B1F-B302-D210E2B8AAE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

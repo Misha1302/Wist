@@ -1,0 +1,6 @@
+﻿func Start() {
+    loop let i = 0; i < 100; i += 1 {
+        returnValue += i
+        Print(returnValue)
+    }
+}

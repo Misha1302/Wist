@@ -8,7 +8,6 @@ public class WistImageBuilder
     private readonly List<(int ind, string c)> _classInserts = new();
     private readonly List<WistConst> _constants = new();
     private readonly List<WistConst> _constants2 = new();
-    private readonly List<string> _globals = new();
     private readonly List<(int jmpInd, string labelName)> _jumps = new();
     private readonly Dictionary<string, int> _labels = new();
     private readonly List<string> _locals = new();
@@ -105,7 +104,8 @@ public class WistImageBuilder
 
     public void CreateGlobal(string name)
     {
-        _globals.Add(name);
+        _ops.Add(WistOp.CreateGlobal);
+        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
     }
 
     public void CreateFunction(string name, int paramsCount)
@@ -265,24 +265,14 @@ public class WistImageBuilder
 
     private void SetGlobal(string name)
     {
-        var ind = FindGlobal(name);
-
         _ops.Add(WistOp.SetGlobal);
-        SetConst(WistConst.CreateInternalConst(ind));
+        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
     }
 
     private void LoadGlobal(string name)
     {
-        var ind = FindGlobal(name);
-
         _ops.Add(WistOp.LoadGlobal);
-        SetConst(WistConst.CreateInternalConst(ind));
-    }
-
-    private int FindGlobal(string name)
-    {
-        var ind = _globals.IndexOf(name);
-        return ind == -1 ? throw new WistException($"Cannot find {name} global") : ind;
+        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
     }
 
     private int FindLocal(string name)
@@ -292,7 +282,6 @@ public class WistImageBuilder
     }
 
     public bool IsLocal(string name) => _locals.Contains(GenerateLocalName(name));
-    public bool IsGlobal(string name) => _globals.Contains(name);
 
 
     private string GenerateLocalName(string name) => $"local<{name}>{_curFunction.name}";
@@ -300,8 +289,7 @@ public class WistImageBuilder
     public void LoadGlobalOrLocal(string name)
     {
         if (IsLocal(name)) LoadLocal(name);
-        else if (IsGlobal(name)) LoadGlobal(name);
-        else throw new WistException($"Unknown variable {name}");
+        else LoadGlobal(name);
     }
 
     public void SetGlobalOrLocal(string name)

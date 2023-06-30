@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
+using Backend.Interpreter;
 
 public static class WistProgram
 {
@@ -39,10 +40,10 @@ public static class WistProgram
 
 
         var wistFixedImage = image.Compile();
-        var engine = WistEngine.CreateEngine(wistFixedImage);
+        WistEngine.Instance.AddToTasks(new WistInterpreter(wistFixedImage));
 
         var s = Stopwatch.StartNew();
-        engine.Run();
+        WistEngine.Instance.Run();
         s.Stop();
         Console.WriteLine(s.ElapsedMilliseconds / 1000.0);
     }

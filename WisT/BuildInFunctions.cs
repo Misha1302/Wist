@@ -1,8 +1,10 @@
 ﻿namespace WisT;
 
+using Antlr4.Runtime;
 using Backend;
 using Backend.Attributes;
 using Backend.Interpreter;
+using WisT.WistContent;
 
 [WistLib]
 public static class WistBuildInFunctions
@@ -80,6 +82,25 @@ public static class WistBuildInFunctions
     public static void GetTypeAsNumber(WistInterpreter i)
     {
         i.Push(new WistConst((int)i.Pop().Type));
+    }
+
+    [WistLibFunction]
+    public static void StartAsync(WistInterpreter i)
+    {
+        var s = i.Pop().GetString();
+
+        var code = WistPreprocessor.Preprocess(s);
+
+        var inputStream = new AntlrInputStream(code);
+        var simpleLexer = new WistGrammarLexer(inputStream);
+        var commonTokenStream = new CommonTokenStream(simpleLexer);
+        var simpleParser = new WistGrammarParser(commonTokenStream);
+        var simpleContext = simpleParser.program();
+        var visitor = new WistGrammarVisitor();
+
+        var image = visitor.CompileCode(simpleContext, "Content");
+        WistEngine.Instance.AddToTasks(new WistInterpreter(image));
+        i.Push(WistConst.CreateNull());
     }
 
     [WistLibFunction]

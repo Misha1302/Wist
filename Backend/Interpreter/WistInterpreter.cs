@@ -11,18 +11,22 @@ public unsafe partial class WistInterpreter
         &PushConst, &Add, &Cmp, &JmpIfFalse, &CallExternalMethod, &JmpIfTrue, &Jmp, &SetLocal, &LoadLocal,
         &LessThan, &GreaterThan, &NotCmp, &LessOrEquals, &GreaterOrEquals, &Sub, &Rem, &Mul, &Div, &Ret, &CallFunc,
         &Drop, &Dup, &SetElem, &PushElem, &AddElem, &SetGlobal, &LoadGlobal, &CopyClass, &SetField, &LoadField,
-        &CallMethod, &SetFirstRegister, &LoadFirstRegister, &PushNewList, &And, &Or, &Xor, &Not
+        &CallMethod, &SetFirstRegister, &LoadFirstRegister, &PushNewList, &And, &Or, &Xor, &Not, &CreateGlobal
     };
 
     private WistConst[] _consts = null!;
     private WistConst[] _consts2 = null!;
     private int _index;
     private ImmutableArray<WistOp> _ops;
+    private WistEngine _engine;
+    public bool Halted => _index >= _ops.Length;
+
 
     public WistInterpreter(WistImageObject imageObject)
     {
         Init(imageObject);
     }
+
 
     private void Init(WistImageObject imageObject)
     {
@@ -34,7 +38,7 @@ public unsafe partial class WistInterpreter
 
     public void RunSteps(int count)
     {
-        for (var i = 0; i < count && _index < _ops.Length; _index++, count++)
+        for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
         {
             var wistOp = _ops[_index];
 
@@ -49,5 +53,10 @@ public unsafe partial class WistInterpreter
     public void ExitInterpreter()
     {
         _index = _ops.Length;
+    }
+
+    public void SetEngine(WistEngine engine)
+    {
+        _engine = engine;
     }
 }
