@@ -349,18 +349,6 @@ public class WistImageBuilder
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
     }
 
-    public void SetFirstRegister()
-    {
-        _ops.Add(WistOp.SetFirstRegister);
-        SetConst(default);
-    }
-
-    public void LoadFirstRegister()
-    {
-        _ops.Add(WistOp.LoadFirstRegister);
-        SetConst(default);
-    }
-
     public void PushList()
     {
         _ops.Add(WistOp.PushNewList);

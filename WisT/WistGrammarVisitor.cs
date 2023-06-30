@@ -213,7 +213,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         var endName = $"while_end_{Guid.NewGuid()}";
 
         _imageBuilder.SetLabel(startName);
+        _needResultLevel++;
         Visit(context.expression());
+        _needResultLevel--;
         _imageBuilder.JmpIfFalse(endName);
 
         Visit(context.block());
@@ -286,7 +288,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             Visit(lineContext); // let i = 0
 
         _imageBuilder.SetLabel(startName);
+        _needResultLevel++;
         var lineContext2 = context.expression();
+        _needResultLevel--;
         if (lineContext2 != null)
             Visit(lineContext2); // i < 10
         _imageBuilder.JmpIfFalse(endName);
@@ -553,19 +557,23 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitArrayInit(WistGrammarParser.ArrayInitContext context)
     {
         _imageBuilder.PushList();
-        _imageBuilder.SetFirstRegister();
+        
+        var name = Guid.NewGuid().ToString();
+        _imageBuilder.CreateLocal(name);
+        _imageBuilder.SetLocal(name);
 
         var length = context.expression().Length;
 
         for (var i = 0; i < length; i++)
         {
-            _imageBuilder.LoadFirstRegister();
+            _imageBuilder.LoadLocal(name);
+            _needResultLevel++;
             Visit(context.expression(i));
+            _needResultLevel--;
             _imageBuilder.AddElem();
         }
 
-        _imageBuilder.LoadFirstRegister();
-
+        _imageBuilder.LoadLocal(name);
         return default;
     }
 

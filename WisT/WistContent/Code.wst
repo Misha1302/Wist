@@ -1,15 +1,12 @@
 ﻿import "Array.wst"
 import "Types.wst"
+import "Enumerator.wst"
 import "WistTime.dll"
 
 func Start() {
-    loop let q = 0; q < 10; q += 1 {
-        let t = GetTime()
-        
-        loop let i = 0; i < 10_000_000; i += 1 { }
-        
-        Write(GetTime() - t)
-        Write("+")
+    let en = new Enumerator(new Array([1, 2, new Array([5, 1120]), "?", "Hello", new Array([5, 120]), "HI!"]))
+    
+    while en.MoveNext() {
+        Print(en.Current())
     }
-    Print("\b ")
 }

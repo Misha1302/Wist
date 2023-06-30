@@ -12,7 +12,7 @@ public unsafe partial class WistInterpreter
         &PushConst, &Add, &Cmp, &JmpIfFalse, &CallExternalMethod, &JmpIfTrue, &Jmp, &SetLocal, &LoadLocal,
         &LessThan, &GreaterThan, &NotCmp, &LessOrEquals, &GreaterOrEquals, &Sub, &Rem, &Mul, &Div, &Ret, &CallFunc,
         &Drop, &Dup, &SetElem, &PushElem, &AddElem, &SetGlobal, &LoadGlobal, &CopyClass, &SetField, &LoadField,
-        &CallMethod, &SetFirstRegister, &LoadFirstRegister, &PushNewList, &And, &Or, &Xor, &Not, &CreateGlobal
+        &CallMethod, &PushNewList, &And, &Or, &Xor, &Not, &CreateGlobal
     };
 
     private WistConst[] _consts = null!;
@@ -43,8 +43,7 @@ public unsafe partial class WistInterpreter
     {
         for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
         {
-
-            /* var format = $"{wistOp} :: {_consts[_index]}";
+            /* var format = $"{_ops[_index]} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
             Console.WriteLine(format); */
 

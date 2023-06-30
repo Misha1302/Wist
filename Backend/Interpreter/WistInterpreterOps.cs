@@ -5,8 +5,6 @@ using static WistMagicMethodsNames;
 
 public partial class WistInterpreter
 {
-    private static WistConst _firstRegister;
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void PushConst(WistInterpreter i)
     {
@@ -43,18 +41,6 @@ public partial class WistInterpreter
         i.PushVariables(varsCountToPush);
         i.PushRet(i._index);
         i._index = @class.GetMethodPtr(methodId);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetFirstRegister(WistInterpreter i)
-    {
-        _firstRegister = i.Pop();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LoadFirstRegister(WistInterpreter i)
-    {
-        i.Push(_firstRegister);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

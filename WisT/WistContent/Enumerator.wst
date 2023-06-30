@@ -1,0 +1,19 @@
+﻿class Enumerator(_arr, _ind) {
+    method Ctor(arr) {
+        this._arr = arr
+        this._ind = 0
+    }
+    
+    method MoveNext() {
+        this._ind += 1
+        return this._ind <= this._arr.GetLen()
+    }
+    
+    method Current() {
+        return this._arr.GetElem(this._ind)
+    }
+    
+    method Reset() {
+        this._ind = 0
+    }
+}
