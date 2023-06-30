@@ -8,8 +8,11 @@ using Backend.Interpreter;
 public static class WistTime
 {
     [WistLibFunction]
-    public static void GetTime(WistInterpreter i)
+    public static void GetTime(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 0) 
+            throw new WistException("number of parameters must be 0");
+        
         i.Push(new WistConst(DateTimeOffset.Now.ToUnixTimeMilliseconds()));
     }
 }

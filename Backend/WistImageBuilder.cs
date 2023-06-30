@@ -90,10 +90,11 @@ public class WistImageBuilder
         _jumps.Add((_constants.Count - 1, labelName));
     }
 
-    public void CallExternalMethod(MethodInfo methodInfo)
+    public void CallExternalMethod(MethodInfo methodInfo, int paramsCount)
     {
         _ops.Add(WistOp.CallExternalMethod);
         SetConst(WistConst.CreateInternalConst(methodInfo.MethodHandle.GetFunctionPointer()));
+        _constants2[^1] = WistConst.CreateInternalConst(paramsCount);
     }
 
     public void CreateLocal(string name)

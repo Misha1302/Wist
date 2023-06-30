@@ -1,15 +1,15 @@
 ﻿import "Array.wst"
 import "Types.wst"
-import "WistTypeConverter.dll"
-import "WistFiles.dll"
+import "WistTime.dll"
 
 func Start() {
-    var returnValue = 0
-    StartAsync(ReadTextFromFile("WistContent/AsyncCode.wst"))
-    
-    loop let i = 0; i < 200; i += 1 {
-        Print("Base!")
+    loop let q = 0; q < 10; q += 1 {
+        let t = GetTime()
+        
+        loop let i = 0; i < 10_000_000; i += 1 { }
+        
+        Write(GetTime() - t)
+        Write("+")
     }
-    
-    Print(returnValue)
+    Print("\b ")
 }

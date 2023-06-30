@@ -25,7 +25,7 @@ public static class WistProgram
         image.JmpIfFalse("end");
 
         image.CallExternalMethod(
-            typeof(WistProgram).GetMethod("PrintHelloWorld", BindingFlags.Static | BindingFlags.Public)!
+            typeof(WistProgram).GetMethod("PrintHelloWorld", BindingFlags.Static | BindingFlags.Public)!, 1
         );
 
         // i = i + 1

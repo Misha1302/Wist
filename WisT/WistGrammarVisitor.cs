@@ -1,6 +1,7 @@
 namespace WisT;
 
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using Backend;
@@ -229,7 +230,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _imageBuilder.PushConst(new WistConst(double.Parse(i.GetText().Replace("_", ""), NumberStyles.Any,
                 CultureInfo.InvariantCulture)));
         else if (context.STRING() is { } s)
-            _imageBuilder.PushConst(new WistConst(s.GetText()[1..^1]));
+            _imageBuilder.PushConst(new WistConst(Regex.Unescape(s.GetText()[1..^1])));
         else if (context.BOOL() is { } b)
             _imageBuilder.PushConst(new WistConst(b.GetText() == "true"));
         else if (context.NULL() is not null)
@@ -426,7 +427,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             var m = _wistLibsManager.TryGetFunction(name);
 
             if (m is not null)
-                _imageBuilder.CallExternalMethod(m);
+                _imageBuilder.CallExternalMethod(m, context.expression().Length);
             else _imageBuilder.CallFunc(name, context.expression().Length);
         }
         else

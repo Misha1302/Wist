@@ -10,35 +10,50 @@ using WisT.WistContent;
 public static class WistBuildInFunctions
 {
     [WistLibFunction]
-    public static void Print(WistInterpreter i)
+    public static void Print(WistInterpreter i, int paramsCount)
     {
-        Console.WriteLine(i.Pop());
+        if (paramsCount > 1)
+            throw new WistException("number of parameters must be 1 or 0");
+        
+        Console.WriteLine(paramsCount == 1 ? i.Pop() : "");
         i.Push(WistConst.CreateNull());
     }
 
     [WistLibFunction]
-    public static void Write(WistInterpreter i)
+    public static void Write(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+        
         Console.Write(i.Pop());
         i.Push(WistConst.CreateNull());
     }
 
     [WistLibFunction]
-    public static void Input(WistInterpreter i)
+    public static void Input(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 0)
+            throw new WistException("number of parameters must be 0");
+
         i.Push(new WistConst(Console.ReadLine() ?? string.Empty));
     }
 
     [WistLibFunction]
-    public static void Exit(WistInterpreter i)
+    public static void Exit(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 0)
+            throw new WistException("number of parameters must be 0");
+
         i.ExitInterpreter();
         // there is no need for Interpreter.Push(WistConst.CreateNull()) because the program will already exit
     }
 
     [WistLibFunction]
-    public static void GetLen(WistInterpreter i)
+    public static void GetLen(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
         var value = i.Pop();
         var res = value.Type switch
         {
@@ -50,8 +65,11 @@ public static class WistBuildInFunctions
     }
 
     [WistLibFunction]
-    public static void AddElem(WistInterpreter i)
+    public static void AddElem(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 2)
+            throw new WistException("number of parameters must be 2");
+
         var value = i.Pop();
         var list = i.Pop();
 
@@ -63,8 +81,11 @@ public static class WistBuildInFunctions
     }
 
     [WistLibFunction]
-    public static void UniteLists(WistInterpreter i)
+    public static void UniteLists(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 2)
+            throw new WistException("number of parameters must be 2");
+
         var list1 = i.Pop();
         var list2 = i.Pop();
         var result = new WistConst(new List<WistConst>());
@@ -79,14 +100,20 @@ public static class WistBuildInFunctions
     }
 
     [WistLibFunction]
-    public static void GetTypeAsNumber(WistInterpreter i)
+    public static void GetTypeAsNumber(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
         i.Push(new WistConst((int)i.Pop().Type));
     }
 
     [WistLibFunction]
-    public static void StartAsync(WistInterpreter i)
+    public static void StartAsync(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
         var s = i.Pop().GetString();
 
         var code = WistPreprocessor.Preprocess(s);
@@ -104,8 +131,11 @@ public static class WistBuildInFunctions
     }
 
     [WistLibFunction]
-    public static void IsSubclass(WistInterpreter i)
+    public static void IsSubclass(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 2)
+            throw new WistException("number of parameters must be 2");
+
         var b = i.Pop();
         var a = i.Pop();
 

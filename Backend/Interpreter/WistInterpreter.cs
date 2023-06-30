@@ -1,6 +1,7 @@
 ﻿namespace Backend.Interpreter;
 
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 
 public unsafe partial class WistInterpreter
 {
@@ -16,16 +17,17 @@ public unsafe partial class WistInterpreter
 
     private WistConst[] _consts = null!;
     private WistConst[] _consts2 = null!;
+    private WistEngine _engine = null!;
     private int _index;
     private ImmutableArray<WistOp> _ops;
-    private WistEngine _engine;
-    public bool Halted => _index >= _ops.Length;
 
 
     public WistInterpreter(WistImageObject imageObject)
     {
         Init(imageObject);
     }
+
+    public bool Halted => _index >= _ops.Length;
 
 
     private void Init(WistImageObject imageObject)
@@ -36,17 +38,17 @@ public unsafe partial class WistInterpreter
         _index = 0;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public void RunSteps(int count)
     {
         for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
         {
-            var wistOp = _ops[_index];
 
             /* var format = $"{wistOp} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
             Console.WriteLine(format); */
 
-            _functions[(int)wistOp](this);
+            _functions[(int)_ops[_index]](this);
         }
     }
 

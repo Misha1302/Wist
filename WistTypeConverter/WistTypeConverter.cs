@@ -8,14 +8,20 @@ using Backend.Interpreter;
 public static class WistTypeConverter
 {
     [WistLibFunction]
-    public static void ToStr(WistInterpreter i)
+    public static void ToStr(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
         i.Push(new WistConst(i.Pop().ToString()));
     }
 
     [WistLibFunction]
-    public static void ToBool(WistInterpreter i)
+    public static void ToBool(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
         var wistConst = i.Pop();
         var result = wistConst.Type switch
         {
@@ -29,8 +35,11 @@ public static class WistTypeConverter
     }
 
     [WistLibFunction]
-    public static void ToNumber(WistInterpreter i)
+    public static void ToNumber(WistInterpreter i, int paramsCount)
     {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
         var wistConst = i.Pop();
         var result = wistConst.Type switch
         {
