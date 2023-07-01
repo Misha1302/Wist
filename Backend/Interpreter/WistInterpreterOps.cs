@@ -371,8 +371,8 @@ public partial class WistInterpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void SetField(WistInterpreter i)
     {
-        var value = i.Pop();
         var c = i.Pop().GetClass();
+        var value = i.Pop();
         c.SetField(i._consts[i._index].GetInternalInteger(), value);
     }
 

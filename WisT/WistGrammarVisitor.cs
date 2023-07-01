@@ -86,14 +86,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFieldAssigment(WistGrammarParser.FieldAssigmentContext context)
     {
-        Visit(context.expression(0)); // class
+        _needResultLevel++;
 
         var assigmentSign = context.ASSIGMENT_SIGN().GetText();
         if (assigmentSign != "=")
         {
             Visit(context.expression(0)); // class
             _imageBuilder.LoadField(context.IDENTIFIER().GetText()); // field
-            Visit(context.expression(1));
+            Visit(context.expression(1)); // value
             HandleMulOrAddOp(assigmentSign[..^1]);
         }
         else
@@ -101,9 +101,14 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             Visit(context.expression(1)); // value
         }
 
+        Visit(context.expression(0)); // class
+
+        _needResultLevel--;
+
         _imageBuilder.SetField(context.IDENTIFIER().GetText());
         return default;
     }
+
 
     public override object? VisitMethodCall(WistGrammarParser.MethodCallContext context)
     {
@@ -309,19 +314,27 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitMethodDecl(WistGrammarParser.MethodDeclContext context)
     {
         var methodName = context.IDENTIFIER(0).GetText();
-        _imageBuilder.CreateMethod(methodName, context.IDENTIFIER().Length - 1);
+        var parameters = context.IDENTIFIER();
+        CreateMethod(methodName, parameters, () => Visit(context.block()));
+
+        return default;
+    }
+
+    private void CreateMethod(string methodName, IReadOnlyList<ITerminalNode> identifiers, Action func)
+    {
+        _imageBuilder.CreateMethod(methodName, identifiers.Count - 1);
 
 
         _imageBuilder.CreateLocal(This);
         _imageBuilder.SetLocal(This);
-        for (var i = context.IDENTIFIER().Length - 1; i >= 1; i--)
+        for (var i = identifiers.Count - 1; i >= 1; i--)
         {
-            var name = context.IDENTIFIER(i).GetText();
+            var name = identifiers[i].GetText();
             _imageBuilder.CreateLocal(name);
             _imageBuilder.SetLocal(name);
         }
 
-        Visit(context.block());
+        func();
 
         if (methodName == Constructor)
             _imageBuilder.LoadLocal(This);
@@ -329,8 +342,6 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _imageBuilder.PushConst(WistConst.CreateNull());
 
         _imageBuilder.Ret();
-
-        return default;
     }
 
     public override object? VisitFuncDecl(WistGrammarParser.FuncDeclContext context)
@@ -387,9 +398,8 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _imageBuilder.SetLabel(endIfName);
 
         // else block
-        var elseIfBlockContext = context.elseIfBlock();
-        if (elseIfBlockContext != null)
-            Visit(elseIfBlockContext);
+        if (context.elseIfBlock() != null)
+            Visit(context.elseIfBlock());
 
         _imageBuilder.SetLabel(elseEndName);
 
@@ -557,7 +567,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitArrayInit(WistGrammarParser.ArrayInitContext context)
     {
         _imageBuilder.PushList();
-        
+
         var name = Guid.NewGuid().ToString();
         _imageBuilder.CreateLocal(name);
         _imageBuilder.SetLocal(name);

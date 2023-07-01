@@ -4,9 +4,33 @@ import "Enumerator.wst"
 import "WistTime.dll"
 
 func Start() {
-    let en = new Enumerator(new Array([1, 2, new Array([5, 1120]), "?", "Hello", new Array([5, 120]), "HI!"]))
-    
-    while en.MoveNext() {
-        Print(en.Current())
+    let g1 = new Generator()
+    let g2 = new Generator2()
+
+    while g1.MoveNext() and g2.MoveNext() {
+        Print("First method returned: " + ToStr(g1.Current()))
+        Print("Second method returned: " + ToStr(g2.Current()))
     }
 }
+
+generator Generator() {
+    Print("1. calculations 1...")
+    give "First state"
+
+    Print("1. enter some symbols...")
+    give 5555 * 99999
+
+    Print("1. calculations 3...")
+    give 1 / 3 * 3
+}
+
+
+
+generator Generator2() {
+    Print("2. calculations 1...")
+    give "First state"
+    
+    Print("2. calculations 2...")
+    give 1 / 3
+}
+
