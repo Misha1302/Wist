@@ -4,16 +4,6 @@ using System.Text;
 
 internal static class WistGenerator
 {
-    private static string Top(string name) => $@"
-class {name}(_state, _current) {{
-    method Ctor() {{
-        this._state = 0
-    }}
-    
-    method MoveNext() {{
-        this._state += 1
-";
-
     private const string Bottom = """
 
         this._state = -1
@@ -26,6 +16,16 @@ class {name}(_state, _current) {{
 }
 """;
 
+    private static string Top(string name) => $@"
+class {name}(_state, _current) {{
+    method Ctor() {{
+        this._state = 0
+    }}
+    
+    method MoveNext() {{
+        this._state += 1
+";
+
     public static string CreateGenerator(string s, string name)
     {
         StringBuilder sb = new(s.Length * 2);
@@ -35,7 +35,7 @@ class {name}(_state, _current) {{
         {
             var ind = s.IndexOf("give", StringComparison.Ordinal);
             if (ind == -1) break;
-            
+
             sb.Append($"if this._state == {i} {{");
 
             sb.Append(s[..ind]);
@@ -45,7 +45,7 @@ class {name}(_state, _current) {{
             sb.AppendLine($"this._current = {s[..indexOf]}");
             sb.AppendLine("return true");
             sb.Append('}');
-            
+
             s = s.Remove(0, indexOf);
             i++;
         }

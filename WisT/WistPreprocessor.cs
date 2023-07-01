@@ -55,7 +55,7 @@ public static partial class WistPreprocessor
 
             sb.Remove(startInd, curInd - startInd);
             code = code.Remove(startInd, curInd - startInd);
-            
+
             sb.Append(WistGenerator.CreateGenerator(s, name));
         }
 

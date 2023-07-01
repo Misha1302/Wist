@@ -42,13 +42,10 @@ public unsafe partial class WistInterpreter
     public void RunSteps(int count)
     {
         for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
-        {
             /* var format = $"{_ops[_index]} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
             Console.WriteLine(format); */
-
             _functions[(int)_ops[_index]](this);
-        }
     }
 
     public void ExitInterpreter()

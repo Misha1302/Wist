@@ -347,7 +347,8 @@ public partial class WistInterpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe void CallExternalMethod(WistInterpreter i)
     {
-        ((delegate*<WistInterpreter, int, void>)i._consts[i._index].GetInternalPtr())(i, i._consts2[i._index].GetInternalInteger());
+        ((delegate*<WistInterpreter, int, void>)i._consts[i._index].GetInternalPtr())(i,
+            i._consts2[i._index].GetInternalInteger());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

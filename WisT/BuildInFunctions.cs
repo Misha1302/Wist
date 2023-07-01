@@ -14,7 +14,7 @@ public static class WistBuildInFunctions
     {
         if (paramsCount > 1)
             throw new WistException("number of parameters must be 1 or 0");
-        
+
         Console.WriteLine(paramsCount == 1 ? i.Pop() : "");
         i.Push(WistConst.CreateNull());
     }
@@ -24,7 +24,7 @@ public static class WistBuildInFunctions
     {
         if (paramsCount != 1)
             throw new WistException("number of parameters must be 1");
-        
+
         Console.Write(i.Pop());
         i.Push(WistConst.CreateNull());
     }

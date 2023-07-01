@@ -14,7 +14,7 @@ public static class WistRandom
     {
         if (paramsCount != 1)
             throw new WistException("number of parameters must be 1");
-        
+
         _random = new Random((int)i.Pop().GetNumber());
     }
 
@@ -23,7 +23,7 @@ public static class WistRandom
     {
         if (paramsCount != 2)
             throw new WistException("number of parameters must be 2");
-        
+
         var max = i.Pop().GetNumber();
         var min = i.Pop().GetNumber();
         i.Push(new WistConst(Random.Shared.Next((int)min, (int)max + 1)));
@@ -34,7 +34,7 @@ public static class WistRandom
     {
         if (paramsCount != 2)
             throw new WistException("number of parameters must be 2");
-        
+
         var max = i.Pop().GetNumber();
         var min = i.Pop().GetNumber();
         i.Push(new WistConst(_random.NextDouble() * (max - min) + min));

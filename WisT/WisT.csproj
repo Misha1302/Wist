@@ -21,7 +21,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
+        <PackageReference Include="Antlr4.Runtime" Version="4.6.6"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -40,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Backend\Backend.csproj" />
+        <ProjectReference Include="..\Backend\Backend.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -54,10 +54,10 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="WistContent\AsyncCode.wst">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="WistContent\Enumerator.wst">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
