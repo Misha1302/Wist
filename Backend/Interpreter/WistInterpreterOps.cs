@@ -419,12 +419,14 @@ public partial class WistInterpreter
         i.Push(res);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void Dup(WistInterpreter i)
     {
         i._stack[i._sp] = i._stack[i._sp - 1];
         i._sp++;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void SetElem(WistInterpreter i)
     {
         var index = i.Pop().GetNumber();
@@ -434,6 +436,7 @@ public partial class WistInterpreter
         list.GetList()[(int)(index + 0.1) - 1] = elem;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void PushElem(WistInterpreter i)
     {
         var index = i.Pop().GetNumber();
@@ -442,6 +445,7 @@ public partial class WistInterpreter
         i.Push(list.GetList()[(int)(index + 0.1) - 1]);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void AddElem(WistInterpreter i)
     {
         var elem = i.Pop();
@@ -449,4 +453,18 @@ public partial class WistInterpreter
 
         list.GetList().Add(elem);
     }
+
+#if DEBUG
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void SetCurLine(WistInterpreter i)
+    {
+        i._curLine = i._consts[i._index].GetInternalInteger();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void SetLocalsCount(WistInterpreter i)
+    {
+        _localsCount = i._consts[i._index].GetInternalInteger();
+    }
+#endif
 }

@@ -59,6 +59,9 @@
         <None Update="WistContent\Enumerator.wst">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="WistContent\CodeToDebug.wst">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

@@ -79,9 +79,18 @@ public readonly struct WistConst
         Type = WistType.List;
     }
 
+    public WistConst(WistInterpreter interpreter)
+    {
+        _handle = new WistGcHandleProvider(interpreter);
+        Type = WistType.Interpreter;
+    }
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public double GetNumber() => Type == WistType.Number ? _valueR : WistThrowHelper.ThrowGetNumber(Type);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public WistInterpreter GetInterpreter() => (WistInterpreter)((GCHandle)_handle!.Pointer).Target!;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetInternalInteger() => _valueI;

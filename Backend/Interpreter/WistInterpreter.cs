@@ -7,6 +7,10 @@ public partial class WistInterpreter
 {
     private WistConst[] _consts = null!;
     private WistConst[] _consts2 = null!;
+
+#if DEBUG
+    private int _curLine = 1;
+#endif
     private WistEngine _engine = null!;
     private int _index;
     private ImmutableArray<WistOp> _ops;
@@ -154,6 +158,14 @@ public partial class WistInterpreter
             case WistOp.CreateGlobal:
                 CreateGlobal(this);
                 break;
+#if DEBUG
+            case WistOp.SetCurLine:
+                SetCurLine(this);
+                break;
+            case WistOp.SetLocalsCount:
+                SetLocalsCount(this);
+                break;
+#endif
             default:
                 ThrowArgumentOutOfRange();
                 break;
@@ -175,4 +187,21 @@ public partial class WistInterpreter
     {
         _engine = engine;
     }
+
+
+#if DEBUG
+    public int GetNumberOfExecutionLine() => _curLine;
+
+
+    public List<(int ind, WistConst value)> GetLocals() => new(_vars[.._localsCount].Select((x, i) => (i, x)));
+
+    public List<(string s, WistConst value)> GetGlobals()
+    {
+        var lst = new List<(string, WistConst Value)>();
+        var e = _engine.Globals.GetEnumerator();
+        while (e.MoveNext())
+            lst.Add((WistHashCode.Instance.GetSourceString(e.Current.Key), e.Current.Value));
+        return lst;
+    }
+#endif
 }

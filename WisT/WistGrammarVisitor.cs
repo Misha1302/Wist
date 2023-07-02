@@ -41,6 +41,10 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     public override object? VisitNewline(WistGrammarParser.NewlineContext context)
     {
         _lineNumber++;
+#if DEBUG
+        _imageBuilder.SetCurLine(_lineNumber);
+        _imageBuilder.SetLocalsCount();
+#endif
         return default;
     }
 
@@ -131,7 +135,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitFieldExpression(WistGrammarParser.FieldExpressionContext context)
     {
+        _needResultLevel++;
         Visit(context.expression()); // class
+        _needResultLevel--;
         _imageBuilder.LoadField(context.IDENTIFIER().GetText());
         return default;
     }
@@ -281,7 +287,10 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public override object? VisitNotExpression(WistGrammarParser.NotExpressionContext context)
     {
+        _needResultLevel++;
         Visit(context.expression());
+        _needResultLevel--;
+
         _imageBuilder.Not();
         return default;
     }
@@ -398,7 +407,9 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
 
         // if condition
+        _needResultLevel++;
         Visit(context.expression());
+        _needResultLevel--;
 
         _imageBuilder.JmpIfFalse(endIfName);
         // if block
@@ -551,7 +562,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         }
         else
         {
-            var fullPath = Path.GetFullPath(Path.Combine(_path, path));
+            var fullPath = Path.Exists(path) ? path : Path.GetFullPath(Path.Combine(_path, path));
             if (_importedCodes.Contains(fullPath)) goto end;
 
             CompileOtherCode(File.ReadAllText(fullPath));

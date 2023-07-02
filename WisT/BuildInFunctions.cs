@@ -136,4 +136,27 @@ public static class WistBuildInFunctions
 
         i.Push(new WistConst(a.GetClass().IsSubclass(b.GetClass())));
     }
+
+    [WistLibFunction]
+    public static void GetChar(WistInterpreter i, int paramsCount)
+    {
+        if (paramsCount != 2)
+            throw new WistException("number of parameters must be 2");
+
+        var ind = i.Pop();
+        var str = i.Pop();
+
+        i.Push(new WistConst(str.GetString()[(int)(ind.GetNumber() + 0.1) - 1].ToString()));
+    }
+
+    [WistLibFunction]
+    public static void IsDigitChar(WistInterpreter i, int paramsCount)
+    {
+        if (paramsCount != 1)
+            throw new WistException("number of parameters must be 1");
+
+        var str = i.Pop();
+
+        i.Push(new WistConst(char.IsDigit(str.GetString()[0])));
+    }
 }

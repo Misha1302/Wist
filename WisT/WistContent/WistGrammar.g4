@@ -16,7 +16,7 @@ elseIfBlock: block | ifBlock;
 whileBlock: WHILE expression block;
 loopBlock: LOOP assigment? SEMICOLON expression SEMICOLON assigment? block;
 call: IDENTIFIER '(' (expression (',' expression)*)? ')';
-block: newline* '{' line* '}';
+block: newline* '{' line* '}' newline*;
 gotoLabel: 'goto' IDENTIFIER;
 setLabel: IDENTIFIER ':';
 arrayInit: '[' (expression (',' expression)*)? ']';

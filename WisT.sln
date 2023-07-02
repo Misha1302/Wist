@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistTime", "WistTime\WistTi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistFiles", "WistFiles\WistFiles.csproj", "{47D40EFC-1BD9-44A6-89A9-D330C934C465}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WistDebugHelper", "WistDebugHelper\WistDebugHelper.csproj", "{2D3B68EF-1BC3-4814-BFFD-0D0446D5FE20}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47D40EFC-1BD9-44A6-89A9-D330C934C465}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D3B68EF-1BC3-4814-BFFD-0D0446D5FE20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D3B68EF-1BC3-4814-BFFD-0D0446D5FE20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D3B68EF-1BC3-4814-BFFD-0D0446D5FE20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D3B68EF-1BC3-4814-BFFD-0D0446D5FE20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

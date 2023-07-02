@@ -1,21 +1,53 @@
 ﻿import "Array.wst"
 import "Types.wst"
 import "Enumerator.wst"
-import "WistTime.dll"
+import "WistDebugHelper.dll"
+import "WistFiles.dll"
 
-import "WistTime.dll"
+func Start() {
+    Print("Enter the file name to debug: ")
+    let interpreter = CreateInterpreter(ReadTextFromFile(Input()))
 
-func Start() 
-
-{
-    let n = new Number( // here will be an syntax error (parenthesis not closed)
-    // and if you can run this code you catch error: can't found Ctor0
-    
-    Print(n)
+    while true {
+        input:
+        Print("Enter line number to set breakpoint: ")
+        let s = Input()
+        if IsPositiveInteger(s) {
+            let n = ToNumber(s)
+            
+            while GetNumberOfExecutionLine(interpreter) != n {
+                DoOneStep(interpreter)
+            }
+            
+            let info = GetRuntimeInfo(interpreter) 
+            
+            let runtimeInfo = new RuntimeInfo(info[2], info[4])
+            Print("Locals: " + ToStr(runtimeInfo.Locals))
+            Print("Globals: " + ToStr(runtimeInfo.Globals))
+            
+            while GetNumberOfExecutionLine(interpreter) == n {
+                DoOneStep(interpreter)
+            }
+        }
+        else {
+            goto input
+        }
+    }
 }
 
-class Number(n)
- 
-{
- 
+func IsPositiveInteger(s) {
+    let len = GetLen(s)
+    loop let i = 1; i <= len; i += 1 {
+        if !IsDigitChar(GetChar(s, i)) {
+            return false
+        }
+    }
+    return len > 0
+}
+
+class RuntimeInfo(Locals, Globals) {
+    method Ctor(locals, globals) {
+        this.Locals = locals
+        this.Globals = globals
+    }
 }

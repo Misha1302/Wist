@@ -386,4 +386,19 @@ public class WistImageBuilder
     }
 
     private record WistBuilderClass(string? Name, List<string> Fields, List<string> Methods);
+
+#if DEBUG
+    public void SetCurLine(int lineNumber)
+    {
+        _ops.Add(WistOp.SetCurLine);
+        SetConst(WistConst.CreateInternalConst(lineNumber));
+    }
+
+
+    public void SetLocalsCount()
+    {
+        _ops.Add(WistOp.SetLocalsCount);
+        SetConst(WistConst.CreateInternalConst(_curFunction.localsCount));
+    }
+#endif
 }

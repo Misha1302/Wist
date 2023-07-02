@@ -12,5 +12,6 @@ public enum WistType : byte
     Pointer,
     Null,
     List,
-    Class
+    Class,
+    Interpreter
 }

@@ -38,5 +38,9 @@ public enum WistOp : byte
     Or,
     Xor,
     Not,
-    CreateGlobal
+    CreateGlobal,
+#if DEBUG
+    SetCurLine,
+    SetLocalsCount
+#endif
 }
