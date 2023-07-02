@@ -7,12 +7,16 @@ using WisT.WistContent;
 const string dir = "WistContent";
 const string path = @$"{dir}\Code.wst";
 
-var code = WistPreprocessor.Preprocess(File.ReadAllText(path));
+var code = File.ReadAllText(path);
 
 var inputStream = new AntlrInputStream(code);
 var simpleLexer = new WistGrammarLexer(inputStream);
+simpleLexer.AddErrorListener(new WistThrowingErrorListener());
+
 var commonTokenStream = new CommonTokenStream(simpleLexer);
 var simpleParser = new WistGrammarParser(commonTokenStream);
+simpleParser.AddErrorListener(new WistThrowingErrorListener());
+
 var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
 

@@ -1,5 +1,7 @@
 ﻿namespace Backend.Glossary;
 
+using Backend.Interpreter;
+
 public static class WistGlossaryHelper
 {
     private static readonly int[] _primes = new int[72]
@@ -31,7 +33,7 @@ public static class WistGlossaryHelper
 
     public static void KeyNotFound(int key)
     {
-        throw new Exception($"Key {key} isn't found");
+        throw new Exception($"Key {key} isn't found (string - '{WistHashCode.Instance.GetSourceString(key)}')");
     }
 
     private static bool IsPrime(int candidate)

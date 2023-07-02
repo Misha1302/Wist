@@ -15,6 +15,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     private WistImageBuilder _imageBuilder = null!;
     private List<string> _importedCodes = null!;
+    private int _lineNumber = 1;
     private IParseTree? _methodCall;
     private int _needResultLevel;
     private string _path = string.Empty;
@@ -32,6 +33,15 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
     public WistGrammarVisitor()
     {
+    }
+
+    public override object VisitErrorNode(IErrorNode node) =>
+        throw new WistException($"Syntax error on line {_lineNumber} - '{node.GetText()}'");
+
+    public override object? VisitNewline(WistGrammarParser.NewlineContext context)
+    {
+        _lineNumber++;
+        return default;
     }
 
     public override object? VisitClassDecl(WistGrammarParser.ClassDeclContext context)
@@ -544,7 +554,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             var fullPath = Path.GetFullPath(Path.Combine(_path, path));
             if (_importedCodes.Contains(fullPath)) goto end;
 
-            CompileOtherCode(WistPreprocessor.Preprocess(File.ReadAllText(fullPath)));
+            CompileOtherCode(File.ReadAllText(fullPath));
             _importedCodes.Add(fullPath);
         }
 

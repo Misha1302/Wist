@@ -2,35 +2,20 @@
 import "Types.wst"
 import "Enumerator.wst"
 import "WistTime.dll"
+
 import "WistTime.dll"
 
-func Start() {
-    let arr = new Array()
-    loop let q = 0; q < 20; q += 1 {
-        let t = GetTime()
-        let primeNumberCount = 734/2
-        
-        let number = 0
-        while primeNumberCount > 0 {
-            number += 1
-            
-            let j = 0
-            loop let i = 1; i < number + 1; i += 1 {
-                if number % i == 0 {
-                    j += 1
-                }
-            }
-        
-            if j == 2 {
-                primeNumberCount -= 1
-            }
-        }
-        
-        let delta = GetTime() - t
-        arr.Add(delta)
-        Print(delta)
-        Print('The latest prime number: ' + ToStr(number))
-    }
-    Print(arr.Average())
+func Start() 
+
+{
+    let n = new Number( // here will be an syntax error (parenthesis not closed)
+    // and if you can run this code you catch error: can't found Ctor0
+    
+    Print(n)
 }
 
+class Number(n)
+ 
+{
+ 
+}

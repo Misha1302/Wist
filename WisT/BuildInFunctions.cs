@@ -113,9 +113,7 @@ public static class WistBuildInFunctions
 
         var s = i.Pop().GetString();
 
-        var code = WistPreprocessor.Preprocess(s);
-
-        var inputStream = new AntlrInputStream(code);
+        var inputStream = new AntlrInputStream(s);
         var simpleLexer = new WistGrammarLexer(inputStream);
         var commonTokenStream = new CommonTokenStream(simpleLexer);
         var simpleParser = new WistGrammarParser(commonTokenStream);

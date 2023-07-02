@@ -3,7 +3,7 @@
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 
-public unsafe partial class WistInterpreter
+public partial class WistInterpreter
 {
     private WistConst[] _consts = null!;
     private WistConst[] _consts2 = null!;
@@ -27,18 +27,15 @@ public unsafe partial class WistInterpreter
         _consts2 = imageObject.Consts2.ToArray();
         _index = 0;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void RunSteps(int count)
     {
         for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
-        {
             /* var format = $"{_ops[_index]} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
             Console.WriteLine(format); */
-
             ExecuteOneOp();
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
@@ -157,7 +154,16 @@ public unsafe partial class WistInterpreter
             case WistOp.CreateGlobal:
                 CreateGlobal(this);
                 break;
+            default:
+                ThrowArgumentOutOfRange();
+                break;
         }
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ThrowArgumentOutOfRange()
+    {
+        throw new ArgumentOutOfRangeException();
     }
 
     public void ExitInterpreter()

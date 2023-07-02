@@ -2,6 +2,7 @@ namespace Backend;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Backend.Interpreter;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct WistConst
@@ -109,7 +110,7 @@ public readonly struct WistConst
     public override bool Equals(object? obj) => obj is WistConst c && c.GetHashCode() == GetHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override int GetHashCode() => _valueL.GetHashCode();
+    public override int GetHashCode() => _valueL.GetWistHashCode();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(WistConst left, WistConst right) => left.Equals(right);

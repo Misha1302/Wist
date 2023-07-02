@@ -1,6 +1,7 @@
 ﻿namespace Backend;
 
 using System.Reflection;
+using Backend.Interpreter;
 
 public class WistImageBuilder
 {
@@ -106,7 +107,7 @@ public class WistImageBuilder
     public void CreateGlobal(string name)
     {
         _ops.Add(WistOp.CreateGlobal);
-        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
     }
 
     public void CreateFunction(string name, int paramsCount)
@@ -229,8 +230,8 @@ public class WistImageBuilder
 
         WistClass CreateWistClass(WistBuilderClass c) =>
             new(
-                c.Fields.Select(x => (x.GetHashCode(), WistConst.CreateNull())),
-                c.Methods.Select(x => (x.GetHashCode(), GetLabelOrFuncPtr(GenerateNewMethodName(x, c.Name))))
+                c.Fields.Select(x => (x.GetWistHashCode(), WistConst.CreateNull())),
+                c.Methods.Select(x => (x.GetWistHashCode(), GetLabelOrFuncPtr(GenerateNewMethodName(x, c.Name))))
             );
 
 
@@ -267,13 +268,13 @@ public class WistImageBuilder
     private void SetGlobal(string name)
     {
         _ops.Add(WistOp.SetGlobal);
-        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
     }
 
     private void LoadGlobal(string name)
     {
         _ops.Add(WistOp.LoadGlobal);
-        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
     }
 
     private int FindLocal(string name)
@@ -314,13 +315,13 @@ public class WistImageBuilder
     public void SetField(string name)
     {
         _ops.Add(WistOp.SetField);
-        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
     }
 
     public void LoadField(string name)
     {
         _ops.Add(WistOp.LoadField);
-        SetConst(WistConst.CreateInternalConst(name.GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
     }
 
     public void CreateMethod(string name, int paramsCount)
@@ -345,7 +346,7 @@ public class WistImageBuilder
     {
         _ops.Add(WistOp.CallMethod);
         var generateMethodName = GenerateMethodNameToCall(methName + paramsCount);
-        SetConst(WistConst.CreateInternalConst(generateMethodName.GetHashCode()));
+        SetConst(WistConst.CreateInternalConst(generateMethodName.GetWistHashCode()));
         _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
     }
 
