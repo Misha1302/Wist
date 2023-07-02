@@ -41,6 +41,8 @@ public enum WistOp : byte
     CreateGlobal,
 #if DEBUG
     SetCurLine,
-    SetLocalsCount
+    SetLocalsCount,
 #endif
+    PushTry,
+    DropTry
 }

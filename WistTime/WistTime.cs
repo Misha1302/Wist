@@ -11,7 +11,7 @@ public static class WistTime
     public static void GetTime(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 0)
-            throw new WistException("number of parameters must be 0");
+            throw new WistError("number of parameters must be 0");
 
         i.Push(new WistConst(DateTimeOffset.Now.ToUnixTimeMilliseconds()));
     }

@@ -14,7 +14,7 @@ public static class WistDebugHelper
     public static void CreateInterpreter(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 1)
-            throw new WistException("number of parameters must be 1");
+            throw new WistError("number of parameters must be 1");
 
         var s = i.Pop().GetString();
 
@@ -36,12 +36,12 @@ public static class WistDebugHelper
     {
 #if DEBUG
         if (paramsCount != 1)
-            throw new WistException("number of parameters must be 1");
+            throw new WistError("number of parameters must be 1");
 
         var interpreter = i.Pop();
         i.Push(new WistConst(interpreter.GetInterpreter().GetNumberOfExecutionLine()));
 #else
-        throw new WistException($"Cannot use function {nameof(GetNumberOfExecutionLine)} in release mode");
+        throw new WistError($"Cannot use function {nameof(GetNumberOfExecutionLine)} in release mode");
 #endif
     }
 
@@ -50,7 +50,7 @@ public static class WistDebugHelper
     {
 #if DEBUG
         if (paramsCount != 1)
-            throw new WistException("number of parameters must be 1");
+            throw new WistError("number of parameters must be 1");
 
         var interpreter = i.Pop().GetInterpreter();
         var locals = interpreter.GetLocals();
@@ -64,7 +64,7 @@ public static class WistDebugHelper
             new(globals.Select(x => x.value).ToList()) // values
         }));
 #else
-        throw new WistException($"Cannot use function {nameof(GetRuntimeInfo)} in release mode");
+        throw new WistError($"Cannot use function {nameof(GetRuntimeInfo)} in release mode");
 #endif
     }
 
@@ -72,7 +72,7 @@ public static class WistDebugHelper
     public static void DoOneStep(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 1)
-            throw new WistException("number of parameters must be 1");
+            throw new WistError("number of parameters must be 1");
 
         var interpreter = i.Pop();
         interpreter.GetInterpreter().RunSteps(1);

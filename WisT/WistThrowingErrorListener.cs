@@ -21,6 +21,6 @@ public class WistThrowingErrorListener : BaseErrorListener, IAntlrErrorListener<
 
     private static void SyntaxError(int line, int charPositionInLine, string msg)
     {
-        throw new WistException($"line={line}; chars={charPositionInLine}; msg={msg}");
+        throw new WistError($"line={line}; chars={charPositionInLine}; msg={msg}");
     }
 }

@@ -13,7 +13,7 @@ public static class WistRandom
     public static void SetSeed(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 1)
-            throw new WistException("number of parameters must be 1");
+            throw new WistError("number of parameters must be 1");
 
         _random = new Random((int)i.Pop().GetNumber());
     }
@@ -22,7 +22,7 @@ public static class WistRandom
     public static void RandomInteger(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 2)
-            throw new WistException("number of parameters must be 2");
+            throw new WistError("number of parameters must be 2");
 
         var max = i.Pop().GetNumber();
         var min = i.Pop().GetNumber();
@@ -33,7 +33,7 @@ public static class WistRandom
     public static void RandomReal(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 2)
-            throw new WistException("number of parameters must be 2");
+            throw new WistError("number of parameters must be 2");
 
         var max = i.Pop().GetNumber();
         var min = i.Pop().GetNumber();

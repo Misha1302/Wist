@@ -219,13 +219,13 @@ public class WistImageBuilder
 
         WistClass GetClass(string name) =>
             CreateWistClass(_classes.Find(x => x.Name == name)
-                            ?? throw new WistException($"Cannot find the label or function with name: {name}"));
+                            ?? throw new WistError($"Cannot find the label or function with name: {name}"));
 
 
         int GetLabelOrFuncPtr(string labelName) =>
             _labels.TryGetValue(labelName, out var value)
                 ? value
-                : throw new WistException($"Cannot find the label or function with name: {labelName}");
+                : throw new WistError($"Cannot find the label or function with name: {labelName}");
 
 
         WistClass CreateWistClass(WistBuilderClass c) =>
@@ -280,7 +280,7 @@ public class WistImageBuilder
     private int FindLocal(string name)
     {
         var ind = _locals.IndexOf(GenerateLocalName(name));
-        return ind == -1 ? throw new WistException($"Cannot find {name} local in {_curFunction.name} func") : ind;
+        return ind == -1 ? throw new WistError($"Cannot find {name} local in {_curFunction.name} func") : ind;
     }
 
     public bool IsLocal(string name) => _locals.Contains(GenerateLocalName(name));
@@ -383,6 +383,19 @@ public class WistImageBuilder
     public void EndFunc()
     {
         EndPreviousFunc();
+    }
+
+    public void PushTry(string catchStartName)
+    {
+        _ops.Add(WistOp.PushTry);
+        SetConst(default);
+        _jumps.Add((_constants.Count - 1, catchStartName));
+    }
+
+    public void DropTry()
+    {
+        _ops.Add(WistOp.DropTry);
+        SetConst(default);
     }
 
     private record WistBuilderClass(string? Name, List<string> Fields, List<string> Methods);

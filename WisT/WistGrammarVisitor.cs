@@ -36,7 +36,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     }
 
     public override object VisitErrorNode(IErrorNode node) =>
-        throw new WistException($"Syntax error on line {_lineNumber} - '{node.GetText()}'");
+        throw new WistError($"Syntax error on line {_lineNumber} - '{node.GetText()}'");
 
     public override object? VisitNewline(WistGrammarParser.NewlineContext context)
     {
@@ -45,6 +45,30 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
         _imageBuilder.SetCurLine(_lineNumber);
         _imageBuilder.SetLocalsCount();
 #endif
+        return default;
+    }
+
+    public override object? VisitTryCatchBlock(WistGrammarParser.TryCatchBlockContext context)
+    {
+        var catchStartName = $"catch_start_{Guid.NewGuid()}";
+        var catchEndName = $"catch_end_{Guid.NewGuid()}";
+
+        // try
+        _imageBuilder.PushTry(catchStartName);
+        Visit(context.block(0));
+        _imageBuilder.DropTry();
+        _imageBuilder.Jmp(catchEndName);
+
+        // catch
+        _imageBuilder.SetLabel(catchStartName);
+        
+        // ex = error
+        _imageBuilder.CreateLocal(context.IDENTIFIER().GetText());
+        _imageBuilder.SetLocal(context.IDENTIFIER().GetText());
+        
+        Visit(context.block(1));
+        _imageBuilder.SetLabel(catchEndName);
+
         return default;
     }
 
@@ -222,7 +246,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
                 _imageBuilder.GreaterOrEquals();
                 break;
             default:
-                throw new WistException("Unknown op");
+                throw new WistError("Unknown op");
         }
 
         return default;
@@ -258,7 +282,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
             _imageBuilder.PushConst(new WistConst(b.GetText() == "true"));
         else if (context.NULL() is not null)
             _imageBuilder.PushConst(WistConst.CreateNull());
-        else throw new WistException("Unknown const");
+        else throw new WistError("Unknown const");
 
         return default;
     }
@@ -279,7 +303,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
                 _imageBuilder.Xor();
                 break;
             default:
-                throw new WistException("Unknown operator");
+                throw new WistError("Unknown operator");
         }
 
         return default;
@@ -545,7 +569,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
                 _imageBuilder.Sub();
                 break;
             default:
-                throw new WistException($"Unknown operation {text}");
+                throw new WistError($"Unknown operation {text}");
         }
     }
 

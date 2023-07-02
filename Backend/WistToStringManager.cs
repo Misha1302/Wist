@@ -19,7 +19,7 @@ public static class WistToStringManager
             WistType.List => $"[{string.Join(", ", wistConst.GetList())}]",
             WistType.Class => $"{{{wistConst.GetClass()}}}",
             WistType.Interpreter => $"{wistConst.GetInterpreter()}",
-            _ => throw new WistException($"Unknown type - {wistConst.Type}")
+            _ => throw new WistError($"Unknown type - {wistConst.Type}")
         };
     }
 

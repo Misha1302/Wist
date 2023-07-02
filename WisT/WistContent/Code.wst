@@ -5,49 +5,25 @@ import "WistDebugHelper.dll"
 import "WistFiles.dll"
 
 func Start() {
-    Print("Enter the file name to debug: ")
-    let interpreter = CreateInterpreter(ReadTextFromFile(Input()))
-
-    while true {
-        input:
-        Print("Enter line number to set breakpoint: ")
-        let s = Input()
-        if IsPositiveInteger(s) {
-            let n = ToNumber(s)
-            
-            while GetNumberOfExecutionLine(interpreter) != n {
-                DoOneStep(interpreter)
-            }
-            
-            let info = GetRuntimeInfo(interpreter) 
-            
-            let runtimeInfo = new RuntimeInfo(info[2], info[4])
-            Print("Locals: " + ToStr(runtimeInfo.Locals))
-            Print("Globals: " + ToStr(runtimeInfo.Globals))
-            
-            while GetNumberOfExecutionLine(interpreter) == n {
-                DoOneStep(interpreter)
-            }
-        }
-        else {
-            goto input
-        }
+    try {
+        Print("1")
+       
+        InvalidFunc1()
+        
+        Print("2")
     }
+    catch ex {
+        Print(ex)
+        Print("3")
+    }
+    
+    Print("4")
 }
 
-func IsPositiveInteger(s) {
-    let len = GetLen(s)
-    loop let i = 1; i <= len; i += 1 {
-        if !IsDigitChar(GetChar(s, i)) {
-            return false
-        }
-    }
-    return len > 0
+func InvalidFunc1() {
+    InvalidFunc2()
 }
 
-class RuntimeInfo(Locals, Globals) {
-    method Ctor(locals, globals) {
-        this.Locals = locals
-        this.Globals = globals
-    }
+func InvalidFunc2() {
+    ThrowError("Error!")
 }

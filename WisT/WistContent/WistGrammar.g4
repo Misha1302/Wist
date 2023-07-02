@@ -1,7 +1,7 @@
 grammar WistGrammar;
 
 program: initFunc? line* EOF;
-line: statement | ifBlock | whileBlock | loopBlock | funcDecl | methodDecl | classDecl | newline+;
+line: statement | ifBlock | whileBlock | loopBlock | funcDecl | methodDecl | classDecl | tryCatchBlock | newline+;
 statement: simpleStatement (SEMICOLON+ | newline+);
 simpleStatement: methodCall | call | gotoLabel | setLabel | return | dllImport | assigment;
 
@@ -10,6 +10,7 @@ fieldAssigment: expression '.' IDENTIFIER ASSIGMENT_SIGN expression;
 varAssigment: (TYPE)? IDENTIFIER ASSIGMENT_SIGN expression;
 elementOfArrayAssigment: expression '[' expression ']' ASSIGMENT_SIGN expression;
 
+tryCatchBlock: 'try' block 'catch' IDENTIFIER block;
 initFunc: 'init' STRING;
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
 elseIfBlock: block | ifBlock;

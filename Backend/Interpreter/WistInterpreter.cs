@@ -36,10 +36,28 @@ public partial class WistInterpreter
     public void RunSteps(int count)
     {
         for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
-            /* var format = $"{_ops[_index]} :: {_consts[_index]}";
-            if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
-            Console.WriteLine(format); */
-            ExecuteOneOp();
+            try
+            {
+                /* var format = $"{_ops[_index]} :: {_consts[_index]}";
+                if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
+                Console.WriteLine(format + $" -- {_index}"); */
+                
+                ExecuteOneOp();
+            }
+            catch (WistError ex)
+            {
+                if (TryPopTry(out var ind, out var rsp))
+                {
+                    Push(new WistConst(ex.Message));
+
+                    _rsp = rsp;
+                    _index = ind;
+                }
+                else
+                {
+                    throw;
+                }
+            }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
@@ -166,6 +184,12 @@ public partial class WistInterpreter
                 SetLocalsCount(this);
                 break;
 #endif
+            case WistOp.PushTry:
+                PushTry(this);
+                break;
+            case WistOp.DropTry:
+                DropTry(this);
+                break;
             default:
                 ThrowArgumentOutOfRange();
                 break;

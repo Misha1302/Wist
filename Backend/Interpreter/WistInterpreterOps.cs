@@ -79,7 +79,7 @@ public partial class WistInterpreter
                 CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __add__, @class);
                 break;
             default:
-                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
                 break;
         }
     }
@@ -104,7 +104,7 @@ public partial class WistInterpreter
                 CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __sub__, @class);
                 break;
             default:
-                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
                 break;
         }
     }
@@ -129,7 +129,7 @@ public partial class WistInterpreter
                 CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __mul__, @class);
                 break;
             default:
-                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
                 break;
         }
     }
@@ -154,7 +154,7 @@ public partial class WistInterpreter
                 CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __div__, @class);
                 break;
             default:
-                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
                 break;
         }
     }
@@ -169,7 +169,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Bool => new WistConst(a.GetBool() && b.GetBool()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -185,7 +185,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Bool => new WistConst(a.GetBool() || b.GetBool()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -201,7 +201,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Bool => new WistConst(a.GetBool() ^ b.GetBool()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -215,7 +215,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Bool => new WistConst(!a.GetBool()),
-            _ => WistException.ThrowInvalidOperationForThisType(a.Type)
+            _ => WistError.ThrowInvalidOperationForThisType(a.Type)
         };
 
         i.Push(res);
@@ -231,7 +231,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() % b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -273,7 +273,7 @@ public partial class WistInterpreter
                 CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __cmp__, @class);
                 break;
             default:
-                WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
+                WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
                 break;
         }
 
@@ -365,7 +365,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() < b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -381,7 +381,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() > b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -397,7 +397,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() >= b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -413,7 +413,7 @@ public partial class WistInterpreter
         var res = a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() <= b.GetNumber()),
-            _ => WistException.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
+            _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
         i.Push(res);
@@ -452,6 +452,19 @@ public partial class WistInterpreter
         var list = i.Pop();
 
         list.GetList().Add(elem);
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void PushTry(WistInterpreter i)
+    {
+        i.PushTry(i._consts[i._index].GetInternalInteger());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void DropTry(WistInterpreter i)
+    {
+        i.DropTry();
     }
 
 #if DEBUG
