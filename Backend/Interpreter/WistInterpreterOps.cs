@@ -65,16 +65,10 @@ public partial class WistInterpreter
         switch (a.Type)
         {
             case WistType.Number:
-                if (a.Type != b.Type)
-                    WistException.ThrowTypesMustBeTheSame();
-
                 var res = new WistConst(a.GetNumber() + b.GetNumber());
                 i.Push(res);
                 break;
             case WistType.String:
-                if (a.Type != b.Type)
-                    WistException.ThrowTypesMustBeTheSame();
-
                 res = new WistConst(a.GetString() + b.GetString());
                 i.Push(res);
                 break;
@@ -96,15 +90,10 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         switch (a.Type)
         {
             case WistType.Number:
-                if (a.Type != b.Type)
-                    WistException.ThrowTypesMustBeTheSame();
-
                 var res = new WistConst(a.GetNumber() - b.GetNumber());
                 i.Push(res);
                 break;
@@ -126,15 +115,10 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         switch (a.Type)
         {
             case WistType.Number:
-                if (a.Type != b.Type)
-                    WistException.ThrowTypesMustBeTheSame();
-
                 var res = new WistConst(a.GetNumber() * b.GetNumber());
                 i.Push(res);
                 break;
@@ -156,15 +140,10 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         switch (a.Type)
         {
             case WistType.Number:
-                if (a.Type != b.Type)
-                    WistException.ThrowTypesMustBeTheSame();
-
                 var res = new WistConst(a.GetNumber() / b.GetNumber());
                 i.Push(res);
                 break;
@@ -186,8 +165,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -204,8 +181,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -222,8 +197,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -254,8 +227,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -282,21 +253,16 @@ public partial class WistInterpreter
         i.Push(new WistConst(res));
     }
 
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static WistConst CmpInternal(WistInterpreter i)
     {
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         switch (a.Type)
         {
             case WistType.Number:
-                if (a.Type != b.Type)
-                    WistException.ThrowTypesMustBeTheSame();
-
                 var res = new WistConst(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01);
                 i.Push(res);
                 break;
@@ -317,18 +283,12 @@ public partial class WistInterpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void JmpIfFalse(WistInterpreter i)
     {
-        if (i._stack[i._sp - 1].Type != WistType.Bool)
-            WistException.ThrowTypeMustBe(WistType.Bool);
-
         if (!i.Pop().GetBool()) Jmp(i);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void JmpIfTrue(WistInterpreter i)
     {
-        if (i._stack[i._sp - 1].Type != WistType.Bool)
-            WistException.ThrowTypeMustBe(WistType.Bool);
-
         if (i.Pop().GetBool()) Jmp(i);
     }
 
@@ -401,8 +361,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -419,8 +377,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -437,8 +393,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {
@@ -455,8 +409,6 @@ public partial class WistInterpreter
         var b = i.Pop();
         var a = i.Pop();
 
-        if (a.Type != b.Type)
-            WistException.ThrowTypesMustBeTheSame();
 
         var res = a.Type switch
         {

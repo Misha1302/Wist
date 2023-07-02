@@ -90,9 +90,6 @@ public static class WistBuildInFunctions
         var list2 = i.Pop();
         var result = new WistConst(new List<WistConst>());
 
-        if (list1.Type != WistType.List || list1.Type != list2.Type)
-            throw new WistException($"Cannot unite lists, 'cause types: {list1.Type} {list2.Type}");
-
         result.GetList().AddRange(list1.GetList());
         result.GetList().AddRange(list2.GetList());
 
@@ -138,9 +135,6 @@ public static class WistBuildInFunctions
 
         var b = i.Pop();
         var a = i.Pop();
-
-        if (a.Type != WistType.Class || b.Type != WistType.Class)
-            throw new WistException("first and second param must be classes");
 
         i.Push(new WistConst(a.GetClass().IsSubclass(b.GetClass())));
     }

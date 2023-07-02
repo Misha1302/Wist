@@ -80,7 +80,7 @@ public readonly struct WistConst
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double GetNumber() => _valueR;
+    public double GetNumber() => Type == WistType.Number ? _valueR : WistThrowHelper.ThrowGetNumber(Type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetInternalInteger() => _valueI;
@@ -89,15 +89,18 @@ public readonly struct WistConst
     public nint GetInternalPtr() => _ptr;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool GetBool() => _valueB;
+    public bool GetBool() => Type == WistType.Bool ? _valueB : WistThrowHelper.ThrowGetBool(Type);
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public List<WistConst> GetList() => (List<WistConst>)((GCHandle)_handle!.Pointer).Target!;
+    public List<WistConst> GetList() => Type == WistType.List
+        ? (List<WistConst>)((GCHandle)_handle!.Pointer).Target!
+        : WistThrowHelper.ThrowGetList(Type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistClass GetClass() =>
-        (WistClass)(((GCHandle)_handle!.Pointer).Target ?? throw new InvalidOperationException());
+    public WistClass GetClass() => Type == WistType.Class
+        ? (WistClass)((GCHandle)_handle!.Pointer).Target!
+        : WistThrowHelper.ThrowGetClass(Type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string GetString() => (string)((GCHandle)_handle!.Pointer).Target!;

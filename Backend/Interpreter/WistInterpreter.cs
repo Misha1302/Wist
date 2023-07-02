@@ -5,16 +5,6 @@ using System.Runtime.CompilerServices;
 
 public unsafe partial class WistInterpreter
 {
-    // https://github.com/dotnet/csharplang/blob/main/proposals/csharp-9.0/function-pointers.md
-    // methods MUST BE in enum WistOp order
-    private readonly delegate*<WistInterpreter, void>[] _functions =
-    {
-        &PushConst, &Add, &Cmp, &JmpIfFalse, &CallExternalMethod, &JmpIfTrue, &Jmp, &SetLocal, &LoadLocal,
-        &LessThan, &GreaterThan, &NotCmp, &LessOrEquals, &GreaterOrEquals, &Sub, &Rem, &Mul, &Div, &Ret, &CallFunc,
-        &Drop, &Dup, &SetElem, &PushElem, &AddElem, &SetGlobal, &LoadGlobal, &CopyClass, &SetField, &LoadField,
-        &CallMethod, &PushNewList, &And, &Or, &Xor, &Not, &CreateGlobal
-    };
-
     private WistConst[] _consts = null!;
     private WistConst[] _consts2 = null!;
     private WistEngine _engine = null!;
@@ -37,15 +27,137 @@ public unsafe partial class WistInterpreter
         _consts2 = imageObject.Consts2.ToArray();
         _index = 0;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public void RunSteps(int count)
     {
         for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
+        {
             /* var format = $"{_ops[_index]} :: {_consts[_index]}";
             if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
             Console.WriteLine(format); */
-            _functions[(int)_ops[_index]](this);
+
+            ExecuteOneOp();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
+    private void ExecuteOneOp()
+    {
+        switch (_ops[_index])
+        {
+            case WistOp.PushConst:
+                PushConst(this);
+                break;
+            case WistOp.Add:
+                Add(this);
+                break;
+            case WistOp.Cmp:
+                Cmp(this);
+                break;
+            case WistOp.JmpIfFalse:
+                JmpIfFalse(this);
+                break;
+            case WistOp.CallExternalMethod:
+                CallExternalMethod(this);
+                break;
+            case WistOp.JmpIfTrue:
+                JmpIfTrue(this);
+                break;
+            case WistOp.Jmp:
+                Jmp(this);
+                break;
+            case WistOp.SetLocal:
+                SetLocal(this);
+                break;
+            case WistOp.LoadLocal:
+                LoadLocal(this);
+                break;
+            case WistOp.LessThan:
+                LessThan(this);
+                break;
+            case WistOp.GreaterThan:
+                GreaterThan(this);
+                break;
+            case WistOp.NotCmp:
+                NotCmp(this);
+                break;
+            case WistOp.LessOrEquals:
+                LessOrEquals(this);
+                break;
+            case WistOp.GreaterOrEquals:
+                GreaterOrEquals(this);
+                break;
+            case WistOp.Sub:
+                Sub(this);
+                break;
+            case WistOp.Rem:
+                Rem(this);
+                break;
+            case WistOp.Mul:
+                Mul(this);
+                break;
+            case WistOp.Div:
+                Div(this);
+                break;
+            case WistOp.Ret:
+                Ret(this);
+                break;
+            case WistOp.CallFunc:
+                CallFunc(this);
+                break;
+            case WistOp.Drop:
+                Drop(this);
+                break;
+            case WistOp.Dup:
+                Dup(this);
+                break;
+            case WistOp.SetElem:
+                SetElem(this);
+                break;
+            case WistOp.PushElem:
+                PushElem(this);
+                break;
+            case WistOp.AddElem:
+                AddElem(this);
+                break;
+            case WistOp.SetGlobal:
+                SetGlobal(this);
+                break;
+            case WistOp.LoadGlobal:
+                LoadGlobal(this);
+                break;
+            case WistOp.CopyClass:
+                CopyClass(this);
+                break;
+            case WistOp.SetField:
+                SetField(this);
+                break;
+            case WistOp.LoadField:
+                LoadField(this);
+                break;
+            case WistOp.CallMethod:
+                CallMethod(this);
+                break;
+            case WistOp.PushNewList:
+                PushNewList(this);
+                break;
+            case WistOp.And:
+                And(this);
+                break;
+            case WistOp.Or:
+                Or(this);
+                break;
+            case WistOp.Xor:
+                Xor(this);
+                break;
+            case WistOp.Not:
+                Not(this);
+                break;
+            case WistOp.CreateGlobal:
+                CreateGlobal(this);
+                break;
+        }
     }
 
     public void ExitInterpreter()

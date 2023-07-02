@@ -65,13 +65,4 @@ public class WistClass
             list.Add((e.Current.Key, e.Current.Value));
         return list;
     }
-
-    public List<(int Key, int Value)> GetAllMethods()
-    {
-        var list = new List<(int Key, int Value)>();
-        var e = _methods.GetEnumerator();
-        while (e.MoveNext())
-            list.Add((e.Current.Key, e.Current.Value));
-        return list;
-    }
 }
