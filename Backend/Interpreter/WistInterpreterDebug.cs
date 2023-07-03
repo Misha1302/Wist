@@ -29,21 +29,21 @@ public partial class WistInterpreter
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetCurLine(WistInterpreter i)
+    private void SetCurLine()
     {
-        i._curLine = i._consts[i._index].GetInternalInteger();
+        _curLine = _consts[_index].GetInternalInteger();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetLocalsCount(WistInterpreter i)
+    private void SetLocalsCount()
     {
-        i._localsCount = i._consts[i._index].GetInternalInteger();
+        _localsCount = _consts[_index].GetInternalInteger();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CreateLocal(WistInterpreter i)
+    private void CreateLocal()
     {
-        i._locals.Add((i._consts[i._index].GetString(), i._consts2[i._index].GetInternalInteger()));
+        _locals.Add((_consts[_index].GetString(), _consts2[_index].GetInternalInteger()));
     }
 }
 

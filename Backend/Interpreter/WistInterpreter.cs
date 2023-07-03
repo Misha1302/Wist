@@ -37,16 +37,16 @@ public partial class WistInterpreter
                 /* var format = $"{_ops[_index]} :: {_consts[_index]}";
                 if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
                 Console.WriteLine(format + $" -- {_index} -- {_curLine}"); */
-                
+
                 ExecuteOneOp();
             }
             catch (WistError ex)
             {
                 if (TryPopTry(out var ind, out var rsp))
                 {
-                    Push(new WistConst(ex.Message));
+                    _stack.Push(new WistConst(ex.Message));
 
-                    _rsp = rsp;
+                    _returnStack.ResetPointer(rsp);
                     _index = ind;
                 }
                 else
@@ -62,132 +62,132 @@ public partial class WistInterpreter
         switch (_ops[_index])
         {
             case WistOp.PushConst:
-                PushConst(this);
+                PushConst();
                 break;
             case WistOp.Add:
-                Add(this);
+                Add();
                 break;
             case WistOp.Cmp:
-                Cmp(this);
+                Cmp();
                 break;
             case WistOp.JmpIfFalse:
-                JmpIfFalse(this);
+                JmpIfFalse();
                 break;
             case WistOp.CallExternalMethod:
-                CallExternalMethod(this);
+                CallExternalMethod();
                 break;
             case WistOp.JmpIfTrue:
-                JmpIfTrue(this);
+                JmpIfTrue();
                 break;
             case WistOp.Jmp:
-                Jmp(this);
+                Jmp();
                 break;
             case WistOp.SetLocal:
-                SetLocal(this);
+                SetLocal();
                 break;
             case WistOp.LoadLocal:
-                LoadLocal(this);
+                LoadLocal();
                 break;
             case WistOp.LessThan:
-                LessThan(this);
+                LessThan();
                 break;
             case WistOp.GreaterThan:
-                GreaterThan(this);
+                GreaterThan();
                 break;
             case WistOp.NotCmp:
-                NotCmp(this);
+                NotCmp();
                 break;
             case WistOp.LessOrEquals:
-                LessOrEquals(this);
+                LessOrEquals();
                 break;
             case WistOp.GreaterOrEquals:
-                GreaterOrEquals(this);
+                GreaterOrEquals();
                 break;
             case WistOp.Sub:
-                Sub(this);
+                Sub();
                 break;
             case WistOp.Rem:
-                Rem(this);
+                Rem();
                 break;
             case WistOp.Mul:
-                Mul(this);
+                Mul();
                 break;
             case WistOp.Div:
-                Div(this);
+                Div();
                 break;
             case WistOp.Ret:
-                Ret(this);
+                Ret();
                 break;
             case WistOp.CallFunc:
-                CallFunc(this);
+                CallFunc();
                 break;
             case WistOp.Drop:
-                Drop(this);
+                Drop();
                 break;
             case WistOp.Dup:
-                Dup(this);
+                Dup();
                 break;
             case WistOp.SetElem:
-                SetElem(this);
+                SetElem();
                 break;
             case WistOp.PushElem:
-                PushElem(this);
+                PushElem();
                 break;
             case WistOp.AddElem:
-                AddElem(this);
+                AddElem();
                 break;
             case WistOp.SetGlobal:
-                SetGlobal(this);
+                SetGlobal();
                 break;
             case WistOp.LoadGlobal:
-                LoadGlobal(this);
+                LoadGlobal();
                 break;
             case WistOp.CopyClass:
-                CopyClass(this);
+                CopyClass();
                 break;
             case WistOp.SetField:
-                SetField(this);
+                SetField();
                 break;
             case WistOp.LoadField:
-                LoadField(this);
+                LoadField();
                 break;
             case WistOp.CallMethod:
-                CallMethod(this);
+                CallMethod();
                 break;
             case WistOp.PushNewList:
-                PushNewList(this);
+                PushNewList();
                 break;
             case WistOp.And:
-                And(this);
+                And();
                 break;
             case WistOp.Or:
-                Or(this);
+                Or();
                 break;
             case WistOp.Xor:
-                Xor(this);
+                Xor();
                 break;
             case WistOp.Not:
-                Not(this);
+                Not();
                 break;
             case WistOp.CreateGlobal:
-                CreateGlobal(this);
+                CreateGlobal();
                 break;
 #if DEBUG
             case WistOp.SetCurLine:
-                SetCurLine(this);
+                SetCurLine();
                 break;
             case WistOp.SetLocalsCount:
-                SetLocalsCount(this);
+                SetLocalsCount();
                 break;
             case WistOp.CreateLocal:
-                CreateLocal(this);
+                CreateLocal();
                 break;
 #endif
             case WistOp.PushTry:
-                PushTry(this);
+                PushTry();
                 break;
             case WistOp.DropTry:
-                DropTry(this);
+                DropTry();
                 break;
             default:
                 ThrowArgumentOutOfRange();
@@ -196,18 +196,11 @@ public partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void ThrowArgumentOutOfRange()
-    {
-        throw new ArgumentOutOfRangeException();
-    }
+    private static void ThrowArgumentOutOfRange() => throw new ArgumentOutOfRangeException();
 
-    public void ExitInterpreter()
-    {
-        _index = _ops.Length;
-    }
+    public void ExitInterpreter() => _index = _ops.Length;
 
-    public void SetEngine(WistEngine engine)
-    {
-        _engine = engine;
-    }
+    public void SetEngine(WistEngine engine) => _engine = engine;
+
+    public WistConst PeekReturnValue() => _stack.Peek();
 }

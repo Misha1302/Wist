@@ -7,7 +7,7 @@ public partial class WistInterpreter
 
     private void PushTry(int ind)
     {
-        _tryStack[_tp++] = (ind, _rsp);
+        _tryStack[_tp++] = (ind, _returnStack.GetPointer());
     }
 
     private void DropTry()

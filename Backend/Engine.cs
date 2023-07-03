@@ -29,7 +29,7 @@ public class WistEngine
                 if (_interpreters[i].Halted)
                 {
                     if (_interpreters.Count == 1)
-                        ExitValue = _interpreters[0].Pop();
+                        ExitValue = _interpreters[0].PeekReturnValue();
                     _interpreters.RemoveAt(i--);
                 }
         }

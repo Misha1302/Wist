@@ -6,77 +6,77 @@ using static WistMagicMethodsNames;
 public partial class WistInterpreter
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void PushConst(WistInterpreter i)
+    private void PushConst()
     {
-        i.Push(i._consts[i._index]);
+        _stack.Push(_consts[_index]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Drop(WistInterpreter i)
+    private void Drop()
     {
-        i._sp--;
+        _stack.Drop();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CallFunc(WistInterpreter i)
+    private void CallFunc()
     {
-        i.PushVariables(i._consts2[i._index].GetInternalInteger());
-        i.PushRet(i._index);
-        Jmp(i);
+        PushVariables(_consts2[_index].GetInternalInteger());
+        _returnStack.Push(_index);
+        Jmp();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CallMethod(WistInterpreter i)
+    private void CallMethod()
     {
-        CallMethodInternal(i,
-            i._consts2[i._index].GetInternalInteger(),
-            i._consts[i._index].GetInternalInteger(),
-            i.Pop().GetClass()
+        CallMethodInternal(
+            _consts2[_index].GetInternalInteger(),
+            _consts[_index].GetInternalInteger(),
+            _stack.Pop().GetClass()
         );
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CallMethodInternal(WistInterpreter i, int varsCountToPush, int methodId, WistClass @class)
+    private void CallMethodInternal(int varsCountToPush, int methodId, WistClass @class)
     {
-        i.PushVariables(varsCountToPush);
-        i.PushRet(i._index);
-        i._index = @class.GetMethodPtr(methodId);
+        PushVariables(varsCountToPush);
+        _returnStack.Push(_index);
+        _index = @class.GetMethodPtr(methodId);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void PushNewList(WistInterpreter i)
-    {
-        i.Push(new WistConst(new List<WistConst>()));
+    private void PushNewList()
+    { 
+        _stack.Push(new WistConst(new List<WistConst>()));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Ret(WistInterpreter i)
+    private void Ret()
     {
-        i.PopVariables();
-        i._index = i.PopRet();
+        PopVariables();
+        _index = _returnStack.Pop();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Add(WistInterpreter i)
+    private void Add()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
         switch (a.Type)
         {
             case WistType.Number:
                 var res = new WistConst(a.GetNumber() + b.GetNumber());
-                i.Push(res);
+                _stack.Push(res);
                 break;
             case WistType.String:
                 res = new WistConst(a.GetString() + b.GetString());
-                i.Push(res);
+                _stack.Push(res);
                 break;
             case WistType.Class:
                 var @class = a.GetClass();
-                i._sp += 2;
-                Dup(i);
-                CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __add__, @class);
+                _stack.Restore(2);
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __add__, @class);
                 break;
             default:
                 WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
@@ -85,23 +85,23 @@ public partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Sub(WistInterpreter i)
+    private void Sub()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         switch (a.Type)
         {
             case WistType.Number:
                 var res = new WistConst(a.GetNumber() - b.GetNumber());
-                i.Push(res);
+                _stack.Push(res);
                 break;
             case WistType.Class:
                 var @class = a.GetClass();
-                i._sp += 2;
-                Dup(i);
-                CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __sub__, @class);
+                _stack.Restore(2);
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __sub__, @class);
                 break;
             default:
                 WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
@@ -110,23 +110,23 @@ public partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Mul(WistInterpreter i)
+    private void Mul()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         switch (a.Type)
         {
             case WistType.Number:
                 var res = new WistConst(a.GetNumber() * b.GetNumber());
-                i.Push(res);
+                _stack.Push(res);
                 break;
             case WistType.Class:
                 var @class = a.GetClass();
-                i._sp += 2;
-                Dup(i);
-                CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __mul__, @class);
+                _stack.Restore(2);
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __mul__, @class);
                 break;
             default:
                 WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
@@ -135,23 +135,23 @@ public partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Div(WistInterpreter i)
+    private void Div()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         switch (a.Type)
         {
             case WistType.Number:
                 var res = new WistConst(a.GetNumber() / b.GetNumber());
-                i.Push(res);
+                _stack.Push(res);
                 break;
             case WistType.Class:
                 var @class = a.GetClass();
-                i._sp += 2;
-                Dup(i);
-                CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __div__, @class);
+                _stack.Restore(2);
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __div__, @class);
                 break;
             default:
                 WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
@@ -160,10 +160,10 @@ public partial class WistInterpreter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void And(WistInterpreter i)
+    private void And()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -172,14 +172,14 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Or(WistInterpreter i)
+    private void Or()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -188,14 +188,14 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Xor(WistInterpreter i)
+    private void Xor()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -204,13 +204,13 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Not(WistInterpreter i)
+    private void Not()
     {
-        var a = i.Pop();
+        var a = _stack.Pop();
 
         var res = a.Type switch
         {
@@ -218,14 +218,14 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisType(a.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Rem(WistInterpreter i)
+    private void Rem()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -234,132 +234,132 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Cmp(WistInterpreter i)
+    private void Cmp()
     {
-        var res = CmpInternal(i);
+        var res = CmpInternal();
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void NotCmp(WistInterpreter i)
+    private void NotCmp()
     {
-        var res = !CmpInternal(i).GetBool();
+        var res = !CmpInternal().GetBool();
 
-        i.Push(new WistConst(res));
+        _stack.Push(new WistConst(res));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static WistConst CmpInternal(WistInterpreter i)
+    private WistConst CmpInternal()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         switch (a.Type)
         {
             case WistType.Number:
                 var res = new WistConst(double.Abs(a.GetNumber() - b.GetNumber()) < 0.000_01);
-                i.Push(res);
+                _stack.Push(res);
                 break;
             case WistType.Class:
                 var @class = a.GetClass();
-                i._sp += 2;
-                Dup(i);
-                CallMethodInternal(i, i._consts2[i._index].GetInternalInteger(), __cmp__, @class);
+                _stack.Restore(2);
+                Dup();
+                CallMethodInternal(_consts2[_index].GetInternalInteger(), __cmp__, @class);
                 break;
             default:
                 WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type);
                 break;
         }
 
-        return i.Pop();
+        return _stack.Pop();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void JmpIfFalse(WistInterpreter i)
+    private void JmpIfFalse()
     {
-        if (!i.Pop().GetBool()) Jmp(i);
+        if (!_stack.Pop().GetBool()) Jmp();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void JmpIfTrue(WistInterpreter i)
+    private void JmpIfTrue()
     {
-        if (i.Pop().GetBool()) Jmp(i);
+        if (_stack.Pop().GetBool()) Jmp();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Jmp(WistInterpreter i)
+    private void Jmp()
     {
-        i._index = i._consts[i._index].GetInternalInteger();
+        _index = _consts[_index].GetInternalInteger();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetLocal(WistInterpreter i)
+    private void SetLocal()
     {
-        i.SetCurVar(i._consts[i._index].GetInternalInteger(), i.Pop());
+        SetCurVar(_consts[_index].GetInternalInteger(), _stack.Pop());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe void CallExternalMethod(WistInterpreter i)
+    private unsafe void CallExternalMethod()
     {
-        ((delegate*<WistInterpreter, int, void>)i._consts[i._index].GetInternalPtr())(i,
-            i._consts2[i._index].GetInternalInteger());
+        ((delegate*<WistInterpreter, int, void>)_consts[_index].GetInternalPtr())
+            (this, _consts2[_index].GetInternalInteger());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LoadLocal(WistInterpreter i)
+    private void LoadLocal()
     {
-        i.Push(i.GetCurVar(i._consts[i._index].GetInternalInteger()));
+        _stack.Push(GetCurVar(_consts[_index].GetInternalInteger()));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LoadGlobal(WistInterpreter i)
+    private void LoadGlobal()
     {
-        i.Push(i.GetGlobalVar(i._consts[i._index].GetInternalInteger()));
+        _stack.Push(GetGlobalVar(_consts[_index].GetInternalInteger()));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CopyClass(WistInterpreter i)
+    private void CopyClass()
     {
-        i.Push(new WistConst(i._consts[i._index].GetClass().Copy()));
+        _stack.Push(new WistConst(_consts[_index].GetClass().Copy()));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetField(WistInterpreter i)
+    private void SetField()
     {
-        var c = i.Pop().GetClass();
-        var value = i.Pop();
-        c.SetField(i._consts[i._index].GetInternalInteger(), value);
+        var c = _stack.Pop().GetClass();
+        var value = _stack.Pop();
+        c.SetField(_consts[_index].GetInternalInteger(), value);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LoadField(WistInterpreter i)
+    private void LoadField()
     {
-        i.Push(i.Pop().GetClass().GetField(i._consts[i._index].GetInternalInteger()));
+        _stack.Push(_stack.Pop().GetClass().GetField(_consts[_index].GetInternalInteger()));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetGlobal(WistInterpreter i)
+    private void SetGlobal()
     {
-        i.SetGlobalVar(i._consts[i._index].GetInternalInteger(), i.Pop());
+        SetGlobalVar(_consts[_index].GetInternalInteger(), _stack.Pop());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CreateGlobal(WistInterpreter i)
+    private void CreateGlobal()
     {
-        i.CreateGlobalVar(i._consts[i._index].GetInternalInteger());
+        CreateGlobalVar(_consts[_index].GetInternalInteger());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LessThan(WistInterpreter i)
+    private void LessThan()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -368,14 +368,14 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void GreaterThan(WistInterpreter i)
+    private void GreaterThan()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -384,14 +384,14 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void GreaterOrEquals(WistInterpreter i)
+    private void GreaterOrEquals()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -400,14 +400,14 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void LessOrEquals(WistInterpreter i)
+    private void LessOrEquals()
     {
-        var b = i.Pop();
-        var a = i.Pop();
+        var b = _stack.Pop();
+        var a = _stack.Pop();
 
 
         var res = a.Type switch
@@ -416,54 +416,53 @@ public partial class WistInterpreter
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
         };
 
-        i.Push(res);
+        _stack.Push(res);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void Dup(WistInterpreter i)
+    private void Dup()
     {
-        i._stack[i._sp] = i._stack[i._sp - 1];
-        i._sp++;
+        _stack.Dup();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetElem(WistInterpreter i)
+    private void SetElem()
     {
-        var index = i.Pop().GetNumber();
-        var elem = i.Pop();
-        var list = i.Pop();
+        var index = _stack.Pop().GetNumber();
+        var elem = _stack.Pop();
+        var list = _stack.Pop();
 
         list.GetList()[(int)(index + 0.1) - 1] = elem;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void PushElem(WistInterpreter i)
+    private void PushElem()
     {
-        var index = i.Pop().GetNumber();
-        var list = i.Pop();
+        var index = _stack.Pop().GetNumber();
+        var list = _stack.Pop();
 
-        i.Push(list.GetList()[(int)(index + 0.1) - 1]);
+        _stack.Push(list.GetList()[(int)(index + 0.1) - 1]);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void AddElem(WistInterpreter i)
+    private void AddElem()
     {
-        var elem = i.Pop();
-        var list = i.Pop();
+        var elem = _stack.Pop();
+        var list = _stack.Pop();
 
         list.GetList().Add(elem);
     }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void PushTry(WistInterpreter i)
+    private void PushTry()
     {
-        i.PushTry(i._consts[i._index].GetInternalInteger());
+        PushTry(_consts[_index].GetInternalInteger());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void DropTry(WistInterpreter i)
+    private void DropTryOp()
     {
-        i.DropTry();
+        DropTry();
     }
 }

@@ -17,8 +17,7 @@ public class WistImageBuilder
 
     public void PushConst(WistConst c)
     {
-        _ops.Add(WistOp.PushConst);
-        SetConst(c);
+        SetOp(WistOp.PushConst, c, default);
     }
 
 
@@ -28,74 +27,61 @@ public class WistImageBuilder
         _labels.Add(labelName, _ops.Count - 1);
     }
 
-    private void SetConst(WistConst c)
+    private void SetConst(WistConst c1, WistConst c2)
     {
-        _constants.Add(c);
-        _constants2.Add(default);
+        _constants.Add(c1);
+        _constants2.Add(c2);
     }
 
     public void Add()
     {
-        _ops.Add(WistOp.Add);
-        SetConst(default);
-        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+        SetOp(WistOp.Add, default, WistConst.CreateInternalConst(_curFunction.localsCount));
     }
 
     public void Sub()
     {
-        _ops.Add(WistOp.Sub);
-        SetConst(default);
-        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+        SetOp(WistOp.Sub, default, WistConst.CreateInternalConst(_curFunction.localsCount));
     }
 
     public void Mul()
     {
-        _ops.Add(WistOp.Mul);
-        SetConst(default);
-        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+        SetOp(WistOp.Mul, default, WistConst.CreateInternalConst(_curFunction.localsCount));
     }
 
     public void Div()
     {
-        _ops.Add(WistOp.Div);
-        SetConst(default);
-        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+        SetOp(WistOp.Div, default, WistConst.CreateInternalConst(_curFunction.localsCount));
     }
 
     public void Cmp()
     {
-        _ops.Add(WistOp.Cmp);
-        SetConst(default);
+        SetOp(WistOp.Cmp, default, default);
     }
 
     public void JmpIfFalse(string labelName)
     {
-        _ops.Add(WistOp.JmpIfFalse);
-        SetConst(default);
+        SetOp(WistOp.JmpIfFalse, default, default);
         _jumps.Add((_constants.Count - 1, labelName));
     }
 
 
     public void JmpIfTrue(string labelName)
     {
-        _ops.Add(WistOp.JmpIfTrue);
-        SetConst(default);
+        SetOp(WistOp.JmpIfTrue, default, default);
         _jumps.Add((_constants.Count - 1, labelName));
     }
 
 
     public void Jmp(string labelName)
     {
-        _ops.Add(WistOp.Jmp);
-        SetConst(default);
+        SetOp(WistOp.Jmp, default, default);
         _jumps.Add((_constants.Count - 1, labelName));
     }
 
     public void CallExternalMethod(MethodInfo methodInfo, int paramsCount)
     {
-        _ops.Add(WistOp.CallExternalMethod);
-        SetConst(WistConst.CreateInternalConst(methodInfo.MethodHandle.GetFunctionPointer()));
-        _constants2[^1] = WistConst.CreateInternalConst(paramsCount);
+        SetOp(WistOp.CallExternalMethod, WistConst.CreateInternalConst(methodInfo.MethodHandle.GetFunctionPointer()),
+            WistConst.CreateInternalConst(paramsCount));
     }
 
     public void CreateLocal(string name)
@@ -103,15 +89,12 @@ public class WistImageBuilder
         _curFunction.localsCount++;
         _locals.Add(GenerateLocalName(name));
 
-        _ops.Add(WistOp.CreateLocal);
-        SetConst(new WistConst(name));
-        _constants2[^1] = new WistConst(_locals.Count - 1);
+        SetOp(WistOp.CreateLocal, new WistConst(name), new WistConst(_locals.Count - 1));
     }
 
     public void CreateGlobal(string name)
     {
-        _ops.Add(WistOp.CreateGlobal);
-        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
+        SetOp(WistOp.CreateGlobal, WistConst.CreateInternalConst(name.GetWistHashCode()), default);
     }
 
     public void CreateFunction(string name, int paramsCount)
@@ -136,72 +119,60 @@ public class WistImageBuilder
     {
         var ind = FindLocal(s);
 
-        _ops.Add(WistOp.SetLocal);
-        SetConst(WistConst.CreateInternalConst(ind));
+        SetOp(WistOp.SetLocal, WistConst.CreateInternalConst(ind), default);
     }
 
     public void LoadLocal(string s)
     {
         var ind = FindLocal(s);
 
-        _ops.Add(WistOp.LoadLocal);
-        SetConst(WistConst.CreateInternalConst(ind));
+        SetOp(WistOp.LoadLocal, WistConst.CreateInternalConst(ind), default);
     }
 
     public void LessThan()
     {
-        _ops.Add(WistOp.LessThan);
-        SetConst(default);
+        SetOp(WistOp.LessThan, default, default);
     }
 
     public void GreaterThan()
     {
-        _ops.Add(WistOp.GreaterThan);
-        SetConst(default);
+        SetOp(WistOp.GreaterThan, default, default);
     }
 
     public void NotCmp()
     {
-        _ops.Add(WistOp.NotCmp);
-        SetConst(default);
+        SetOp(WistOp.NotCmp, default, default);
     }
 
     public void LessOrEquals()
     {
-        _ops.Add(WistOp.LessOrEquals);
-        SetConst(default);
+        SetOp(WistOp.LessOrEquals, default, default);
     }
 
     public void GreaterOrEquals()
     {
-        _ops.Add(WistOp.GreaterOrEquals);
-        SetConst(default);
+        SetOp(WistOp.GreaterOrEquals, default, default);
     }
 
     public void Rem()
     {
-        _ops.Add(WistOp.Rem);
-        SetConst(default);
+        SetOp(WistOp.Rem, default, default);
     }
 
     public void Ret()
     {
-        _ops.Add(WistOp.Ret);
-        SetConst(default);
+        SetOp(WistOp.Ret, default, default);
     }
 
     public void CallFunc(string funcName, int paramsCount)
     {
-        _ops.Add(WistOp.CallFunc);
-        SetConst(default);
-        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+        SetOp(WistOp.CallFunc, default, WistConst.CreateInternalConst(_curFunction.localsCount));
         _jumps.Add((_constants.Count - 1, GenerateFuncName(funcName, paramsCount)));
     }
 
     public void Drop()
     {
-        _ops.Add(WistOp.Drop);
-        SetConst(default);
+        SetOp(WistOp.Drop, default, default);
     }
 
 
@@ -247,38 +218,32 @@ public class WistImageBuilder
 
     public void Dup()
     {
-        _ops.Add(WistOp.Dup);
-        SetConst(default);
+        SetOp(WistOp.Dup, default, default);
     }
 
     public void SetElem()
     {
-        _ops.Add(WistOp.SetElem);
-        SetConst(default);
+        SetOp(WistOp.SetElem, default, default);
     }
 
     public void PushElem()
     {
-        _ops.Add(WistOp.PushElem);
-        SetConst(default);
+        SetOp(WistOp.PushElem, default, default);
     }
 
     public void AddElem()
     {
-        _ops.Add(WistOp.AddElem);
-        SetConst(default);
+        SetOp(WistOp.AddElem, default, default);
     }
 
     private void SetGlobal(string name)
     {
-        _ops.Add(WistOp.SetGlobal);
-        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
+        SetOp(WistOp.SetGlobal, WistConst.CreateInternalConst(name.GetWistHashCode()), default);
     }
 
     private void LoadGlobal(string name)
     {
-        _ops.Add(WistOp.LoadGlobal);
-        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
+        SetOp(WistOp.LoadGlobal, WistConst.CreateInternalConst(name.GetWistHashCode()), default);
     }
 
     private int FindLocal(string name)
@@ -287,7 +252,7 @@ public class WistImageBuilder
         return ind == -1 ? throw new WistError($"Cannot find {name} local in {_curFunction.name} func") : ind;
     }
 
-    public bool IsLocal(string name) => _locals.Contains(GenerateLocalName(name));
+    private bool IsLocal(string name) => _locals.Contains(GenerateLocalName(name));
 
 
     private string GenerateLocalName(string name) => $"local<{name}>{_curFunction.name}";
@@ -311,21 +276,18 @@ public class WistImageBuilder
 
     public void InstantiateClass(string name)
     {
-        _ops.Add(WistOp.CopyClass);
-        SetConst(default);
+        SetOp(WistOp.CopyClass, default, default);
         _classInserts.Add((_constants.Count - 1, name));
     }
 
     public void SetField(string name)
     {
-        _ops.Add(WistOp.SetField);
-        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
+        SetOp(WistOp.SetField, WistConst.CreateInternalConst(name.GetWistHashCode()), default);
     }
 
     public void LoadField(string name)
     {
-        _ops.Add(WistOp.LoadField);
-        SetConst(WistConst.CreateInternalConst(name.GetWistHashCode()));
+        SetOp(WistOp.LoadField, WistConst.CreateInternalConst(name.GetWistHashCode()), default);
     }
 
     public void CreateMethod(string name, int paramsCount)
@@ -348,40 +310,37 @@ public class WistImageBuilder
 
     public void CallMethod(string methName, int paramsCount)
     {
-        _ops.Add(WistOp.CallMethod);
         var generateMethodName = GenerateMethodNameToCall(methName + paramsCount);
-        SetConst(WistConst.CreateInternalConst(generateMethodName.GetWistHashCode()));
-        _constants2[^1] = WistConst.CreateInternalConst(_curFunction.localsCount);
+
+        SetOp(WistOp.CallMethod,
+            WistConst.CreateInternalConst(generateMethodName.GetWistHashCode()),
+            WistConst.CreateInternalConst(_curFunction.localsCount)
+        );
     }
 
     public void PushList()
     {
-        _ops.Add(WistOp.PushNewList);
-        SetConst(default);
+        SetOp(WistOp.PushNewList, default, default);
     }
 
     public void And()
     {
-        _ops.Add(WistOp.And);
-        SetConst(default);
+        SetOp(WistOp.And, default, default);
     }
 
     public void Or()
     {
-        _ops.Add(WistOp.Or);
-        SetConst(default);
+        SetOp(WistOp.Or, default, default);
     }
 
     public void Xor()
     {
-        _ops.Add(WistOp.Xor);
-        SetConst(default);
+        SetOp(WistOp.Xor, default, default);
     }
 
     public void Not()
     {
-        _ops.Add(WistOp.Not);
-        SetConst(default);
+        SetOp(WistOp.Not, default, default);
     }
 
     public void EndFunc()
@@ -391,15 +350,20 @@ public class WistImageBuilder
 
     public void PushTry(string catchStartName)
     {
-        _ops.Add(WistOp.PushTry);
-        SetConst(default);
+        SetOp(WistOp.PushTry, default, default);
         _jumps.Add((_constants.Count - 1, catchStartName));
     }
 
     public void DropTry()
     {
-        _ops.Add(WistOp.DropTry);
-        SetConst(default);
+        SetOp(WistOp.DropTry, default, default);
+    }
+
+
+    private void SetOp(WistOp op, WistConst c1, WistConst c2)
+    {
+        _ops.Add(op);
+        SetConst(c1, c2);
     }
 
     private record WistBuilderClass(string? Name, List<string> Fields, List<string> Methods);
@@ -407,15 +371,13 @@ public class WistImageBuilder
 #if DEBUG
     public void SetCurLine(int lineNumber)
     {
-        _ops.Add(WistOp.SetCurLine);
-        SetConst(WistConst.CreateInternalConst(lineNumber));
+        SetOp(WistOp.SetCurLine, WistConst.CreateInternalConst(lineNumber), default);
     }
 
 
     public void SetLocalsCount()
     {
-        _ops.Add(WistOp.SetLocalsCount);
-        SetConst(WistConst.CreateInternalConst(_curFunction.localsCount));
+        SetOp(WistOp.SetLocalsCount, WistConst.CreateInternalConst(_curFunction.localsCount), default);
     }
 #endif
 }

@@ -2,9 +2,12 @@
 
 using Backend.Interpreter;
 
+/// <summary>
+///     thanks https://gist.github.com/teoadal/06787e351df35863928191d9e1c0f5f8
+/// </summary>
 public static class WistGlossaryHelper
 {
-    private static readonly int[] _primes = new int[72]
+    private static readonly int[] _primes =
     {
         3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
         1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591, 17519, 21023,
