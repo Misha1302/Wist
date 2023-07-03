@@ -466,18 +466,4 @@ public partial class WistInterpreter
     {
         i.DropTry();
     }
-
-#if DEBUG
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void SetCurLine(WistInterpreter i)
-    {
-        i._curLine = i._consts[i._index].GetInternalInteger();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void SetLocalsCount(WistInterpreter i)
-    {
-        _localsCount = i._consts[i._index].GetInternalInteger();
-    }
-#endif
 }

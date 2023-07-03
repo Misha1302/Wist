@@ -57,7 +57,7 @@ public static class WistDebugHelper
         var globals = interpreter.GetGlobals();
         i.Push(new WistConst(new List<WistConst>
         {
-            new(locals.Select(x => new WistConst(x.ind)).ToList()), // ints
+            new(locals.Select(x => new WistConst(x.s)).ToList()), // strings
             new(locals.Select(x => x.value).ToList()), // values
 
             new(globals.Select(x => new WistConst(x.s)).ToList()), // strings

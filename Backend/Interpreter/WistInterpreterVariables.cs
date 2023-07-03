@@ -6,9 +6,6 @@ public partial class WistInterpreter
 {
     private readonly int[] _pushed = new int[16384];
     private readonly WistConst[] _vars = new WistConst[16384];
-#if DEBUG
-    private int _localsCount;
-#endif
     private int _pvp;
     private int _vp;
 

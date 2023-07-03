@@ -5,25 +5,72 @@ import "WistDebugHelper.dll"
 import "WistFiles.dll"
 
 func Start() {
-    try {
-        Print("1")
-       
-        InvalidFunc1()
-        
-        Print("2")
+    Print("Enter the file name to debug: ")
+    let interpreter = CreateInterpreter(ReadTextFromFile(Input()))
+    
+    while true {
+        input:
+        Print("Enter line number to set breakpoint: ")
+        let s = Input()
+        if IsPositiveInteger(s) {
+            let n = ToNumber(s)
+            
+            while GetNumberOfExecutionLine(interpreter) != n {
+                DoOneStep(interpreter)
+            }
+            
+            let info = GetRuntimeInfo(interpreter) 
+            
+            let runtimeInfo = new RuntimeInfo(info[1], info[2], info[3], info[4])            
+            Print(runtimeInfo.ToString())
+            
+            while GetNumberOfExecutionLine(interpreter) == n {
+                DoOneStep(interpreter)
+            }
+        }
+        else {
+            goto input
+        }
     }
-    catch ex {
-        Print(ex)
-        Print("3")
+}
+
+func IsPositiveInteger(s) {
+    let len = GetLen(s)
+    loop let i = 1; i <= len; i += 1 {
+        if !IsDigitChar(GetChar(s, i)) {
+            return false
+        }
+    }
+    return len > 0
+}
+
+class RuntimeInfo(LocalsNames, LocalsValues, GlobalsNames, GlobalsValues, LocalsCount, GlobalsCount) {
+    method Ctor(localsNames, localsValues, globalsNames, globalsValues) {
+        this.LocalsNames = localsNames
+        this.LocalsValues = localsValues
+        this.GlobalsNames = globalsNames
+        this.GlobalsValues = globalsValues
+        
+        this.LocalsCount = GetLen(this.LocalsNames)
+        this.GlobalsCount = GetLen(this.GlobalsNames)
     }
     
-    Print("4")
+    method ToString() {
+        let s = ""
+        loop let i = 1; i <= this.LocalsCount; i += 1 {
+            s += this.LocalsNames[i] + "=" + ToStr(this.LocalsValues[i]) + "; "
+        }
+        s += "\n"
+        loop let i = 1; i <= this.GlobalsCount; i += 1 {
+            s += this.GlobalsNames[i] + "=" + ToStr(this.GlobalsValues[i]) + "; "
+        }
+        return s
+    }
 }
 
-func InvalidFunc1() {
-    InvalidFunc2()
-}
-
-func InvalidFunc2() {
-    ThrowError("Error!")
+func Fact(n) {
+    if n <= 1 {
+        return 1
+    }
+    return Fact(n - 1) * n
 }

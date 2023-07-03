@@ -7,10 +7,6 @@ public partial class WistInterpreter
 {
     private WistConst[] _consts = null!;
     private WistConst[] _consts2 = null!;
-
-#if DEBUG
-    private int _curLine = 1;
-#endif
     private WistEngine _engine = null!;
     private int _index;
     private ImmutableArray<WistOp> _ops;
@@ -40,7 +36,7 @@ public partial class WistInterpreter
             {
                 /* var format = $"{_ops[_index]} :: {_consts[_index]}";
                 if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
-                Console.WriteLine(format + $" -- {_index}"); */
+                Console.WriteLine(format + $" -- {_index} -- {_curLine}"); */
                 
                 ExecuteOneOp();
             }
@@ -183,6 +179,9 @@ public partial class WistInterpreter
             case WistOp.SetLocalsCount:
                 SetLocalsCount(this);
                 break;
+            case WistOp.CreateLocal:
+                CreateLocal(this);
+                break;
 #endif
             case WistOp.PushTry:
                 PushTry(this);
@@ -211,21 +210,4 @@ public partial class WistInterpreter
     {
         _engine = engine;
     }
-
-
-#if DEBUG
-    public int GetNumberOfExecutionLine() => _curLine;
-
-
-    public List<(int ind, WistConst value)> GetLocals() => new(_vars[.._localsCount].Select((x, i) => (i, x)));
-
-    public List<(string s, WistConst value)> GetGlobals()
-    {
-        var lst = new List<(string, WistConst Value)>();
-        var e = _engine.Globals.GetEnumerator();
-        while (e.MoveNext())
-            lst.Add((WistHashCode.Instance.GetSourceString(e.Current.Key), e.Current.Value));
-        return lst;
-    }
-#endif
 }

@@ -1,7 +1,18 @@
 ﻿func Start() {
-    let i = 0
-    
-    while i < 100 {
-        i += 1
+    Print(2)
+    while (true) {
+        Print(4)
+        Print(Fact(5))
+        Print(6)
     }
+}
+
+func Fact(n) {
+    Print(11)
+    if n <= 1 {
+        Print(13)
+        return 1
+    }
+    Print(16)
+    return Fact(n - 1) * n
 }
