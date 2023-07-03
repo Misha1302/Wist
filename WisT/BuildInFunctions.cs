@@ -170,4 +170,24 @@ public static class WistBuildInFunctions
 
         throw new WistError(str.GetString());
     }
+
+    [WistLibFunction]
+    public static void Invoke(WistInterpreter i, int paramsCount)
+    {
+        if (paramsCount != 2)
+            throw new WistError("number of parameters must be 2");
+
+        var parameters = i.Pop().GetList();
+
+        var pop = i.Pop();
+        var addr = pop.Type == WistType.InternalInteger
+            ? pop.GetInternalInteger()
+            : throw new WistError("Address must be internal integer");
+
+        // ReSharper disable once ForCanBeConvertedToForeach
+        for (var j = 0; j < parameters.Count; j++)
+            i.Push(parameters[j]);
+
+        i.CallByAddr(addr, 0);
+    }
 }

@@ -10,6 +10,7 @@ fieldAssigment: expression '.' IDENTIFIER ASSIGMENT_SIGN expression;
 varAssigment: (TYPE)? IDENTIFIER ASSIGMENT_SIGN expression;
 elementOfArrayAssigment: expression '[' expression ']' ASSIGMENT_SIGN expression;
 
+refAmpersand: IDENTIFIER '&' NUMBER;
 tryCatchBlock: 'try' block 'catch' IDENTIFIER block;
 initFunc: 'init' STRING;
 ifBlock: 'if' expression block ('else' elseIfBlock)?;
@@ -46,6 +47,7 @@ expression
     | expression BOOL_OP expression         #boolExpression
     | arrayInit                             #arrayInitExpression
     | classInit                             #classInitExpression
+    | refAmpersand                          #refAmpersandExpression
     ;
 
 

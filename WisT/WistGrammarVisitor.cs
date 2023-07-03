@@ -61,14 +61,20 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
 
         // catch
         _imageBuilder.SetLabel(catchStartName);
-        
+
         // ex = error
         _imageBuilder.CreateLocal(context.IDENTIFIER().GetText());
         _imageBuilder.SetLocal(context.IDENTIFIER().GetText());
-        
+
         Visit(context.block(1));
         _imageBuilder.SetLabel(catchEndName);
 
+        return default;
+    }
+
+    public override object? VisitRefAmpersand(WistGrammarParser.RefAmpersandContext context)
+    {
+        _imageBuilder.FuncRef(context.IDENTIFIER().GetText(), int.Parse(context.NUMBER().GetText()));
         return default;
     }
 

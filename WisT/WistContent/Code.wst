@@ -5,25 +5,18 @@ import "WistDebugHelper.dll"
 import "WistFiles.dll"
 
 func Start() {
-    try {
-        Print("1")
-       
-        InvalidFunc1()
-        
-        Print("2")
-    }
-    catch ex {
-        Print(ex)
-        Print("3")
-    }
+    let firstFuncAddr = F&1
+    let secondFuncAddr = F&2
+    Print(firstFuncAddr)
+    Print(secondFuncAddr)
     
-    Print("4")
+    Invoke(secondFuncAddr, ['Hi ', 54])
 }
 
-func InvalidFunc1() {
-    InvalidFunc2()
+func F(n) {
+    Print(n)
 }
 
-func InvalidFunc2() {
-    ThrowError("Error!")
+func F(n, n2) {
+    Print(ToStr(n) + ToStr(n2))
 }

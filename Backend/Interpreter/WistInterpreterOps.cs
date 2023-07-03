@@ -20,9 +20,7 @@ public partial class WistInterpreter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void CallFunc()
     {
-        PushVariables(_consts2[_index].GetInternalInteger());
-        _returnStack.Push(_index);
-        Jmp();
+        CallByAddr(_consts[_index].GetInternalInteger(), _consts2[_index].GetInternalInteger());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,7 +43,7 @@ public partial class WistInterpreter
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void PushNewList()
-    { 
+    {
         _stack.Push(new WistConst(new List<WistConst>()));
     }
 
@@ -464,5 +462,14 @@ public partial class WistInterpreter
     private void DropTryOp()
     {
         DropTry();
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void CallByAddr(int addr, int varsCountToPush)
+    {
+        PushVariables(varsCountToPush);
+        _returnStack.Push(_index);
+        _index = addr;
     }
 }

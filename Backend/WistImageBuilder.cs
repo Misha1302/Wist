@@ -366,6 +366,12 @@ public class WistImageBuilder
         SetConst(c1, c2);
     }
 
+    public void FuncRef(string s, int paramsCount)
+    {
+        SetOp(WistOp.PushConst, default, default);
+        _jumps.Add((_constants.Count - 1, GenerateFuncName(s, paramsCount)));
+    }
+
     private record WistBuilderClass(string? Name, List<string> Fields, List<string> Methods);
 
 #if DEBUG

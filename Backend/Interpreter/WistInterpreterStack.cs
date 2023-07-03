@@ -1,7 +1,5 @@
 ﻿namespace Backend.Interpreter;
 
-using System.Runtime.CompilerServices;
-
 public partial class WistInterpreter
 {
     private readonly WistStack<int> _returnStack = new(512);
