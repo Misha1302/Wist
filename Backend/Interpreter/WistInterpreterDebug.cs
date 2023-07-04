@@ -1,5 +1,4 @@
 ﻿#if DEBUG
-
 namespace Backend.Interpreter;
 
 using System.Runtime.CompilerServices;

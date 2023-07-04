@@ -1,4 +1,4 @@
-﻿namespace WistDebugHelper;
+﻿namespace WistDebuggerHelper;
 
 using Antlr4.Runtime;
 using Backend;
@@ -8,7 +8,7 @@ using WisT;
 using WisT.WistContent;
 
 [WistLib]
-public static class WistDebugHelper
+public static class WistDebuggerHelper
 {
     [WistLibFunction]
     public static void CreateInterpreter(WistInterpreter i, int paramsCount)

@@ -126,6 +126,26 @@ public static class WistBuildInFunctions
     }
 
     [WistLibFunction]
+    public static void InvokeAsync(WistInterpreter i, int paramsCount)
+    {
+        if (paramsCount != 1)
+            throw new WistError("number of parameters must be 1");
+
+        var pop = i.Pop();
+        var addr = pop.Type == WistType.InternalInteger
+            ? pop.GetInternalInteger()
+            : throw new WistError("Address must be internal integer");
+
+        var imageObject = i.GetImage();
+        var interpreter = new WistInterpreter(imageObject);
+        interpreter.SetExecutionIndex(addr + 1);
+        interpreter.PushRet(imageObject.Ops.Count, 0);
+
+        WistEngine.Instance.AddToTasks(interpreter);
+        i.Push(WistConst.CreateNull());
+    }
+
+    [WistLibFunction]
     public static void IsSubclass(WistInterpreter i, int paramsCount)
     {
         if (paramsCount != 2)

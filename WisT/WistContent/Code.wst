@@ -1,22 +1,19 @@
 ﻿import "Array.wst"
 import "Types.wst"
 import "Enumerator.wst"
-import "WistDebugHelper.dll"
+import "WistDebuggerHelper.dll"
 import "WistFiles.dll"
+import "WistTime.dll"
 
-func Start() {
-    let firstFuncAddr = F&1
-    let secondFuncAddr = F&2
-    Print(firstFuncAddr)
-    Print(secondFuncAddr)
+func Start() {    
+    InvokeAsync(AsyncFunc&0)
     
-    Invoke(secondFuncAddr, ['Hi ', 54])
+    var t = GetTime()
+    loop let i = 0; i < 1_000_000; i += 1 { }
+    Print("main: " + ToStr(GetTime() - t))
 }
 
-func F(n) {
-    Print(n)
-}
-
-func F(n, n2) {
-    Print(ToStr(n) + ToStr(n2))
+func AsyncFunc() {
+    loop let i = 0; i < 1_000_000; i += 1 { }
+    Print("async: " + ToStr(GetTime() - t))
 }

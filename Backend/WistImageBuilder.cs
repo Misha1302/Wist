@@ -88,8 +88,9 @@ public class WistImageBuilder
     {
         _curFunction.localsCount++;
         _locals.Add(GenerateLocalName(name));
-
+#if DEBUG
         SetOp(WistOp.CreateLocal, new WistConst(name), new WistConst(_locals.Count - 1));
+#endif
     }
 
     public void CreateGlobal(string name)

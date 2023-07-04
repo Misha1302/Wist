@@ -4,9 +4,8 @@ using System.Runtime.CompilerServices;
 
 public partial class WistInterpreter
 {
-    private readonly int[] _pushed = new int[16384];
+    private readonly WistStack<int> _pushed = new(16384);
     private readonly WistConst[] _vars = new WistConst[16384];
-    private int _pvp;
     private int _vp;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,9 +32,9 @@ public partial class WistInterpreter
     private void PushVariables(int count)
     {
         _vp += count;
-        _pushed[_pvp++] = count;
+        _pushed.Push(count);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void PopVariables() => _vp -= _pushed[--_pvp];
+    private void PopVariables() => _vp -= _pushed.Pop();
 }

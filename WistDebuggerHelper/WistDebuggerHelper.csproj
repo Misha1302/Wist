@@ -4,15 +4,14 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <OutputPath>..\Wist\bin\Debug\</OutputPath>
+        <OutputPath>\bin\Debug\</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <OutputPath>..\Wist\bin\Release\</OutputPath>
+        <OutputPath>\bin\Release\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>

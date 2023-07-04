@@ -49,5 +49,10 @@ public class WistStack<T>
     public T Peek() => _arr[_sp - 1];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T Peek(int ind) => _arr[ind];
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetPointer() => _sp;
+
+    public override string ToString() => string.Join(", ", _arr[.._sp]);
 }

@@ -35,8 +35,8 @@ public partial class WistInterpreter
             try
             {
                 /* var format = $"{_ops[_index]} :: {_consts[_index]}";
-                if (_sp > 0) format += $" :: {string.Join(", ", _stack[.._sp])}";
-                Console.WriteLine(format + $" -- {_index} -- {_curLine}"); */
+                if (_stack.ToString() != "") format += $" :: {_stack}";
+                Console.WriteLine(format + $" -- {_index}"); */
 
                 ExecuteOneOp();
             }
@@ -197,10 +197,4 @@ public partial class WistInterpreter
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ThrowArgumentOutOfRange() => throw new ArgumentOutOfRangeException();
-
-    public void ExitInterpreter() => _index = _ops.Length;
-
-    public void SetEngine(WistEngine engine) => _engine = engine;
-
-    public WistConst PeekReturnValue() => _stack.Peek();
 }
