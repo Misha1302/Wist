@@ -2,7 +2,6 @@
 
 using System.Runtime.CompilerServices;
 
-[SkipLocalsInit]
 public class WistStack<T>
 {
     private readonly T[] _arr;
@@ -47,9 +46,6 @@ public class WistStack<T>
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Peek() => _arr[_sp - 1];
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T Peek(int ind) => _arr[ind];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetPointer() => _sp;

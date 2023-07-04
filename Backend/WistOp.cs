@@ -1,6 +1,6 @@
 ﻿namespace Backend;
 
-public enum WistOp : byte
+public enum WistOp
 {
     PushConst,
     Add,

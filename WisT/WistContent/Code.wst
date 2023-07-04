@@ -9,11 +9,11 @@ func Start() {
     InvokeAsync(AsyncFunc&0)
     
     var t = GetTime()
-    loop let i = 0; i < 1_000_000; i += 1 { }
+    loop let i = 0; i < 10_000_000; i += 1 { }
     Print("main: " + ToStr(GetTime() - t))
 }
 
 func AsyncFunc() {
-    loop let i = 0; i < 1_000_000; i += 1 { }
+    loop let i = 0; i < 10_000_000; i += 1 { }
     Print("async: " + ToStr(GetTime() - t))
 }

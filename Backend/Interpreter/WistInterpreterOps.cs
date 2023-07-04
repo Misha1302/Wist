@@ -360,13 +360,11 @@ public partial class WistInterpreter
         var a = _stack.Pop();
 
 
-        var res = a.Type switch
+        _stack.Push( a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() < b.GetNumber()),
             _ => WistError.ThrowInvalidOperationForThisTypes(a.Type, b.Type)
-        };
-
-        _stack.Push(res);
+        });
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

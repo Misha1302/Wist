@@ -1,25 +1,29 @@
 ﻿namespace Backend.Interpreter;
 
+using System.Runtime.CompilerServices;
+
 public partial class WistInterpreter
 {
-    private readonly (int ind, int rsp)[] _tryStack = new (int ind, int rsp)[128];
-    private int _tp;
+    private readonly WistStack<(int ind, int rsp)> _tryStack = new(128);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void PushTry(int ind)
     {
-        _tryStack[_tp++] = (ind, _returnStack.GetPointer());
+        _tryStack.Push((ind, _returnStack.GetPointer()));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void DropTry()
     {
-        _tp--;
+        _tryStack.Drop();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool TryPopTry(out int ind, out int rsp)
     {
-        if (_tp > 0)
+        if (_tryStack.CanPop())
         {
-            (ind, rsp) = _tryStack[--_tp];
+            (ind, rsp) = _tryStack.Pop();
             return true;
         }
 

@@ -1,7 +1,7 @@
 ﻿namespace Backend.Interpreter;
 
-using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 public partial class WistInterpreter
 {
@@ -9,7 +9,7 @@ public partial class WistInterpreter
     private WistConst[] _consts2 = null!;
     private WistEngine _engine = null!;
     private int _index;
-    private ImmutableArray<WistOp> _ops;
+    private WistOp[] _ops = null!;
 
 
     public WistInterpreter(WistImageObject imageObject)
@@ -17,21 +17,35 @@ public partial class WistInterpreter
         Init(imageObject);
     }
 
-    public bool Halted => _index >= _ops.Length;
+    public bool Halted
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _index >= _ops.Length;
+    }
 
 
     private void Init(WistImageObject imageObject)
     {
-        _ops = ImmutableArray.Create(imageObject.Ops.ToArray());
+        _ops = imageObject.Ops.ToArray();
+
         _consts = imageObject.Consts.ToArray();
         _consts2 = imageObject.Consts2.ToArray();
         _index = 0;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+    [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
     public void RunSteps(int count)
     {
-        for (var i = 0; i < count && _index < _ops.Length; _index++, i++)
+        ref var start = ref MemoryMarshal.GetArrayDataReference(_ops);
+        ref var end = ref Unsafe.Add(ref start, _ops.Length);
+
+        var i = 0;
+        while (i < count)
+        {
+            ref var curElem = ref Unsafe.Add(ref start, _index);
+            if (!Unsafe.IsAddressLessThan(ref curElem, ref end))
+                break;
+
             try
             {
                 /* var format = $"{_ops[_index]} :: {_consts[_index]}";
@@ -54,6 +68,10 @@ public partial class WistInterpreter
                     throw;
                 }
             }
+
+            _index++;
+            i++;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]

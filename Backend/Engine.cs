@@ -23,7 +23,7 @@ public class WistEngine
         while (_interpreters.Count != 0)
         {
             for (var i = _interpreters.Count - 1; i >= 0; i--)
-                _interpreters[i].RunSteps(1000);
+                _interpreters[i].RunSteps(1_000);
 
             for (var i = _interpreters.Count - 1; i >= 0; i--)
                 if (_interpreters[i].Halted)
