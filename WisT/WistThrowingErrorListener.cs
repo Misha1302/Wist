@@ -1,7 +1,7 @@
 ﻿namespace WisT;
 
 using Antlr4.Runtime;
-using Backend;
+using WistCompiler;
 
 public class WistThrowingErrorListener : BaseErrorListener, IAntlrErrorListener<int>
 {

@@ -32,10 +32,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Backend\Backend.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="WistGrammar\Array.wst">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -62,6 +58,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Antlr4.Runtime" Version="4.6.6"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\WistCompiler\WistCompiler.csproj"/>
     </ItemGroup>
 
 </Project>
