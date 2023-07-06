@@ -133,4 +133,60 @@ public readonly struct WistConst
             _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
         };
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst LessThan(WistConst a, WistConst b)
+    {
+        return a.Type switch
+        {
+            WistType.Number => new WistConst(a.GetNumber() < b.GetNumber()),
+            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst GreaterThan(WistConst a, WistConst b)
+    {
+        return a.Type switch
+        {
+            WistType.Number => new WistConst(a.GetNumber() > b.GetNumber()),
+            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst LessThanOrEquals(WistConst a, WistConst b)
+    {
+        return a.Type switch
+        {
+            WistType.Number => new WistConst(a.GetNumber() <= b.GetNumber()),
+            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst GreaterThanOrEquals(WistConst a, WistConst b)
+    {
+        return a.Type switch
+        {
+            WistType.Number => new WistConst(a.GetNumber() >= b.GetNumber()),
+            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst Equals(WistConst a, WistConst b)
+    {
+        return a.Type switch
+        {
+            WistType.Number => new WistConst(Math.Abs(a.GetNumber() - b.GetNumber()) < 0.001),
+            WistType.String => new WistConst(a.GetString() == b.GetString()),
+            WistType.Bool => new WistConst(a.GetBool() == b.GetBool()),
+            WistType.List => new WistConst(a.GetList().SequenceEqual(b.GetList())),
+            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst NotEquals(WistConst a, WistConst b) => new(!Equals(a, b).GetBool());
 }

@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>WistCompiler</AssemblyName>
         <RootNamespace>WistCompiler</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

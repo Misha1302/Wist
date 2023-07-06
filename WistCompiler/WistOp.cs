@@ -7,9 +7,14 @@ public enum WistOp
     Sub,
     Mul,
     Div,
-    CreateLocal,
     LoadLocal,
     SetLocal,
     SetField,
-    LoadField
+    LoadField,
+    SetLabel,
+    GoTo,
+    CallExternMethod,
+    Drop,
+    LessThan,
+    GoToIfTrue
 }
