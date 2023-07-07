@@ -1,24 +1,25 @@
 ﻿namespace WistCompiler;
 
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 
 public class WistClass
 {
-    private readonly WistGlossary<WistConst> _fields = new(3);
-    private readonly WistGlossary<int> _methods = new(3);
+    private readonly SortedDictionary<int, DynamicMethod> _methods = new();
+    private WistGlossary<WistConst> _fields = new(3);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public WistClass(IEnumerable<(int id, WistConst value)> fields, IEnumerable<(int id, int pos)> methods)
+    public WistClass(IEnumerable<(int id, WistConst value)> fields, IEnumerable<(int id, DynamicMethod m)> methods)
     {
         foreach (var (id, value) in fields)
             _fields.Add(id, value);
 
-        foreach (var (id, pos) in methods)
-            _methods.Add(id, pos);
+        foreach (var (id, m) in methods)
+            _methods.Add(id, m);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private WistClass(WistGlossary<WistConst> fields, WistGlossary<int> methods)
+    private WistClass(WistGlossary<WistConst> fields, SortedDictionary<int, DynamicMethod> methods)
     {
         foreach (var entry in fields)
             _fields.Add(entry.Key, entry.Value);
@@ -37,7 +38,7 @@ public class WistClass
     public WistConst GetField(int id) => _fields.GetValue(id);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetMethodPtr(int id) => _methods.GetValue(id);
+    public DynamicMethod GetMethod(int id) => _methods[id];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsSubclass(WistClass other)
@@ -60,5 +61,22 @@ public class WistClass
         while (e.MoveNext())
             list.Add((e.Current.Key, e.Current.Value));
         return list;
+    }
+
+    public List<(int Key, DynamicMethod? Value)> GetAllMethods()
+    {
+        return _methods.Select(x => (x.Key, x.Value)).ToList()!;
+    }
+
+    public void AddField(int id)
+    {
+        var fields = _fields;
+        fields.Add(id);
+        _fields = fields;
+    }
+
+    public void AddMethod(int id, DynamicMethod dynamicMethod)
+    {
+        _methods.Add(id, dynamicMethod);
     }
 }

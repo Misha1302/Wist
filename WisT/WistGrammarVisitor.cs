@@ -1,8 +1,5 @@
 namespace WisT;
 
-using System.Globalization;
-using System.Text.RegularExpressions;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using WisT.WistContent;
 using WistCompiler;
@@ -13,7 +10,7 @@ public class WistGrammarVisitor : WistGrammarBaseVisitor<object?>
     private const string Constructor = "Ctor";
     private const string StartFuncName = "Start";
 
-    private WistImageBuilder _imageBuilder = null!;
+    private readonly WistImageBuilder _imageBuilder = null!;
     private List<string> _importedCodes = null!;
     private int _lineNumber = 1;
     private IParseTree? _methodCall;

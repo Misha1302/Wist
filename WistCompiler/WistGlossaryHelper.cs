@@ -34,7 +34,7 @@ public static class WistGlossaryHelper
 
     public static void KeyNotFound(int key)
     {
-        throw new Exception($"Key {key} isn't found')");
+        throw new Exception($"Key {key} isn't found ({WistHashGenerator.GetStringFromHash(key)})");
     }
 
     private static bool IsPrime(int candidate)

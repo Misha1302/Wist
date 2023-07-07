@@ -7,47 +7,38 @@ using GrEmit;
 public class WistCompiler
 {
     private static WistCompiler? _instance;
+    private List<string> _args = null!;
 
-    private readonly AssemblyBuilder _asm = AssemblyBuilder.DefineDynamicAssembly(
-        new AssemblyName(Guid.NewGuid().ToString()),
-        AssemblyBuilderAccess.Run
-    );
-
-    private List<Type> _classes = null!;
-
-    private TypeBuilder _curClass = null!;
-    private Type _curType = null!;
-    private Dictionary<string, FieldBuilder> _fields = null!;
+    private List<WistClass> _classes = null!;
+    private WistClass _curClass = null!;
     private Dictionary<string, GroboIL.Label> _labels = null!;
 
     private Dictionary<string, GroboIL.Local> _locals = null!;
-    private List<DynamicMethod> _methods = null!;
     public static WistCompiler Instance => _instance ??= new WistCompiler();
 
     public WistExecutableObject Compile(WistImageObject image)
     {
-        _methods = new List<DynamicMethod>();
-        _classes = new List<Type>();
+        _classes = new List<WistClass>();
         _locals = new Dictionary<string, GroboIL.Local>();
         _labels = new Dictionary<string, GroboIL.Label>();
-        _fields = new Dictionary<string, FieldBuilder>();
 
         foreach (var c in image.Classes)
         {
-            CreateClass(c.Name, c.Fields);
+            CreateClass(c.Fields);
 
             foreach (var m in c.Methods)
-                CreateMethod(m.Name, m.Instructions);
+                CreateMethod(m.Name, m.Args, m.Instructions);
         }
 
-        return new WistExecutableObject(_methods, _classes);
+        return new WistExecutableObject(_classes);
     }
 
-    private void CreateMethod(string name, List<WistInstruction> instructions)
+    private void CreateMethod(string name, string[] args, List<WistInstruction> instructions)
     {
         var m = new DynamicMethod(name, typeof(WistConst), new[] { typeof(WistConst) });
         var il = new GroboIL(m);
-        _methods.Add(m);
+        _curClass.AddMethod(name.GenerateHashCode(), m);
+        _args = args.ToList();
 
         foreach (var instr in instructions)
             CompileOneOp(il, instr.Op, instr.Arg!);
@@ -55,35 +46,20 @@ public class WistCompiler
         il.Ret();
     }
 
-    private void CreateField(string name)
+    // ReSharper disable once ParameterTypeCanBeEnumerable.Local
+    private void CreateClass(string[] fields)
     {
-        var field = _curClass.DefineField(name, typeof(WistConst), FieldAttributes.Public);
-        _fields.Add(name, field);
-    }
-
-    private void CreateClass(string name, string[] fields)
-    {
-        var moduleBuilder = _asm.DefineDynamicModule(name);
-        var tb = moduleBuilder.DefineType(name,
-            TypeAttributes.Public |
-            TypeAttributes.Class |
-            TypeAttributes.AutoClass |
-            TypeAttributes.AnsiClass |
-            TypeAttributes.BeforeFieldInit |
-            TypeAttributes.AutoLayout,
-            null);
-
-        _curClass = tb;
+        _curClass = new WistClass(new List<(int id, WistConst value)>(), new List<(int id, DynamicMethod method)>());
+        _classes.Add(_curClass);
 
         foreach (var f in fields)
-            CreateField(f);
-
-        _curType = tb.CreateType();
-        _classes.Add(_curType);
+            _curClass.AddField(f.GenerateHashCode());
     }
 
     private void CompileOneOp(GroboIL il, WistOp op, object const1)
     {
+        var constStr = (const1 as string)!;
+        GroboIL.Local? classLocal;
         switch (op)
         {
             case WistOp.Add:
@@ -104,47 +80,59 @@ public class WistCompiler
             case WistOp.Drop:
                 il.Pop();
                 break;
+            case WistOp.IsNotEquals:
+                il.Call(typeof(WistConst).GetMethod("IsNotEquals"));
+                break;
             case WistOp.LoadLocal:
-                il.Ldloc(_locals[(string)const1]);
+                il.Ldloc(_locals[constStr]);
                 break;
             case WistOp.SetLabel:
-                var label = il.DefineLabel((string)const1);
+                var label = il.DefineLabel(constStr);
                 il.MarkLabel(label);
-                _labels.Add((string)const1, label);
+                _labels.Add(constStr, label);
                 break;
             case WistOp.GoTo:
-                il.Br(_labels[(string)const1]);
+                il.Br(_labels[constStr]);
                 break;
             case WistOp.GoToIfTrue:
                 var name = il.DeclareLocal(typeof(WistConst));
                 il.Stloc(name);
                 il.Ldloca(name);
-                il.Callnonvirt(typeof(WistConst).GetMethod("GetBool"));
-                il.Brtrue(_labels[(string)const1]);
+                il.Call(typeof(WistConst).GetMethod("GetBool"));
+                il.Brtrue(_labels[constStr]);
                 break;
             case WistOp.LessThan:
                 il.Call(typeof(WistConst).GetMethod("LessThan"));
                 break;
             case WistOp.SetLocal:
-                if (!_locals.ContainsKey((string)const1))
-                    _locals.Add((string)const1, il.DeclareLocal(typeof(WistConst), (string)const1));
-                il.Stloc(_locals[(string)const1]);
+                if (!_locals.ContainsKey(constStr))
+                    _locals.Add(constStr, il.DeclareLocal(typeof(WistConst), constStr));
+                il.Stloc(_locals[constStr]);
                 break;
             case WistOp.SetField:
-                var loc = il.DeclareLocal(typeof(WistConst), Guid.NewGuid().ToString());
-                il.Stloc(loc);
-                il.Ldarga(0);
-                il.Call(typeof(WistConst).GetMethod("GetClass"));
-                il.Castclass(_curType);
-                il.Ldloc(loc);
+                var valueLocal = il.DeclareLocal(typeof(WistConst));
+                classLocal = il.DeclareLocal(typeof(WistConst));
+                il.Stloc(valueLocal); // value
 
-                il.Stfld(_curType.GetField((string)const1));
+                il.Stloc(classLocal); // class
+                il.Ldloca(classLocal); // class
+                il.Call(typeof(WistConst).GetMethod("GetClass")); // class
+
+                il.Ldc_I4(constStr.GenerateHashCode()); // id
+                il.Ldloc(valueLocal); // value
+                il.Call(typeof(WistClass).GetMethod("SetField")); // int id, WistConst value
+                break;
+            case WistOp.LoadArg:
+                il.Ldarg(_args.IndexOf(constStr));
                 break;
             case WistOp.LoadField:
-                il.Ldarga(0);
+                classLocal = il.DeclareLocal(typeof(WistConst));
+                il.Stloc(classLocal); // class
+                il.Ldloca(classLocal); // class
+
                 il.Call(typeof(WistConst).GetMethod("GetClass"));
-                il.Castclass(_curType);
-                il.Ldfld(_curType.GetField((string)const1));
+                il.Ldc_I4(constStr.GenerateHashCode()); // id
+                il.Call(typeof(WistClass).GetMethod("GetField"));
                 break;
             case WistOp.Push:
                 Type type;

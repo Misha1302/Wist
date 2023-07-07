@@ -51,7 +51,7 @@ public readonly struct WistConst
         Type = WistType.List;
     }
 
-    public WistConst(object createInstance)
+    public WistConst(WistClass createInstance)
     {
         _handle = new WistGcHandleProvider(createInstance);
         Type = WistType.Class;
@@ -71,8 +71,8 @@ public readonly struct WistConst
         : WistThrowHelper.ThrowGetList(Type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public object GetClass() => Type == WistType.Class
-        ? ((GCHandle)_handle!.Pointer).Target!
+    public WistClass GetClass() => Type == WistType.Class
+        ? (WistClass)((GCHandle)_handle!.Pointer).Target!
         : WistThrowHelper.ThrowGetClass(Type);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -175,7 +175,7 @@ public readonly struct WistConst
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst Equals(WistConst a, WistConst b)
+    public static WistConst IsEquals(WistConst a, WistConst b)
     {
         return a.Type switch
         {
@@ -188,5 +188,5 @@ public readonly struct WistConst
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static WistConst NotEquals(WistConst a, WistConst b) => new(!Equals(a, b).GetBool());
+    public static WistConst IsNotEquals(WistConst a, WistConst b) => new(!IsEquals(a, b).GetBool());
 }

@@ -1,3 +1,3 @@
 namespace WistCompiler;
 
-public record WistImageMethod(string Name, List<WistInstruction> Instructions);
+public record WistImageMethod(string Name, string[] Args, List<WistInstruction> Instructions);

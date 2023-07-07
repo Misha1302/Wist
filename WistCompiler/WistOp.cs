@@ -16,5 +16,7 @@ public enum WistOp
     CallExternMethod,
     Drop,
     LessThan,
-    GoToIfTrue
+    GoToIfTrue,
+    LoadArg,
+    IsNotEquals
 }
