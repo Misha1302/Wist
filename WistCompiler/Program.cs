@@ -1,7 +1,5 @@
 ﻿namespace WistCompiler;
 
-using System.Reflection;
-
 public class WistProgram
 {
     public static void Main(string[] args)
@@ -13,75 +11,26 @@ public class WistProgram
     // ReSharper disable once UnusedParameter.Local
     private void Start(string[] args)
     {
-        /*
-         this.field = 1
-         local = 1.01
-         
-    start:
-         print(this.field)
-         this.field = this.field * local
-         if this.field != +inf then goto start
-        */
         var instr = new List<WistInstruction>
         {
-            // this.field = 1
-            new(WistOp.LoadArg, "this"),
-            new(WistOp.Push, 1.0),
-            new(WistOp.SetField, "field"),
+            new(WistOp.CreateClass, "SomeInfo"),
+            new(WistOp.SetLocal, "loc"),
 
-            // local = 1.01
-            new(WistOp.Push, 1.01),
-            new(WistOp.SetLocal, "local"),
+            new(WistOp.LoadLocal, "loc"),
+            new(WistOp.Push, 123456789.0),
+            new(WistOp.SetField, "info"),
 
-            // start:
-            new(WistOp.SetLabel, "start"),
-
-            // print(this.field)
-            new(WistOp.LoadArg, "this"),
-            new(WistOp.LoadField, "field"),
-            new(WistOp.CallExternMethod, GetType().GetMethod("PrintNumber", BindingFlags.Public | BindingFlags.Static)),
-            new(WistOp.Drop),
-
-            // this.field = this.field * local
-            new(WistOp.LoadArg, "this"),
-
-            // --- this.field
-            new(WistOp.LoadArg, "this"),
-            new(WistOp.LoadField, "field"),
-            // --- local
-            new(WistOp.LoadLocal, "local"),
-            // --- *
-            new(WistOp.Mul),
-
-            // --- this.field = 
-            new(WistOp.SetField, "field"),
-
-
-            // this.field != +inf
-            new(WistOp.LoadArg, "this"),
-            new(WistOp.LoadField, "field"),
-
-            new(WistOp.Push, double.PositiveInfinity),
-            new(WistOp.LessThan),
-
-            // goto start
-            new(WistOp.GoToIfTrue, "start"),
-
-            new(WistOp.LoadArg, "this"),
-            new(WistOp.LoadField, "field")
+            new(WistOp.LoadLocal, "loc"),
+            new(WistOp.LoadField, "info")
         };
 
         var mainMethod = new WistImageMethod(WistExecutableObject.MainMethodName, new[] { "this" }, instr);
 
         var mainClass = new WistImageClass("Main", new[] { "field" }, new[] { mainMethod });
+        var class2 = new WistImageClass("SomeInfo", new[] { "info" }, Array.Empty<WistImageMethod>());
 
-        var obj = WistCompiler.Instance.Compile(
-            new WistImageObject(
-                new[]
-                {
-                    mainClass
-                }
-            )
+        var obj = WistCompiler.Compile(
+            new WistImageObject(new[] { mainClass, class2 })
         );
 
 

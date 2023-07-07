@@ -4,40 +4,38 @@ using System.Reflection;
 using System.Reflection.Emit;
 using GrEmit;
 
-public class WistCompiler
+public static class WistCompiler
 {
-    private static WistCompiler? _instance;
-    private List<string> _args = null!;
+    private static List<string> _args = null!;
 
-    private List<WistClass> _classes = null!;
-    private WistClass _curClass = null!;
-    private Dictionary<string, GroboIL.Label> _labels = null!;
+    private static List<WistCompilerClass> _classes = null!;
+    private static WistCompilerClass _curClass = null!;
+    private static Dictionary<string, GroboIL.Label> _labels = null!;
 
-    private Dictionary<string, GroboIL.Local> _locals = null!;
-    public static WistCompiler Instance => _instance ??= new WistCompiler();
+    private static Dictionary<string, GroboIL.Local> _locals = null!;
 
-    public WistExecutableObject Compile(WistImageObject image)
+    public static WistExecutableObject Compile(WistImageObject image)
     {
-        _classes = new List<WistClass>();
+        _classes = new List<WistCompilerClass>();
         _locals = new Dictionary<string, GroboIL.Local>();
         _labels = new Dictionary<string, GroboIL.Label>();
 
+        foreach (var c in image.Classes) CreateClass(c.Fields, c.Name);
+
         foreach (var c in image.Classes)
         {
-            CreateClass(c.Fields);
-
             foreach (var m in c.Methods)
                 CreateMethod(m.Name, m.Args, m.Instructions);
         }
 
-        return new WistExecutableObject(_classes);
+        return new WistExecutableObject(_classes.Select(x => x.Class).ToList());
     }
 
-    private void CreateMethod(string name, string[] args, List<WistInstruction> instructions)
+    private static void CreateMethod(string name, string[] args, List<WistInstruction> instructions)
     {
         var m = new DynamicMethod(name, typeof(WistConst), new[] { typeof(WistConst) });
         var il = new GroboIL(m);
-        _curClass.AddMethod(name.GenerateHashCode(), m);
+        _curClass.Class.AddMethod(name.GenerateHashCode(), m);
         _args = args.ToList();
 
         foreach (var instr in instructions)
@@ -47,32 +45,47 @@ public class WistCompiler
     }
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Local
-    private void CreateClass(string[] fields)
+    private static void CreateClass(string[] fields, string name)
     {
-        _curClass = new WistClass(new List<(int id, WistConst value)>(), new List<(int id, DynamicMethod method)>());
+        _curClass = new WistCompilerClass(name,
+            new WistClass(new List<(int id, WistConst value)>(), new List<(int id, DynamicMethod method)>()));
         _classes.Add(_curClass);
+        WistCompilerHelper.Classes.Add(_curClass.Name.GenerateHashCode(), _curClass.Class);
 
         foreach (var f in fields)
-            _curClass.AddField(f.GenerateHashCode());
+            _curClass.Class.AddField(f.GenerateHashCode());
     }
 
-    private void CompileOneOp(GroboIL il, WistOp op, object const1)
+    private static void CompileOneOp(GroboIL il, WistOp op, object const1)
     {
         var constStr = (const1 as string)!;
         GroboIL.Local? classLocal;
         switch (op)
         {
             case WistOp.Add:
-                il.Call(typeof(WistConst).GetMethod("Sum"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.Sum)));
                 break;
             case WistOp.Sub:
-                il.Call(typeof(WistConst).GetMethod("Sub"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.Sub)));
                 break;
             case WistOp.Mul:
-                il.Call(typeof(WistConst).GetMethod("Mul"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.Mul)));
                 break;
             case WistOp.Div:
-                il.Call(typeof(WistConst).GetMethod("Div"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.Div)));
+                break;
+            case WistOp.CreateClass:
+                var cl = _classes.Find(x => x.Name == constStr) ??
+                         throw new WistError($"Can't find class with name {constStr}");
+
+                il.Ldc_I4(cl.Name.GenerateHashCode());
+                il.Call(typeof(WistCompilerHelper).GetMethod(nameof(WistCompilerHelper.PushClass)));
+
+                il.Newobj(typeof(WistConst).GetConstructor(
+                        BindingFlags.Public | BindingFlags.Instance,
+                        new[] { typeof(WistClass) }
+                    )
+                );
                 break;
             case WistOp.CallExternMethod:
                 il.Call((MethodInfo)const1);

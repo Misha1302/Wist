@@ -18,5 +18,6 @@ public enum WistOp
     LessThan,
     GoToIfTrue,
     LoadArg,
-    IsNotEquals
+    IsNotEquals,
+    CreateClass
 }
