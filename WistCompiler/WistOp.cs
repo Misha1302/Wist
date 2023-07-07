@@ -12,14 +12,18 @@ public enum WistOp
     SetField,
     LoadField,
     SetLabel,
-    GoTo,
+    Goto,
     CallExternMethod,
     Drop,
     LessThan,
-    GoToIfTrue,
+    GotoIfTrue,
     LoadArg,
     IsNotEquals,
     CreateClass,
     CallDynamicMethod,
-    Ret
+    Ret,
+    LessThanOrEquals,
+    GotoIfFalse,
+    Rem,
+    IsEquals
 }

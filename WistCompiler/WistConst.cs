@@ -110,7 +110,7 @@ public readonly struct WistConst
         return a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() - b.GetNumber()),
-            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+            _ => throw new WistError($"Cannot sub types: {a.Type} and {b.Type}")
         };
     }
 
@@ -120,7 +120,7 @@ public readonly struct WistConst
         return a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() * b.GetNumber()),
-            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+            _ => throw new WistError($"Cannot mul types: {a.Type} and {b.Type}")
         };
     }
 
@@ -130,7 +130,17 @@ public readonly struct WistConst
         return a.Type switch
         {
             WistType.Number => new WistConst(a.GetNumber() / b.GetNumber()),
-            _ => throw new WistError($"Cannot sum types: {a.Type} and {b.Type}")
+            _ => throw new WistError($"Cannot div types: {a.Type} and {b.Type}")
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static WistConst Rem(WistConst a, WistConst b)
+    {
+        return a.Type switch
+        {
+            WistType.Number => new WistConst(a.GetNumber() % b.GetNumber()),
+            _ => throw new WistError($"Cannot rem types: {a.Type} and {b.Type}")
         };
     }
 
@@ -189,4 +199,6 @@ public readonly struct WistConst
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static WistConst IsNotEquals(WistConst a, WistConst b) => new(!IsEquals(a, b).GetBool());
+
+    public override string ToString() => WistToStringManager.ToStr(this);
 }

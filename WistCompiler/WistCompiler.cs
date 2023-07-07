@@ -6,7 +6,7 @@ using GrEmit;
 
 public static class WistCompiler
 {
-    private static readonly List<string> _args = null!;
+    private static List<string> _args = null!;
 
     private static List<WistCompilerClass> _classes = null!;
     private static WistCompilerClass _curClass = null!;
@@ -16,6 +16,7 @@ public static class WistCompiler
 
     public static WistExecutableObject Compile(WistImageObject image)
     {
+        _args = new List<string>();
         _classes = new List<WistCompilerClass>();
         _locals = new Dictionary<string, GroboIL.Local>();
         _labels = new Dictionary<string, GroboIL.Label>();
@@ -26,8 +27,8 @@ public static class WistCompiler
         {
             foreach (var m in c.Methods)
             {
-                var dyn = WistDynamicMethodFabric.CreateDynamicMethod(m.Name);
-                _curClass.AddMethod(m.Name.GenerateHashCode(), dyn, m.Instructions);
+                var dyn = WistDynamicMethodFabric.CreateDynamicMethod(m.Name, m.Args.Length);
+                _curClass.AddMethod(m.Name.GenerateHashCode(), dyn, m.Instructions, m.Args.ToList());
             }
         }
 
@@ -35,9 +36,9 @@ public static class WistCompiler
         {
             foreach (var m in c.Class.GetAllMethods())
             {
-                var valueTuples = c.Class.GetAllMethods();
-                var valueTuple = valueTuples.First(x => x.Key == m.Key).Value;
-                var il = new GroboIL(valueTuple);
+                var il = new GroboIL(c.Class.GetAllMethods().First(x => x.Key == m.Key).Value);
+
+                _args = c.GetParams(m.Key);
 
                 foreach (var instr in c.GetInstructions(m.Key))
                     CompileOneOp(il, instr.Op, instr.Arg!);
@@ -61,6 +62,14 @@ public static class WistCompiler
 
     private static void CompileOneOp(GroboIL il, WistOp op, object const1)
     {
+        void GetBool()
+        {
+            var local = il.DeclareLocal(typeof(WistConst));
+            il.Stloc(local);
+            il.Ldloca(local);
+            il.Call(typeof(WistConst).GetMethod(nameof(WistConst.GetBool)));
+        }
+
         var constStr = (const1 as string)!;
 
         GroboIL.Local? classLocal;
@@ -77,6 +86,9 @@ public static class WistCompiler
                 break;
             case WistOp.Div:
                 il.Call(typeof(WistConst).GetMethod(nameof(WistConst.Div)));
+                break;
+            case WistOp.Rem:
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.Rem)));
                 break;
             case WistOp.CreateClass:
                 var cl = _classes.Find(x => x.Name == constStr) ??
@@ -110,28 +122,41 @@ public static class WistCompiler
                 il.Pop();
                 break;
             case WistOp.IsNotEquals:
-                il.Call(typeof(WistConst).GetMethod("IsNotEquals"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.IsNotEquals)));
+                break;
+            case WistOp.IsEquals:
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.IsEquals)));
                 break;
             case WistOp.LoadLocal:
                 il.Ldloc(_locals[constStr]);
                 break;
             case WistOp.SetLabel:
-                var label = il.DefineLabel(constStr);
-                il.MarkLabel(label);
-                _labels.Add(constStr, label);
+                if (!_labels.ContainsKey(constStr))
+                    _labels.Add(constStr, il.DefineLabel(constStr));
+                il.MarkLabel(_labels[constStr]);
                 break;
-            case WistOp.GoTo:
+            case WistOp.Goto:
+                if (!_labels.ContainsKey(constStr))
+                    _labels.Add(constStr, il.DefineLabel(constStr));
                 il.Br(_labels[constStr]);
                 break;
-            case WistOp.GoToIfTrue:
-                var name = il.DeclareLocal(typeof(WistConst));
-                il.Stloc(name);
-                il.Ldloca(name);
-                il.Call(typeof(WistConst).GetMethod("GetBool"));
+            case WistOp.GotoIfTrue:
+                if (!_labels.ContainsKey(constStr))
+                    _labels.Add(constStr, il.DefineLabel(constStr));
+                GetBool();
                 il.Brtrue(_labels[constStr]);
                 break;
+            case WistOp.GotoIfFalse:
+                if (!_locals.ContainsKey(constStr))
+                    _labels.Add(constStr, il.DefineLabel(constStr));
+                GetBool();
+                il.Brfalse(_labels[constStr]);
+                break;
             case WistOp.LessThan:
-                il.Call(typeof(WistConst).GetMethod("LessThan"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.LessThan)));
+                break;
+            case WistOp.LessThanOrEquals:
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.LessThanOrEquals)));
                 break;
             case WistOp.SetLocal:
                 if (!_locals.ContainsKey(constStr))
@@ -145,11 +170,11 @@ public static class WistCompiler
 
                 il.Stloc(classLocal); // class
                 il.Ldloca(classLocal); // class
-                il.Call(typeof(WistConst).GetMethod("GetClass")); // class
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.GetClass))); // class
 
                 il.Ldc_I4(constStr.GenerateHashCode()); // id
                 il.Ldloc(valueLocal); // value
-                il.Call(typeof(WistClass).GetMethod("SetField")); // int id, WistConst value
+                il.Call(typeof(WistClass).GetMethod(nameof(WistClass.SetField))); // int id, WistConst value
                 break;
             case WistOp.LoadArg:
                 il.Ldarg(_args.IndexOf(constStr));
@@ -162,9 +187,9 @@ public static class WistCompiler
                 il.Stloc(classLocal); // class
                 il.Ldloca(classLocal); // class
 
-                il.Call(typeof(WistConst).GetMethod("GetClass"));
+                il.Call(typeof(WistConst).GetMethod(nameof(WistConst.GetClass)));
                 il.Ldc_I4(constStr.GenerateHashCode()); // id
-                il.Call(typeof(WistClass).GetMethod("GetField"));
+                il.Call(typeof(WistClass).GetMethod(nameof(WistClass.GetField)));
                 break;
             case WistOp.Push:
                 Type type;
