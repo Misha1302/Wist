@@ -19,5 +19,7 @@ public enum WistOp
     GoToIfTrue,
     LoadArg,
     IsNotEquals,
-    CreateClass
+    CreateClass,
+    CallDynamicMethod,
+    Ret
 }

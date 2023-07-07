@@ -6,7 +6,7 @@ using GrEmit;
 
 public static class WistCompiler
 {
-    private static List<string> _args = null!;
+    private static readonly List<string> _args = null!;
 
     private static List<WistCompilerClass> _classes = null!;
     private static WistCompilerClass _curClass = null!;
@@ -25,23 +25,26 @@ public static class WistCompiler
         foreach (var c in image.Classes)
         {
             foreach (var m in c.Methods)
-                CreateMethod(m.Name, m.Args, m.Instructions);
+            {
+                var dyn = WistDynamicMethodFabric.CreateDynamicMethod(m.Name);
+                _curClass.AddMethod(m.Name.GenerateHashCode(), dyn, m.Instructions);
+            }
+        }
+
+        foreach (var c in _classes)
+        {
+            foreach (var m in c.Class.GetAllMethods())
+            {
+                var valueTuples = c.Class.GetAllMethods();
+                var valueTuple = valueTuples.First(x => x.Key == m.Key).Value;
+                var il = new GroboIL(valueTuple);
+
+                foreach (var instr in c.GetInstructions(m.Key))
+                    CompileOneOp(il, instr.Op, instr.Arg!);
+            }
         }
 
         return new WistExecutableObject(_classes.Select(x => x.Class).ToList());
-    }
-
-    private static void CreateMethod(string name, string[] args, List<WistInstruction> instructions)
-    {
-        var m = new DynamicMethod(name, typeof(WistConst), new[] { typeof(WistConst) });
-        var il = new GroboIL(m);
-        _curClass.Class.AddMethod(name.GenerateHashCode(), m);
-        _args = args.ToList();
-
-        foreach (var instr in instructions)
-            CompileOneOp(il, instr.Op, instr.Arg!);
-
-        il.Ret();
     }
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Local
@@ -59,6 +62,7 @@ public static class WistCompiler
     private static void CompileOneOp(GroboIL il, WistOp op, object const1)
     {
         var constStr = (const1 as string)!;
+
         GroboIL.Local? classLocal;
         switch (op)
         {
@@ -88,7 +92,19 @@ public static class WistCompiler
                 );
                 break;
             case WistOp.CallExternMethod:
-                il.Call((MethodInfo)const1);
+                var m = (MethodInfo)const1;
+
+                il.Ldc_IntPtr(m.MethodHandle.GetFunctionPointer());
+                var parameterTypes = m.GetParameters().Select(x => x.ParameterType).ToArray();
+                il.Calli(CallingConventions.Standard, typeof(WistConst), parameterTypes);
+                break;
+            case WistOp.CallDynamicMethod:
+                var dynamicMethod = _classes.SelectMany(x => x.Class.GetAllMethods())
+                    .FirstOrDefault(x => x.Key == constStr.GenerateHashCode());
+                if (dynamicMethod == default || dynamicMethod.Value is null)
+                    throw new WistError($"Can't find method with name {constStr}");
+
+                il.Call(dynamicMethod.Value);
                 break;
             case WistOp.Drop:
                 il.Pop();
@@ -137,6 +153,9 @@ public static class WistCompiler
                 break;
             case WistOp.LoadArg:
                 il.Ldarg(_args.IndexOf(constStr));
+                break;
+            case WistOp.Ret:
+                il.Ret();
                 break;
             case WistOp.LoadField:
                 classLocal = il.DeclareLocal(typeof(WistConst));
