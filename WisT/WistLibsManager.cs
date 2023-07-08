@@ -1,6 +1,7 @@
 ﻿namespace WisT;
 
 using System.Reflection;
+using WistCompiler;
 
 public class WistLibsManager
 {

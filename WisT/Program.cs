@@ -19,5 +19,5 @@ var simpleContext = simpleParser.program();
 var visitor = new WistGrammarVisitor();
 
 var image = visitor.CompileCode(simpleContext, dir);
-var method = WistCompiler.WistCompiler.Instance.Compile(image);
-Console.WriteLine($"main func returned: {method.Invoke(null, null)}");
+var exe = WistCompiler.WistCompiler.Compile(image);
+Console.WriteLine($"main func returned: {exe.Execute()}");
